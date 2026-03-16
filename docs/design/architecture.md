@@ -93,12 +93,12 @@ Spring Bootのみがデータベースに直接アクセスする。
   HTTP Client:  Axios
 
 API Gateway (.NET):
-  フレームワーク: ASP.NET Core 9 (Minimal API)
+  フレームワーク: ASP.NET Core 10 (.NET 10 / Minimal API)
   認証:          ASP.NET Core JWT Bearer
   プロキシ:      YARP (Yet Another Reverse Proxy)
 
 バックエンド (Java):
-  フレームワーク: Spring Boot 3.x (Java 21)
+  フレームワーク: Spring Boot 3.5.x (Java 25 LTS)
   API形式:       RESTful API
   ORM:          Spring Data JPA (Hibernate)
   バリデーション: Bean Validation

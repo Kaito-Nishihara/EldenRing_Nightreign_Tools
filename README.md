@@ -18,8 +18,8 @@ Next.js (3000) → .NET Gateway (8080) → Spring Boot (8081) → PostgreSQL (54
 | サービス | 技術 | 責務 |
 |---------|------|------|
 | frontend | Next.js 15 + TypeScript | UI・マップ描画・PWA |
-| gateway | ASP.NET Core 9 + YARP | API Gateway・JWT認証 |
-| backend | Spring Boot 3.x (Java 21) + Flyway | マスタ管理・パターン検索・記録集計 |
+| gateway | ASP.NET Core 10 + YARP | API Gateway・JWT認証 |
+| backend | Spring Boot 3.5.x (Java 25) + Flyway | マスタ管理・パターン検索・記録集計 |
 | db | PostgreSQL 16 | データ永続化 |
 
 ## 起動方法

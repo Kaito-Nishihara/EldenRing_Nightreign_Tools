@@ -115,6 +115,9 @@ CREATE TABLE shrink_entries (
 
 ## 3. ER図
 
+DBML ファイル: [`er_diagram.dbml`](er_diagram.dbml)
+[dbdiagram.io](https://dbdiagram.io) にペーストすると図として表示される。
+
 ```
 bosses 1──* boss_weaknesses
 

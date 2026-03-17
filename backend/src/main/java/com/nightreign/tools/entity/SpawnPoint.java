@@ -40,6 +40,12 @@ public class SpawnPoint {
     public SpawnPoint() {
     }
 
+    /** 初回永続化時にcreatedAtを自動設定する */
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
     // --- Getter / Setter ---
 
     public Integer getId() {

@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* 将来的な設定拡張のためのプレースホルダー */
+  webpack: (config, { isServer }) => {
+    // Konva.jsはSSR非対応のため、サーバーサイドでcanvasモジュールを除外
+    if (isServer) {
+      config.externals = [...(config.externals || []), "canvas"];
+    }
+    return config;
+  },
 };
 
 export default nextConfig;

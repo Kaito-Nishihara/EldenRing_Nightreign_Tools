@@ -44,7 +44,7 @@ apiClient.interceptors.response.use(
  * ボス一覧を取得する
  */
 export async function getBosses(): Promise<Boss[]> {
-  const response = await apiClient.get<Boss[]>("/api/bosses");
+  const response = await apiClient.get<Boss[]>("/api/v1/bosses");
   return response.data;
 }
 
@@ -52,7 +52,7 @@ export async function getBosses(): Promise<Boss[]> {
  * 地変一覧を取得する
  */
 export async function getJihen(): Promise<Jihen[]> {
-  const response = await apiClient.get<Jihen[]>("/api/jihen");
+  const response = await apiClient.get<Jihen[]>("/api/v1/jihen");
   return response.data;
 }
 
@@ -60,7 +60,7 @@ export async function getJihen(): Promise<Jihen[]> {
  * 収縮候補地一覧を取得する
  */
 export async function getShrinkZones(): Promise<ShrinkZone[]> {
-  const response = await apiClient.get<ShrinkZone[]>("/api/shrink-zones");
+  const response = await apiClient.get<ShrinkZone[]>("/api/v1/shrink-zones");
   return response.data;
 }
 
@@ -68,7 +68,7 @@ export async function getShrinkZones(): Promise<ShrinkZone[]> {
  * 開始地点一覧を取得する
  */
 export async function getSpawnPoints(): Promise<SpawnPoint[]> {
-  const response = await apiClient.get<SpawnPoint[]>("/api/spawn-points");
+  const response = await apiClient.get<SpawnPoint[]>("/api/v1/spawn-points");
   return response.data;
 }
 
@@ -90,7 +90,7 @@ export async function getPatterns(
   if (jihenId) {
     params.jihenId = jihenId;
   }
-  const response = await apiClient.get<PatternResponse>("/api/patterns", {
+  const response = await apiClient.get<PatternResponse>("/api/v1/patterns", {
     params,
   });
   return response.data;
@@ -104,7 +104,7 @@ export async function createPlayRecord(
   request: PlayRecordRequest
 ): Promise<{ id: number; createdAt: string }> {
   const response = await apiClient.post<{ id: number; createdAt: string }>(
-    "/api/play-records",
+    "/api/v1/play-records",
     request
   );
   return response.data;

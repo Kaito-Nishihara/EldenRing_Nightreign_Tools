@@ -1,0 +1,20 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/nightreign}
+    username: ${DB_USER:nightreign}
+    password: ${DB_PASSWORD:nightreign}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: game
+  flyway:
+    schemas: game
+    baseline-on-migrate: true
+
+app:
+  service-key: ${SERVICE_KEY:default-dev-key}

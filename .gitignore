@@ -1,0 +1,31 @@
+# 環境変数
+.env
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node.js (frontend)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# Java (backend)
+backend/.gradle/
+backend/build/
+backend/bin/
+backend/out/
+backend/gradle/wrapper/gradle-wrapper.jar
+
+# .NET (gateway)
+gateway/bin/
+gateway/obj/
+
+# Docker
+docker-compose.override.yml

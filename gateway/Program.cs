@@ -10,8 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 // サービス登録
 // ==========================================
 
-// JWT サービスをシングルトンとして登録
-builder.Services.AddSingleton<JwtService>();
+// JWT サービスをシングルトンとして登録（認証ミドルウェアと共有するため先にインスタンス化）
+var jwtServiceInstance = new JwtService(builder.Configuration);
+builder.Services.AddSingleton(jwtServiceInstance);
 
 // CORS 設定（フロントエンドからのアクセスを許可）
 builder.Services.AddCors(options =>
@@ -30,18 +31,15 @@ builder.Services.AddCors(options =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        // JwtService を構築して署名キーを取得
-        var jwtService = new JwtService(builder.Configuration);
-
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = jwtService.Issuer,
+            ValidIssuer = jwtServiceInstance.Issuer,
             ValidateAudience = true,
-            ValidAudience = jwtService.Audience,
+            ValidAudience = jwtServiceInstance.Audience,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = jwtService.GetSigningKey(),
+            IssuerSigningKey = jwtServiceInstance.GetSigningKey(),
             ClockSkew = TimeSpan.FromMinutes(1)
         };
     });

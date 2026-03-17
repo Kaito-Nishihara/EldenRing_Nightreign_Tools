@@ -28,6 +28,7 @@ CREATE TABLE bosses (
     id               VARCHAR(50)  PRIMARY KEY,        -- 例: 'gladius'
     name_ja          VARCHAR(100) NOT NULL,
     name_en          VARCHAR(100),
+    image_path       VARCHAR(200),                     -- ボス画像パス（例: /images/bosses/gladius.webp）
     is_dlc           BOOLEAN      NOT NULL DEFAULT FALSE,
     unlock_condition VARCHAR(200),
     created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -50,6 +51,7 @@ CREATE TABLE boss_weaknesses (
 CREATE TABLE jihen (
     id               VARCHAR(50)  PRIMARY KEY,        -- 例: 'crater'
     name_ja          VARCHAR(100) NOT NULL,
+    image_path       VARCHAR(200),                     -- 地変画像パス（例: /images/jihen/crater.webp）
     area             VARCHAR(50)  NOT NULL,
     center_x         DECIMAL(5,4) NOT NULL,            -- マップ上のX座標（0.0〜1.0）
     center_y         DECIMAL(5,4) NOT NULL,            -- マップ上のY座標（0.0〜1.0）
@@ -65,6 +67,7 @@ CREATE TABLE jihen (
 CREATE TABLE shrink_zones (
     id         SERIAL       PRIMARY KEY,
     name_ja    VARCHAR(100) NOT NULL,
+    icon_path  VARCHAR(200),                            -- エリアアイコン画像パス
     center_x   DECIMAL(5,4) NOT NULL,                  -- マップ上のX座標（0.0〜1.0）
     center_y   DECIMAL(5,4) NOT NULL,                  -- マップ上のY座標（0.0〜1.0）
     radius     DECIMAL(5,4) NOT NULL,                  -- 収縮円の半径

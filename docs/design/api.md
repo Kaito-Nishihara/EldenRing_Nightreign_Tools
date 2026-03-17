@@ -38,6 +38,7 @@
     "id": "gladius",
     "nameJa": "三つ首の獣（グラディウス）",
     "nameEn": "Gladius, Beast Regent",
+    "imagePath": "/images/bosses/gladius.webp",
     "weaknesses": ["holy"],
     "isDlc": false,
     "unlockCondition": "最初から選択可能"
@@ -53,6 +54,7 @@
   {
     "id": "crater",
     "nameJa": "火口",
+    "imagePath": "/images/jihen/crater.webp",
     "area": "north",
     "centerX": 0.50,
     "centerY": 0.20,
@@ -70,6 +72,7 @@
   {
     "id": 1,
     "nameJa": "北砦付近",
+    "iconPath": "/images/zones/zone_01.webp",
     "centerX": 0.45,
     "centerY": 0.20,
     "radius": 0.08

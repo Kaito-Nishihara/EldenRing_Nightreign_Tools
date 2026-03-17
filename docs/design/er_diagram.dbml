@@ -5,6 +5,7 @@ Table bosses {
   id               varchar(50)  [pk, note: '例: gladius']
   name_ja          varchar(100) [not null]
   name_en          varchar(100)
+  image_path       varchar(200) [note: 'ボス画像パス 例: /images/bosses/gladius.webp']
   is_dlc           boolean      [not null, default: false]
   unlock_condition varchar(200)
   created_at       timestamp    [not null, default: `CURRENT_TIMESTAMP`]
@@ -19,6 +20,7 @@ Table boss_weaknesses {
 Table jihen {
   id               varchar(50)  [pk, note: '例: crater']
   name_ja          varchar(100) [not null]
+  image_path       varchar(200) [note: '地変画像パス 例: /images/jihen/crater.webp']
   area             varchar(50)  [not null]
   center_x         decimal(5,4) [not null, note: 'マップ上のX座標 0.0〜1.0']
   center_y         decimal(5,4) [not null, note: 'マップ上のY座標 0.0〜1.0']
@@ -30,6 +32,7 @@ Table jihen {
 Table shrink_zones {
   id         serial       [pk]
   name_ja    varchar(100) [not null]
+  icon_path  varchar(200) [note: 'エリアアイコン画像パス']
   center_x   decimal(5,4) [not null, note: 'マップ上のX座標 0.0〜1.0']
   center_y   decimal(5,4) [not null, note: 'マップ上のY座標 0.0〜1.0']
   radius     decimal(5,4) [not null, note: '収縮円の半径']

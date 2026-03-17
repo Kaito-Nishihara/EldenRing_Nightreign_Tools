@@ -142,6 +142,12 @@ EldenRing_Nightreign_Tools/
 │       └── api.md
 ├── frontend/                              # Next.js
 │   ├── Dockerfile
+│   ├── public/
+│   │   └── images/
+│   │       ├── map/                       # マップ画像
+│   │       ├── bosses/                    # ボス画像（サムネイル）
+│   │       ├── jihen/                     # 地変画像（サムネイル）
+│   │       └── zones/                     # 収縮候補地アイコン
 │   └── src/
 │       ├── app/
 │       │   ├── page.tsx                   # メイン画面（条件選択 + パターン表示）

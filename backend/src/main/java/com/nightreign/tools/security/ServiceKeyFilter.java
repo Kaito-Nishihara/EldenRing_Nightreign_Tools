@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.LocalDateTime;
 
 /**
@@ -44,7 +46,7 @@ public class ServiceKeyFilter extends OncePerRequestFilter {
 
         String headerValue = request.getHeader(SERVICE_KEY_HEADER);
 
-        if (headerValue == null || !headerValue.equals(serviceKey)) {
+        if (headerValue == null || !isEqual(headerValue, serviceKey)) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding("UTF-8");
@@ -58,6 +60,16 @@ public class ServiceKeyFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * タイミング攻撃を防ぐための定数時間比較
+     */
+    private boolean isEqual(String a, String b) {
+        return MessageDigest.isEqual(
+                a.getBytes(StandardCharsets.UTF_8),
+                b.getBytes(StandardCharsets.UTF_8)
+        );
     }
 
     /**

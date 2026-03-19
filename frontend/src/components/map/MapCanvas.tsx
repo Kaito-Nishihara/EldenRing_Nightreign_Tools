@@ -100,10 +100,11 @@ export default function MapCanvas({
 
   /** マウスホイールによるズーム操作 */
   const handleWheel = useCallback(
-    (e: { evt: WheelEvent; target: { getStage: () => { getPointerPosition: () => { x: number; y: number } | null } } }) => {
+    (e: { evt: WheelEvent; target: { getStage: () => { getPointerPosition: () => { x: number; y: number } | null } | null } }) => {
       e.evt.preventDefault();
 
       const stage = e.target.getStage();
+      if (!stage) return;
       const pointer = stage.getPointerPosition();
       if (!pointer) return;
 

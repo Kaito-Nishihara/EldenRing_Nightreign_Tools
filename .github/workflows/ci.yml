@@ -6,15 +6,15 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   backend:
     name: Backend (Spring Boot)
     runs-on: ubuntu-latest
     # backendディレクトリに変更がある場合のみ実行
-    if: >
-      github.event_name == 'push' ||
-      contains(join(github.event.pull_request.labels.*.name, ','), 'backend') ||
-      true
     defaults:
       run:
         working-directory: backend

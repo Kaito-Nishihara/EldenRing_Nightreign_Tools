@@ -5,6 +5,7 @@ import com.nightreign.tools.dto.PlayRecordResponse;
 import com.nightreign.tools.dto.ShrinkEntryRequest;
 import com.nightreign.tools.entity.*;
 import com.nightreign.tools.repository.*;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,20 +45,20 @@ public class PlayRecordService {
     public PlayRecordResponse createPlayRecord(PlayRecordRequest request) {
         // ボスの存在チェック
         Boss boss = bossRepository.findById(request.bossId())
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         "bossId '" + request.bossId() + "' は存在しません"));
 
         // 地変の存在チェック（任意項目）
         Jihen jihen = null;
         if (request.jihenId() != null && !request.jihenId().isBlank()) {
             jihen = jihenRepository.findById(request.jihenId())
-                    .orElseThrow(() -> new IllegalArgumentException(
+                    .orElseThrow(() -> new EntityNotFoundException(
                             "jihenId '" + request.jihenId() + "' は存在しません"));
         }
 
         // 開始地点の存在チェック
         SpawnPoint spawnPoint = spawnPointRepository.findById(request.spawnPointId())
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         "spawnPointId '" + request.spawnPointId() + "' は存在しません"));
 
         // day+phaseの重複チェック
@@ -80,7 +81,7 @@ public class PlayRecordService {
         // 収縮エントリの作成
         for (ShrinkEntryRequest entryReq : request.entries()) {
             ShrinkZone zone = shrinkZoneRepository.findById(entryReq.zoneId())
-                    .orElseThrow(() -> new IllegalArgumentException(
+                    .orElseThrow(() -> new EntityNotFoundException(
                             "zoneId '" + entryReq.zoneId() + "' は存在しません"));
 
             ShrinkEntry entry = new ShrinkEntry();

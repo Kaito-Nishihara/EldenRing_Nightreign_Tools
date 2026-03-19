@@ -10,25 +10,42 @@ jobs:
   backend:
     name: Backend (Spring Boot)
     runs-on: ubuntu-latest
+    # backendディレクトリに変更がある場合のみ実行
+    if: >
+      github.event_name == 'push' ||
+      contains(join(github.event.pull_request.labels.*.name, ','), 'backend') ||
+      true
     defaults:
       run:
         working-directory: backend
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check backend changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+
       - name: Setup Java 21
+        if: steps.changes.outputs.backend == 'true' || github.event_name == 'push'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
       - name: Setup Gradle
+        if: steps.changes.outputs.backend == 'true' || github.event_name == 'push'
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build
+        if: steps.changes.outputs.backend == 'true' || github.event_name == 'push'
         run: gradle build -x test
 
       - name: Test
+        if: steps.changes.outputs.backend == 'true' || github.event_name == 'push'
         run: gradle test
 
   gateway:
@@ -40,15 +57,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check gateway changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            gateway:
+              - 'gateway/**'
+
       - name: Setup .NET 10
+        if: steps.changes.outputs.gateway == 'true' || github.event_name == 'push'
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
 
       - name: Restore
+        if: steps.changes.outputs.gateway == 'true' || github.event_name == 'push'
         run: dotnet restore
 
       - name: Build
+        if: steps.changes.outputs.gateway == 'true' || github.event_name == 'push'
         run: dotnet build --no-restore -c Release
 
   frontend:
@@ -60,16 +88,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check frontend changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+
       - name: Setup Node.js 20
+        if: steps.changes.outputs.frontend == 'true' || github.event_name == 'push'
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Install dependencies
+        if: steps.changes.outputs.frontend == 'true' || github.event_name == 'push'
         run: npm install
 
       - name: Lint
+        if: steps.changes.outputs.frontend == 'true' || github.event_name == 'push'
         run: npm run lint
 
       - name: Build
+        if: steps.changes.outputs.frontend == 'true' || github.event_name == 'push'
         run: npm run build

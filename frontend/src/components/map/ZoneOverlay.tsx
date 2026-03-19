@@ -1,23 +1,6 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import type { ShrinkZone } from "@/types";
-
-/**
- * react-konvaはSSR非対応のため、dynamic importで読み込む
- */
-const Circle = dynamic(
-  () => import("react-konva").then((mod) => mod.Circle),
-  { ssr: false }
-);
-const Text = dynamic(
-  () => import("react-konva").then((mod) => mod.Text),
-  { ssr: false }
-);
-const Group = dynamic(
-  () => import("react-konva").then((mod) => mod.Group),
-  { ssr: false }
-);
 
 /** ゾーンの表示色（通常・選択時） */
 const ZONE_COLOR = {
@@ -39,15 +22,20 @@ interface ZoneOverlayProps {
 /**
  * 収縮候補地オーバーレイコンポーネント
  * マップ上に12ゾーンを半透明の円で表示する
+ * 親のMapCanvasがdynamic importでSSR隔離済みのため、requireで直接取得する
  */
 export default function ZoneOverlay({
   zones,
   selectedZoneId,
   onZoneSelect,
 }: ZoneOverlayProps) {
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  const { Circle, Text, Group } = require("react-konva");
+  /* eslint-enable @typescript-eslint/no-require-imports */
+
   return (
     <>
-      {zones.map((zone) => {
+      {zones.map((zone: ShrinkZone) => {
         const isSelected = zone.id === selectedZoneId;
 
         return (

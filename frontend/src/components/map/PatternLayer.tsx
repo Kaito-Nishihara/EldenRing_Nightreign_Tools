@@ -1,25 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import dynamic from "next/dynamic";
 import type { Pattern } from "@/types";
-
-const Group = dynamic(
-  () => import("react-konva").then((mod) => mod.Group),
-  { ssr: false }
-);
-const Circle = dynamic(
-  () => import("react-konva").then((mod) => mod.Circle),
-  { ssr: false }
-);
-const Line = dynamic(
-  () => import("react-konva").then((mod) => mod.Line),
-  { ssr: false }
-);
-const Text = dynamic(
-  () => import("react-konva").then((mod) => mod.Text),
-  { ssr: false }
-);
 
 /**
  * 色覚多様性対応カラーパレット
@@ -55,12 +37,17 @@ interface PatternLayerProps {
  * パターン描画レイヤー
  * パターンごとに色分けした収縮円を描画し、
  * Day間の遷移を線で接続する
+ * 親のMapCanvasがdynamic importでSSR隔離済みのため、requireで直接取得する
  */
 export default function PatternLayer({
   patterns,
   selectedPatternIndex,
   onPatternSelect,
 }: PatternLayerProps) {
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  const { Group, Circle, Line, Text } = require("react-konva");
+  /* eslint-enable @typescript-eslint/no-require-imports */
+
   /** パターンクリック時のハンドラー */
   const handlePatternClick = useCallback(
     (patternIndex: number) => {

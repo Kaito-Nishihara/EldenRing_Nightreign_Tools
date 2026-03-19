@@ -1,20 +1,6 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import type { SpawnPoint, ShrinkZone } from "@/types";
-
-const Circle = dynamic(
-  () => import("react-konva").then((mod) => mod.Circle),
-  { ssr: false }
-);
-const Text = dynamic(
-  () => import("react-konva").then((mod) => mod.Text),
-  { ssr: false }
-);
-const Group = dynamic(
-  () => import("react-konva").then((mod) => mod.Group),
-  { ssr: false }
-);
 
 interface AdminOverlayProps {
   /** 登録済み開始地点 */
@@ -38,10 +24,12 @@ interface AdminOverlayProps {
 /**
  * 管理画面用マップオーバーレイ
  * 登録済みマスタデータとクリック位置を表示する
+ * 親のMapCanvasがdynamic importでSSR隔離済みのため、requireで直接取得する
  */
 export default function AdminOverlay({
   spawnPoints,
   shrinkZones,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   editMode,
   clickedPosition,
   editingSpawnPointId,
@@ -49,6 +37,10 @@ export default function AdminOverlay({
   onSpawnPointClick,
   onShrinkZoneClick,
 }: AdminOverlayProps) {
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  const { Circle, Text, Group } = require("react-konva");
+  /* eslint-enable @typescript-eslint/no-require-imports */
+
   return (
     <>
       {/* 収縮候補地を円で表示 */}
@@ -120,7 +112,7 @@ export default function AdminOverlay({
             x={clickedPosition.x}
             y={clickedPosition.y}
             radius={5}
-            fill={editMode === "spawn-point" ? "#f59e0b" : "#f59e0b"}
+            fill="#f59e0b"
             stroke="#ffffff"
             strokeWidth={2}
           />

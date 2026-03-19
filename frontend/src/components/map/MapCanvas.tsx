@@ -3,26 +3,6 @@
 import { useRef, useState, useCallback, useEffect, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 
-/**
- * react-konvaはSSR非対応のため、dynamic importで読み込む
- */
-const Stage = dynamic(
-  () => import("react-konva").then((mod) => mod.Stage),
-  { ssr: false }
-);
-const Layer = dynamic(
-  () => import("react-konva").then((mod) => mod.Layer),
-  { ssr: false }
-);
-const Rect = dynamic(
-  () => import("react-konva").then((mod) => mod.Rect),
-  { ssr: false }
-);
-const KonvaImage = dynamic(
-  () => import("react-konva").then((mod) => mod.Image),
-  { ssr: false }
-);
-
 /** マップキャンバスのデフォルトサイズ */
 const DEFAULT_MAP_WIDTH = 1024;
 const DEFAULT_MAP_HEIGHT = 1024;
@@ -45,27 +25,25 @@ interface MapCanvasProps {
 }
 
 /**
- * マップキャンバスコンポーネント
- * react-konvaを使用してマップ画像を表示し、ズーム・パン操作に対応する
+ * MapCanvasの内部実装
+ * react-konvaのimportをSSRから隔離するため、このコンポーネントをdynamic importする
  */
-export default function MapCanvas({
+function MapCanvasInner({
   mapImagePath,
   width = DEFAULT_MAP_WIDTH,
   height = DEFAULT_MAP_HEIGHT,
   children,
   onStageClick,
 }: MapCanvasProps) {
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  const { Stage, Layer, Rect, Image: KonvaImage } = require("react-konva");
+  /* eslint-enable @typescript-eslint/no-require-imports */
+
   const containerRef = useRef<HTMLDivElement>(null);
   const [stageSize, setStageSize] = useState({ width: 800, height: 600 });
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [mapImage, setMapImage] = useState<HTMLImageElement | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  /** クライアントサイドでのみレンダリングするためのフラグ */
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   /** コンテナサイズの変更を監視してステージサイズを更新する */
   useEffect(() => {
@@ -103,7 +81,8 @@ export default function MapCanvas({
 
   /** マウスホイールによるズーム操作 */
   const handleWheel = useCallback(
-    (e: { evt: WheelEvent; target: { getStage: () => { getPointerPosition: () => { x: number; y: number } | null } | null } }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (e: any) => {
       e.evt.preventDefault();
 
       const stage = e.target.getStage();
@@ -118,7 +97,6 @@ export default function MapCanvas({
           ? Math.min(oldScale * scaleBy, MAX_SCALE)
           : Math.max(oldScale / scaleBy, MIN_SCALE);
 
-      // ポインター位置を中心にズームする
       const mousePointTo = {
         x: (pointer.x - position.x) / oldScale,
         y: (pointer.y - position.y) / oldScale,
@@ -135,14 +113,14 @@ export default function MapCanvas({
 
   /** ステージクリック時にマップ座標を計算して親に通知する */
   const handleStageClick = useCallback(
-    (e: { target: { getStage: () => { getPointerPosition: () => { x: number; y: number } | null } | null } }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (e: any) => {
       if (!onStageClick) return;
       const stage = e.target.getStage();
       if (!stage) return;
       const pointer = stage.getPointerPosition();
       if (!pointer) return;
 
-      // スクリーン座標をマップ座標に変換
       const mapX = (pointer.x - position.x) / scale;
       const mapY = (pointer.y - position.y) / scale;
 
@@ -153,7 +131,8 @@ export default function MapCanvas({
 
   /** ドラッグ終了時の位置更新 */
   const handleDragEnd = useCallback(
-    (e: { target: { x: () => number; y: () => number } }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (e: any) => {
       setPosition({
         x: e.target.x(),
         y: e.target.y(),
@@ -167,38 +146,34 @@ export default function MapCanvas({
       ref={containerRef}
       className="w-full h-full bg-gray-900 overflow-hidden relative"
     >
-      {isClient && (
-        <Stage
-          width={stageSize.width}
-          height={stageSize.height}
-          scaleX={scale}
-          scaleY={scale}
-          x={position.x}
-          y={position.y}
-          draggable
-          onWheel={handleWheel}
-          onDragEnd={handleDragEnd}
-          onClick={handleStageClick}
-          onTap={handleStageClick}
-        >
-          <Layer>
-            {/* マップ画像またはプレースホルダー */}
-            {mapImage ? (
-              <KonvaImage image={mapImage} width={width} height={height} />
-            ) : (
-              <Rect
-                width={width}
-                height={height}
-                fill="#374151"
-                stroke="#6B7280"
-                strokeWidth={2}
-              />
-            )}
-          </Layer>
-          {/* オーバーレイ用レイヤー（子コンポーネント） */}
-          <Layer>{children}</Layer>
-        </Stage>
-      )}
+      <Stage
+        width={stageSize.width}
+        height={stageSize.height}
+        scaleX={scale}
+        scaleY={scale}
+        x={position.x}
+        y={position.y}
+        draggable
+        onWheel={handleWheel}
+        onDragEnd={handleDragEnd}
+        onClick={handleStageClick}
+        onTap={handleStageClick}
+      >
+        <Layer>
+          {mapImage ? (
+            <KonvaImage image={mapImage} width={width} height={height} />
+          ) : (
+            <Rect
+              width={width}
+              height={height}
+              fill="#374151"
+              stroke="#6B7280"
+              strokeWidth={2}
+            />
+          )}
+        </Layer>
+        <Layer>{children}</Layer>
+      </Stage>
 
       {/* ズーム表示 */}
       <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
@@ -207,3 +182,18 @@ export default function MapCanvas({
     </div>
   );
 }
+
+/**
+ * マップキャンバスコンポーネント
+ * react-konvaはSSR非対応のため、dynamic importでクライアントのみ描画する
+ */
+const MapCanvas = dynamic(() => Promise.resolve(MapCanvasInner), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full bg-gray-900 flex items-center justify-center">
+      <span className="text-gray-500 text-sm">マップを読み込み中...</span>
+    </div>
+  ),
+});
+
+export default MapCanvas;

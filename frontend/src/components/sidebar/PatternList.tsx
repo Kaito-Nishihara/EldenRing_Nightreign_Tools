@@ -1,6 +1,8 @@
 "use client";
 
+import { useMemo } from "react";
 import type { PatternResponse } from "@/types";
+import { getPatternColor } from "@/components/map/PatternLayer";
 
 interface PatternListProps {
   /** パターン検索結果 */
@@ -9,17 +11,38 @@ interface PatternListProps {
   loading?: boolean;
   /** エラー情報 */
   error?: string | null;
+  /** 選択中のパターンインデックス */
+  selectedPatternIndex?: number | null;
+  /** パターン選択ハンドラー */
+  onPatternSelect?: (patternIndex: number | null) => void;
 }
 
 /**
  * パターン一覧
- * 検索結果のパターンを記録件数順に表示する
+ * 検索結果のパターンを記録件数順に表示し、マップとハイライト連動する
  */
 export default function PatternList({
   data,
   loading = false,
   error = null,
+  selectedPatternIndex = null,
+  onPatternSelect,
 }: PatternListProps) {
+  /** 統計テキストを生成 */
+  const statsText = useMemo(() => {
+    if (!data || data.patterns.length === 0 || data.totalRecords === 0) return null;
+
+    const top = data.patterns[0];
+    if (!top || top.entries.length === 0) return null;
+
+    const ratio = Math.round((top.recordCount / data.totalRecords) * 100);
+    /** Day1-P1のゾーン名を統計テキストに使用 */
+    const firstEntry = top.entries.find((e) => e.day === 1 && e.phase === 1);
+    if (!firstEntry) return null;
+
+    return `${data.totalRecords}回中${top.recordCount}回(${ratio}%)は${firstEntry.zone.nameJa}付近`;
+  }, [data]);
+
   if (error) {
     return (
       <div className="p-4 border border-red-700 rounded-lg bg-red-900/20">
@@ -61,40 +84,67 @@ export default function PatternList({
         </span>
       </div>
 
+      {/* 統計テキスト */}
+      {statsText && (
+        <p className="text-xs text-gray-400 bg-gray-700/30 px-2 py-1 rounded">
+          {statsText}
+        </p>
+      )}
+
       {data.patterns.length === 0 ? (
         <p className="text-sm text-gray-400">
-          該当するパターンが見つかりませんでした
+          まだデータがありません。今回記録しましょう
         </p>
       ) : (
         <div className="space-y-2">
-          {data.patterns.map((pattern) => (
-            <div
-              key={pattern.patternIndex}
-              className="p-3 border border-gray-600 rounded-md bg-gray-700/50"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-bold text-blue-300">
-                  パターン {pattern.patternIndex}
-                </span>
-                <span className="text-xs text-gray-400">
-                  {pattern.recordCount}件記録
-                </span>
-              </div>
-              <div className="space-y-1">
-                {pattern.entries.map((entry) => (
-                  <div
-                    key={`${entry.day}-${entry.phase}`}
-                    className="flex items-center gap-2 text-xs text-gray-300"
-                  >
-                    <span className="bg-gray-600 px-1.5 py-0.5 rounded text-gray-200">
-                      Day{entry.day}-P{entry.phase}
+          {data.patterns.map((pattern) => {
+            const color = getPatternColor(pattern.patternIndex - 1);
+            const isSelected = selectedPatternIndex === pattern.patternIndex;
+
+            return (
+              <button
+                key={pattern.patternIndex}
+                type="button"
+                onClick={() =>
+                  onPatternSelect?.(isSelected ? null : pattern.patternIndex)
+                }
+                className={`w-full text-left p-3 border rounded-md transition-colors ${
+                  isSelected
+                    ? "border-white/50 bg-gray-600/50"
+                    : "border-gray-600 bg-gray-700/50 hover:bg-gray-700/80"
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-bold flex items-center gap-2">
+                    {/* カラーインジケーター */}
+                    <span
+                      className="inline-block w-3 h-3 rounded-full"
+                      style={{ backgroundColor: color }}
+                    />
+                    <span style={{ color }}>
+                      パターン {pattern.patternIndex}
                     </span>
-                    <span>{entry.zone.nameJa}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    {pattern.recordCount}件記録
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  {pattern.entries.map((entry) => (
+                    <div
+                      key={`${entry.day}-${entry.phase}`}
+                      className="flex items-center gap-2 text-xs text-gray-300"
+                    >
+                      <span className="bg-gray-600 px-1.5 py-0.5 rounded text-gray-200">
+                        Day{entry.day}-P{entry.phase}
+                      </span>
+                      <span>{entry.zone.nameJa}</span>
+                    </div>
+                  ))}
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

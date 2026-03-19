@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import MapCanvas from "@/components/map/MapCanvas";
 import ZoneOverlay from "@/components/map/ZoneOverlay";
+import PatternLayer from "@/components/map/PatternLayer";
 import ConditionPanel from "@/components/sidebar/ConditionPanel";
 import PatternList from "@/components/sidebar/PatternList";
 import { useMasterData } from "@/hooks/useMasterData";
 import { usePatterns } from "@/hooks/usePatterns";
 import { getShrinkZones } from "@/lib/api";
+import { getMapImagePath } from "@/lib/mapImage";
 import type { ShrinkZone } from "@/types";
 
 /**
@@ -24,18 +26,24 @@ export default function HomePage() {
   const [selectedJihenId, setSelectedJihenId] = useState<string | null>(null);
   const [selectedSpawnPointId, setSelectedSpawnPointId] = useState<number | null>(null);
 
+  // パターン選択の状態（マップ⇔リスト連動）
+  const [selectedPatternIndex, setSelectedPatternIndex] = useState<number | null>(null);
+
   // マスタデータ取得
   const { bosses, jihenList, spawnPoints, loading: masterLoading, error: masterError } = useMasterData();
 
   // パターン検索
   const { data: patternData, loading: patternLoading, error: patternError, search, clear } = usePatterns();
 
+  // 地変に応じたマップ画像パス
+  const mapImagePath = getMapImagePath(selectedJihenId);
+
   // 収縮候補地をAPI経由で取得
   useEffect(() => {
     getShrinkZones()
       .then(setZones)
-      .catch(() => {
-        // API未接続時はフォールバック表示なし
+      .catch((err) => {
+        console.error("収縮候補地の取得に失敗:", err);
       });
   }, []);
 
@@ -46,6 +54,8 @@ export default function HomePage() {
     } else {
       clear();
     }
+    // 検索条件変更時にパターン選択をリセット
+    setSelectedPatternIndex(null);
   }, [selectedBossId, selectedSpawnPointId, selectedJihenId, search, clear]);
 
   /** ゾーン選択ハンドラー */
@@ -86,17 +96,26 @@ export default function HomePage() {
             data={patternData}
             loading={patternLoading}
             error={patternError}
+            selectedPatternIndex={selectedPatternIndex}
+            onPatternSelect={setSelectedPatternIndex}
           />
         </aside>
 
         {/* マップキャンバス */}
         <main className="order-1 md:order-2 flex-1 min-h-[50vh] md:min-h-0">
-          <MapCanvas mapImagePath={null}>
+          <MapCanvas mapImagePath={mapImagePath}>
             <ZoneOverlay
               zones={zones}
               selectedZoneId={selectedZoneId}
               onZoneSelect={handleZoneSelect}
             />
+            {patternData && (
+              <PatternLayer
+                patterns={patternData.patterns}
+                selectedPatternIndex={selectedPatternIndex}
+                onPatternSelect={setSelectedPatternIndex}
+              />
+            )}
           </MapCanvas>
         </main>
       </div>

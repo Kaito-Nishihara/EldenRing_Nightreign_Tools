@@ -83,13 +83,13 @@ class MasterControllerTest {
     @Test
     void getSpawnPoints_200で開始地点一覧を返す() throws Exception {
         var sp = new SpawnPointResponse(1, "北東・野営地付近",
-                new BigDecimal("0.7500"), new BigDecimal("0.2500"), "campfire");
+                new BigDecimal("0.7500"), new BigDecimal("0.2500"), "church");
         when(masterService.getAllSpawnPoints()).thenReturn(List.of(sp));
 
         mockMvc.perform(get("/api/v1/spawn-points"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].nameJa").value("北東・野営地付近"))
-                .andExpect(jsonPath("$[0].nearbyBaseType").value("campfire"));
+                .andExpect(jsonPath("$[0].nearbyBaseType").value("church"));
     }
 }

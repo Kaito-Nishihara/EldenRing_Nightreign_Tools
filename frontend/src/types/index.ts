@@ -37,7 +37,7 @@ export interface SpawnPoint {
   nameJa: string;
   x: number;
   y: number;
-  nearbyBaseType: "campfire" | "ruins";
+  nearbyBaseType: "church" | "camp";
 }
 
 /** パターン */

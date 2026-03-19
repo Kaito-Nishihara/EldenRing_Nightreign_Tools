@@ -29,7 +29,7 @@ public class SpawnPoint {
     @Column(nullable = false, precision = 5, scale = 4)
     private BigDecimal y;
 
-    /** 近隣の拠点タイプ（例: campfire, ruins） */
+    /** 近隣の拠点タイプ（例: church, camp） */
     @Column(name = "nearby_base_type", nullable = false, length = 30)
     private String nearbyBaseType;
 

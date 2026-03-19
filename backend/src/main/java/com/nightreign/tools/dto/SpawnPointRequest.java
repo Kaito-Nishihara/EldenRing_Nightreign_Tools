@@ -19,7 +19,7 @@ public record SpawnPointRequest(
         BigDecimal y,
 
         @NotBlank(message = "拠点タイプは必須です")
-        @Pattern(regexp = "campfire|ruins", message = "拠点タイプはcampfireまたはruinsのみ有効です")
+        @Pattern(regexp = "church|camp", message = "拠点タイプはchurchまたはcampのみ有効です")
         String nearbyBaseType
 ) {
 }

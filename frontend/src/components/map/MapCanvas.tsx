@@ -40,6 +40,8 @@ interface MapCanvasProps {
   height?: number;
   /** オーバーレイとして描画する子要素 */
   children?: ReactNode;
+  /** マップ上のクリックイベント（マップ座標系のx,yを返す） */
+  onStageClick?: (x: number, y: number) => void;
 }
 
 /**
@@ -51,6 +53,7 @@ export default function MapCanvas({
   width = DEFAULT_MAP_WIDTH,
   height = DEFAULT_MAP_HEIGHT,
   children,
+  onStageClick,
 }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [stageSize, setStageSize] = useState({ width: 800, height: 600 });
@@ -130,6 +133,24 @@ export default function MapCanvas({
     [scale, position]
   );
 
+  /** ステージクリック時にマップ座標を計算して親に通知する */
+  const handleStageClick = useCallback(
+    (e: { target: { getStage: () => { getPointerPosition: () => { x: number; y: number } | null } | null } }) => {
+      if (!onStageClick) return;
+      const stage = e.target.getStage();
+      if (!stage) return;
+      const pointer = stage.getPointerPosition();
+      if (!pointer) return;
+
+      // スクリーン座標をマップ座標に変換
+      const mapX = (pointer.x - position.x) / scale;
+      const mapY = (pointer.y - position.y) / scale;
+
+      onStageClick(Math.round(mapX), Math.round(mapY));
+    },
+    [onStageClick, position, scale]
+  );
+
   /** ドラッグ終了時の位置更新 */
   const handleDragEnd = useCallback(
     (e: { target: { x: () => number; y: () => number } }) => {
@@ -157,6 +178,8 @@ export default function MapCanvas({
           draggable
           onWheel={handleWheel}
           onDragEnd={handleDragEnd}
+          onClick={handleStageClick}
+          onTap={handleStageClick}
         >
           <Layer>
             {/* マップ画像またはプレースホルダー */}

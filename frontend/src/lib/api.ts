@@ -110,4 +110,64 @@ export async function createPlayRecord(
   return response.data;
 }
 
+// ==========================================
+// 管理画面用API
+// ==========================================
+
+/** 管理用: 開始地点を登録する */
+export async function adminCreateSpawnPoint(
+  data: Omit<SpawnPoint, "id">
+): Promise<SpawnPoint> {
+  const response = await apiClient.post<SpawnPoint>(
+    "/api/v1/admin/spawn-points",
+    data
+  );
+  return response.data;
+}
+
+/** 管理用: 開始地点を更新する */
+export async function adminUpdateSpawnPoint(
+  id: number,
+  data: Omit<SpawnPoint, "id">
+): Promise<SpawnPoint> {
+  const response = await apiClient.put<SpawnPoint>(
+    `/api/v1/admin/spawn-points/${id}`,
+    data
+  );
+  return response.data;
+}
+
+/** 管理用: 開始地点を削除する */
+export async function adminDeleteSpawnPoint(id: number): Promise<void> {
+  await apiClient.delete(`/api/v1/admin/spawn-points/${id}`);
+}
+
+/** 管理用: 収縮候補地を登録する */
+export async function adminCreateShrinkZone(
+  data: Omit<ShrinkZone, "id">
+): Promise<ShrinkZone> {
+  const response = await apiClient.post<ShrinkZone>(
+    "/api/v1/admin/shrink-zones",
+    data
+  );
+  return response.data;
+}
+
+/** 管理用: 収縮候補地を更新する */
+export async function adminUpdateShrinkZone(
+  id: number,
+  data: Omit<ShrinkZone, "id">
+): Promise<ShrinkZone> {
+  const response = await apiClient.put<ShrinkZone>(
+    `/api/v1/admin/shrink-zones/${id}`,
+    data
+  );
+  return response.data;
+}
+
+/** 管理用: 収縮候補地を削除する */
+export async function adminDeleteShrinkZone(id: number): Promise<void> {
+  await apiClient.delete(`/api/v1/admin/shrink-zones/${id}`);
+}
+
 export default apiClient;

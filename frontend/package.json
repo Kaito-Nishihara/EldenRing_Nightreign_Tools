@@ -14,7 +14,7 @@
     "next": "15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-konva": "^18.2.10"
+    "react-konva": "^19.2.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

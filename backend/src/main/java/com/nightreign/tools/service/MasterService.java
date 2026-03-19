@@ -38,7 +38,7 @@ public class MasterService {
 
     /** ボス一覧を取得する */
     public List<BossResponse> getAllBosses() {
-        return bossRepository.findAll().stream()
+        return bossRepository.findAllBy().stream()
                 .map(BossResponse::from)
                 .toList();
     }

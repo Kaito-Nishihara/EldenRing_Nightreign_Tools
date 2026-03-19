@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import MapCanvas from "@/components/map/MapCanvas";
 import AdminOverlay from "@/components/admin/AdminOverlay";
 import SpawnPointForm from "@/components/admin/SpawnPointForm";
@@ -183,9 +184,9 @@ export default function AdminPage() {
             マスタデータ座標登録
           </span>
         </h1>
-        <a href="/" className="text-sm text-blue-400 hover:text-blue-300">
+        <Link href="/" className="text-sm text-blue-400 hover:text-blue-300">
           メインページへ戻る
-        </a>
+        </Link>
       </header>
 
       {/* メインコンテンツ */}

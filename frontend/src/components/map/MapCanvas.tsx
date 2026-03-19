@@ -20,6 +20,8 @@ interface MapCanvasProps {
   height?: number;
   /** オーバーレイとして描画する子要素 */
   children?: ReactNode;
+  /** 収縮暗転レイヤー（destination-outが必要なため専用Layerで描画） */
+  shrinkOverlay?: ReactNode;
   /** マップ上のクリックイベント（マップ座標系のx,yを返す） */
   onStageClick?: (x: number, y: number) => void;
 }
@@ -33,6 +35,7 @@ function MapCanvasInner({
   width = DEFAULT_MAP_WIDTH,
   height = DEFAULT_MAP_HEIGHT,
   children,
+  shrinkOverlay,
   onStageClick,
 }: MapCanvasProps) {
   /* eslint-disable @typescript-eslint/no-require-imports */
@@ -172,6 +175,8 @@ function MapCanvasInner({
             />
           )}
         </Layer>
+        {/* 収縮暗転レイヤー（destination-outで円形切り抜きするため専用Layer） */}
+        {shrinkOverlay && <Layer listening={false}>{shrinkOverlay}</Layer>}
         <Layer>{children}</Layer>
       </Stage>
 

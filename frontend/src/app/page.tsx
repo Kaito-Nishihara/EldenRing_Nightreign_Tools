@@ -6,6 +6,7 @@ import ZoneOverlay from "@/components/map/ZoneOverlay";
 import PatternLayer from "@/components/map/PatternLayer";
 import ConditionPanel from "@/components/sidebar/ConditionPanel";
 import PatternList from "@/components/sidebar/PatternList";
+import ShrinkOverlay from "@/components/map/ShrinkOverlay";
 import { useMasterData } from "@/hooks/useMasterData";
 import { usePatterns } from "@/hooks/usePatterns";
 import { getShrinkZones } from "@/lib/api";
@@ -58,6 +59,20 @@ export default function HomePage() {
     setSelectedPatternIndex(null);
   }, [selectedBossId, selectedSpawnPointId, selectedJihenId, search, clear]);
 
+  // 選択中パターンの最初のエントリ（収縮暗転表示用）
+  const selectedEntry = (() => {
+    if (!patternData || selectedPatternIndex === null) return null;
+    const pattern = patternData.patterns.find(
+      (p) => p.patternIndex === selectedPatternIndex
+    );
+    if (!pattern || pattern.entries.length === 0) return null;
+    // Day1-Phase1を優先表示
+    const sorted = [...pattern.entries].sort((a, b) =>
+      a.day !== b.day ? a.day - b.day : a.phase - b.phase
+    );
+    return sorted[0];
+  })();
+
   /** ゾーン選択ハンドラー */
   const handleZoneSelect = (zone: ShrinkZone) => {
     setSelectedZoneId((prev) => (prev === zone.id ? null : zone.id));
@@ -103,7 +118,10 @@ export default function HomePage() {
 
         {/* マップキャンバス */}
         <main className="order-1 md:order-2 flex-1 min-h-[50vh] md:min-h-0">
-          <MapCanvas mapImagePath={mapImagePath}>
+          <MapCanvas
+            mapImagePath={mapImagePath}
+            shrinkOverlay={<ShrinkOverlay entry={selectedEntry} />}
+          >
             <ZoneOverlay
               zones={zones}
               selectedZoneId={selectedZoneId}

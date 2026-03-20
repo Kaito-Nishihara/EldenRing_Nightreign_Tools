@@ -1,6 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import type { SpawnPoint, ShrinkZone, BasePoint } from "@/types";
+
+/** 開始地点アイコンのサイズ */
+const SPAWN_ICON_SIZE = 48;
 
 interface AdminOverlayProps {
   /** 登録済み開始地点 */
@@ -40,8 +44,18 @@ export default function AdminOverlay({
   onShrinkZoneClick,
 }: AdminOverlayProps) {
   /* eslint-disable @typescript-eslint/no-require-imports */
-  const { Circle, Text, Group } = require("react-konva");
+  const { Circle, Text, Group, Image: KonvaImage } = require("react-konva");
   /* eslint-enable @typescript-eslint/no-require-imports */
+
+  /** 開始地点アイコン画像 */
+  const [spawnIcon, setSpawnIcon] = useState<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const img = new window.Image();
+    img.src = "/icons/zones/spawn.webp";
+    img.onload = () => setSpawnIcon(img);
+  }, []);
 
   return (
     <>
@@ -76,7 +90,7 @@ export default function AdminOverlay({
         );
       })}
 
-      {/* 開始地点をマーカーで表示 */}
+      {/* 開始地点をアイコンで表示 */}
       {spawnPoints.map((sp) => {
         const isEditing = editingSpawnPointId === sp.id;
         return (
@@ -85,18 +99,39 @@ export default function AdminOverlay({
             onClick={() => onSpawnPointClick(sp)}
             onTap={() => onSpawnPointClick(sp)}
           >
-            <Circle
-              x={sp.x}
-              y={sp.y}
-              radius={isEditing ? 8 : 6}
-              fill={isEditing ? "#3b82f6" : "#60a5fa"}
-              stroke={isEditing ? "#ffffff" : "#93c5fd"}
-              strokeWidth={isEditing ? 3 : 2}
-              hitStrokeWidth={15}
-            />
+            {spawnIcon ? (
+              <>
+                <Circle
+                  x={sp.x}
+                  y={sp.y}
+                  radius={SPAWN_ICON_SIZE / 2 + 2}
+                  fill="rgba(0,0,0,0.5)"
+                  stroke={isEditing ? "#ffffff" : "#93c5fd"}
+                  strokeWidth={isEditing ? 3 : 2}
+                  hitStrokeWidth={15}
+                />
+                <KonvaImage
+                  image={spawnIcon}
+                  x={sp.x - SPAWN_ICON_SIZE / 2}
+                  y={sp.y - SPAWN_ICON_SIZE / 2}
+                  width={SPAWN_ICON_SIZE}
+                  height={SPAWN_ICON_SIZE}
+                />
+              </>
+            ) : (
+              <Circle
+                x={sp.x}
+                y={sp.y}
+                radius={isEditing ? 8 : 6}
+                fill={isEditing ? "#3b82f6" : "#60a5fa"}
+                stroke={isEditing ? "#ffffff" : "#93c5fd"}
+                strokeWidth={isEditing ? 3 : 2}
+                hitStrokeWidth={15}
+              />
+            )}
             <Text
               x={sp.x - 30}
-              y={sp.y - 20}
+              y={sp.y + SPAWN_ICON_SIZE / 2 + 4}
               text={sp.nameJa}
               fontSize={10}
               fill={isEditing ? "#93c5fd" : "#bfdbfe"}
@@ -107,8 +142,8 @@ export default function AdminOverlay({
         );
       })}
 
-      {/* 拠点候補地を?マークで表示 */}
-      {basePoints.map((bp) => (
+      {/* 拠点候補地を?マークで表示（拠点候補モード時のみ） */}
+      {editMode === "base-point" && basePoints.map((bp) => (
         <Group key={`bp-${bp.id}`}>
           <Circle
             x={bp.x}

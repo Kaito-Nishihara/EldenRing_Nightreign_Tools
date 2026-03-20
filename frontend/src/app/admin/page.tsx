@@ -382,7 +382,7 @@ export default function AdminPage() {
                   >
                     <span className="font-bold">{sp.nameJa}</span>
                     <span className="text-gray-500 ml-2">
-                      ({sp.x}, {sp.y}) {sp.nearbyBaseType}
+                      ({sp.x}, {sp.y})
                     </span>
                   </button>
                 ))

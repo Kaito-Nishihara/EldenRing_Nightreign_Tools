@@ -21,17 +21,13 @@ public class SpawnPoint {
     @Column(name = "name_ja", nullable = false, length = 100)
     private String nameJa;
 
-    /** X座標（0.0～1.0の正規化座標） */
-    @Column(nullable = false, precision = 5, scale = 4)
+    /** X座標（ピクセル座標） */
+    @Column(nullable = false, precision = 7, scale = 2)
     private BigDecimal x;
 
-    /** Y座標（0.0～1.0の正規化座標） */
-    @Column(nullable = false, precision = 5, scale = 4)
+    /** Y座標（ピクセル座標） */
+    @Column(nullable = false, precision = 7, scale = 2)
     private BigDecimal y;
-
-    /** 近隣の拠点タイプ（例: church, camp） */
-    @Column(name = "nearby_base_type", nullable = false, length = 30)
-    private String nearbyBaseType;
 
     /** 作成日時 */
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -78,14 +74,6 @@ public class SpawnPoint {
 
     public void setY(BigDecimal y) {
         this.y = y;
-    }
-
-    public String getNearbyBaseType() {
-        return nearbyBaseType;
-    }
-
-    public void setNearbyBaseType(String nearbyBaseType) {
-        this.nearbyBaseType = nearbyBaseType;
     }
 
     public LocalDateTime getCreatedAt() {

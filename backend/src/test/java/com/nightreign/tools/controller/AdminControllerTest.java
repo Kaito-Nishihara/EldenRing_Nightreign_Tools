@@ -63,13 +63,11 @@ class AdminControllerTest {
             sp.setNameJa("テスト");
             sp.setX(new BigDecimal("100"));
             sp.setY(new BigDecimal("200"));
-            sp.setNearbyBaseType("church");
             when(adminService.getAllSpawnPoints()).thenReturn(List.of(sp));
 
             mockMvc.perform(get("/api/v1/admin/spawn-points"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$[0].nameJa").value("テスト"))
-                    .andExpect(jsonPath("$[0].nearbyBaseType").value("church"));
+                    .andExpect(jsonPath("$[0].nameJa").value("テスト"));
         }
 
         @Test
@@ -80,13 +78,12 @@ class AdminControllerTest {
             saved.setNameJa("新地点");
             saved.setX(new BigDecimal("100"));
             saved.setY(new BigDecimal("200"));
-            saved.setNearbyBaseType("church");
             when(adminService.createSpawnPoint(any())).thenReturn(saved);
 
             mockMvc.perform(post("/api/v1/admin/spawn-points")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("""
-                                    {"nameJa":"新地点","x":100,"y":200,"nearbyBaseType":"church"}
+                                    {"nameJa":"新地点","x":100,"y":200}
                                     """))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.nameJa").value("新地点"));
@@ -98,18 +95,7 @@ class AdminControllerTest {
             mockMvc.perform(post("/api/v1/admin/spawn-points")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("""
-                                    {"nameJa":"","x":100,"y":200,"nearbyBaseType":"church"}
-                                    """))
-                    .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("POST: 不正なnearbyBaseTypeでバリデーションエラー400")
-        void createSpawnPointInvalidBaseType() throws Exception {
-            mockMvc.perform(post("/api/v1/admin/spawn-points")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content("""
-                                    {"nameJa":"テスト","x":100,"y":200,"nearbyBaseType":"invalid"}
+                                    {"nameJa":"","x":100,"y":200}
                                     """))
                     .andExpect(status().isBadRequest());
         }
@@ -122,13 +108,12 @@ class AdminControllerTest {
             updated.setNameJa("更新後");
             updated.setX(new BigDecimal("300"));
             updated.setY(new BigDecimal("400"));
-            updated.setNearbyBaseType("camp");
             when(adminService.updateSpawnPoint(eq(1), any())).thenReturn(updated);
 
             mockMvc.perform(put("/api/v1/admin/spawn-points/1")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("""
-                                    {"nameJa":"更新後","x":300,"y":400,"nearbyBaseType":"camp"}
+                                    {"nameJa":"更新後","x":300,"y":400}
                                     """))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.nameJa").value("更新後"));

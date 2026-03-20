@@ -2,7 +2,6 @@ package com.nightreign.tools.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import java.math.BigDecimal;
 
 /**
@@ -16,10 +15,6 @@ public record SpawnPointRequest(
         BigDecimal x,
 
         @NotNull(message = "Y座標は必須です")
-        BigDecimal y,
-
-        @NotBlank(message = "拠点タイプは必須です")
-        @Pattern(regexp = "church|camp", message = "拠点タイプはchurchまたはcampのみ有効です")
-        String nearbyBaseType
+        BigDecimal y
 ) {
 }

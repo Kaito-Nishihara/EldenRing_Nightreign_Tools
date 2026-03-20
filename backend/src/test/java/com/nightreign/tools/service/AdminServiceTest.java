@@ -65,14 +65,13 @@ class AdminServiceTest {
         @DisplayName("登録: 正常にエンティティが保存される")
         void createSpawnPoint() {
             var request = new SpawnPointRequest(
-                    "北の高台", new BigDecimal("100"), new BigDecimal("200"), "church");
+                    "北の高台", new BigDecimal("100"), new BigDecimal("200"));
 
             var saved = new SpawnPoint();
             saved.setId(1);
             saved.setNameJa("北の高台");
             saved.setX(new BigDecimal("100"));
             saved.setY(new BigDecimal("200"));
-            saved.setNearbyBaseType("church");
             when(spawnPointRepository.save(any())).thenReturn(saved);
 
             var result = adminService.createSpawnPoint(request);
@@ -92,12 +91,11 @@ class AdminServiceTest {
             when(spawnPointRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
             var request = new SpawnPointRequest(
-                    "新名", new BigDecimal("300"), new BigDecimal("400"), "camp");
+                    "新名", new BigDecimal("300"), new BigDecimal("400"));
 
             var result = adminService.updateSpawnPoint(1, request);
 
             assertThat(result.getNameJa()).isEqualTo("新名");
-            assertThat(result.getNearbyBaseType()).isEqualTo("camp");
         }
 
         @Test
@@ -106,7 +104,7 @@ class AdminServiceTest {
             when(spawnPointRepository.findById(999)).thenReturn(Optional.empty());
 
             var request = new SpawnPointRequest(
-                    "名前", BigDecimal.ZERO, BigDecimal.ZERO, "church");
+                    "名前", BigDecimal.ZERO, BigDecimal.ZERO);
 
             assertThatThrownBy(() -> adminService.updateSpawnPoint(999, request))
                     .isInstanceOf(EntityNotFoundException.class);

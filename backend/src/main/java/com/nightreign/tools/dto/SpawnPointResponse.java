@@ -10,8 +10,7 @@ public record SpawnPointResponse(
         Integer id,
         String nameJa,
         BigDecimal x,
-        BigDecimal y,
-        String nearbyBaseType
+        BigDecimal y
 ) {
     /** EntityからDTOに変換する */
     public static SpawnPointResponse from(SpawnPoint sp) {
@@ -19,8 +18,7 @@ public record SpawnPointResponse(
                 sp.getId(),
                 sp.getNameJa(),
                 sp.getX(),
-                sp.getY(),
-                sp.getNearbyBaseType()
+                sp.getY()
         );
     }
 }

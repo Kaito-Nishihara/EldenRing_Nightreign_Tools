@@ -31,16 +31,13 @@ export default function SpawnPointForm({
   onCancel,
 }: SpawnPointFormProps) {
   const [nameJa, setNameJa] = useState("");
-  const [nearbyBaseType, setNearbyBaseType] = useState<"church" | "camp">("church");
 
   /** 編集データが変わったらフォームを更新 */
   useEffect(() => {
     if (editing) {
       setNameJa(editing.nameJa);
-      setNearbyBaseType(editing.nearbyBaseType);
     } else {
       setNameJa("");
-      setNearbyBaseType("church");
     }
   }, [editing]);
 
@@ -61,7 +58,6 @@ export default function SpawnPointForm({
       nameJa,
       x: position.x,
       y: position.y,
-      nearbyBaseType,
     });
   };
 
@@ -93,21 +89,8 @@ export default function SpawnPointForm({
           onChange={(e) => setNameJa(e.target.value)}
           required
           className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 text-sm"
-          placeholder="例: 北の高台"
+          placeholder="例: 北の教会"
         />
-      </div>
-
-      {/* 拠点タイプ */}
-      <div>
-        <label className="block text-xs text-gray-400 mb-1">拠点タイプ</label>
-        <select
-          value={nearbyBaseType}
-          onChange={(e) => setNearbyBaseType(e.target.value as "church" | "camp")}
-          className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 text-sm"
-        >
-          <option value="church">教会</option>
-          <option value="camp">野営地</option>
-        </select>
       </div>
 
       {/* ボタン */}

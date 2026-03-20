@@ -4,6 +4,7 @@ import com.nightreign.tools.dto.ShrinkZoneRequest;
 import com.nightreign.tools.dto.SpawnPointRequest;
 import com.nightreign.tools.entity.ShrinkZone;
 import com.nightreign.tools.entity.SpawnPoint;
+import com.nightreign.tools.repository.BasePointRepository;
 import com.nightreign.tools.repository.ShrinkZoneRepository;
 import com.nightreign.tools.repository.SpawnPointRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -32,6 +33,9 @@ class AdminServiceTest {
 
     @Mock
     private ShrinkZoneRepository shrinkZoneRepository;
+
+    @Mock
+    private BasePointRepository basePointRepository;
 
     @InjectMocks
     private AdminService adminService;

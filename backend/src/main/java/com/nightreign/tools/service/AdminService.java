@@ -121,15 +121,16 @@ public class AdminService {
     // BasePoint CRUD
     // ==========================================
 
-    /** 拠点候補地一覧を取得する */
+    /** 拠点候補地一覧を取得する（マップIDで絞り込み） */
     @Transactional(readOnly = true)
-    public List<BasePoint> getAllBasePoints() {
-        return basePointRepository.findAll();
+    public List<BasePoint> getBasePointsByMapId(String mapId) {
+        return basePointRepository.findByMapId(mapId);
     }
 
     /** 拠点候補地を登録する */
     public BasePoint createBasePoint(BasePointRequest request) {
         BasePoint entity = new BasePoint();
+        entity.setMapId(request.mapId());
         entity.setNameJa(request.nameJa());
         entity.setX(request.x());
         entity.setY(request.y());
@@ -141,6 +142,7 @@ public class AdminService {
         BasePoint entity = basePointRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "拠点候補地が見つかりません: id=" + id));
+        entity.setMapId(request.mapId());
         entity.setNameJa(request.nameJa());
         entity.setX(request.x());
         entity.setY(request.y());

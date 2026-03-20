@@ -172,10 +172,13 @@ export async function adminDeleteShrinkZone(id: number): Promise<void> {
 }
 
 /**
- * 拠点候補地一覧を取得する
+ * 拠点候補地一覧を取得する（マップIDで絞り込み）
+ * @param mapId - マップ識別子（デフォルト: normal）
  */
-export async function getBasePoints(): Promise<BasePoint[]> {
-  const response = await apiClient.get<BasePoint[]>("/api/v1/base-points");
+export async function getBasePoints(mapId: string = "normal"): Promise<BasePoint[]> {
+  const response = await apiClient.get<BasePoint[]>("/api/v1/base-points", {
+    params: { mapId },
+  });
   return response.data;
 }
 

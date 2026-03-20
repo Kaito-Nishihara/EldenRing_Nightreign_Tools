@@ -17,6 +17,10 @@ public class BasePoint {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    /** マップ識別子（normal, kakou, sankan, fuhai, nokurateou） */
+    @Column(name = "map_id", nullable = false, length = 20)
+    private String mapId = "normal";
+
     /** 識別用の名前（任意） */
     @Column(name = "name_ja", length = 100)
     private String nameJa;
@@ -49,6 +53,14 @@ public class BasePoint {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getMapId() {
+        return mapId;
+    }
+
+    public void setMapId(String mapId) {
+        this.mapId = mapId;
     }
 
     public String getNameJa() {

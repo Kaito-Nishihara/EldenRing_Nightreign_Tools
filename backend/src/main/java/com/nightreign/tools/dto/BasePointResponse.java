@@ -8,6 +8,7 @@ import java.math.BigDecimal;
  */
 public record BasePointResponse(
         Integer id,
+        String mapId,
         String nameJa,
         BigDecimal x,
         BigDecimal y
@@ -16,6 +17,7 @@ public record BasePointResponse(
     public static BasePointResponse from(BasePoint bp) {
         return new BasePointResponse(
                 bp.getId(),
+                bp.getMapId(),
                 bp.getNameJa(),
                 bp.getX(),
                 bp.getY()

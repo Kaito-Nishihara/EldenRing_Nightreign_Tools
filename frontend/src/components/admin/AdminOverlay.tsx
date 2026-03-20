@@ -113,16 +113,20 @@ export default function AdminOverlay({
           <Circle
             x={bp.x}
             y={bp.y}
-            radius={10}
+            radius={32}
             fill={editMode === "base-point" ? "rgba(80, 70, 50, 0.9)" : "rgba(80, 70, 50, 0.5)"}
             stroke="#C8B87C"
             strokeWidth={editMode === "base-point" ? 2 : 1}
           />
           <Text
-            x={bp.x - 5}
-            y={bp.y - 7}
+            x={bp.x - 20}
+            y={bp.y - 20}
+            width={40}
+            height={48}
+            align="center"
+            verticalAlign="middle"
             text="?"
-            fontSize={14}
+            fontSize={40}
             fontStyle="bold"
             fill="#C8B87C"
           />

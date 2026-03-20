@@ -8,6 +8,7 @@ import com.nightreign.tools.dto.SpawnPointResponse;
 import com.nightreign.tools.service.MasterService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -50,9 +51,10 @@ public class MasterController {
         return masterService.getAllSpawnPoints();
     }
 
-    /** 拠点候補地一覧を取得する */
+    /** 拠点候補地一覧を取得する（マップIDで絞り込み） */
     @GetMapping("/base-points")
-    public List<BasePointResponse> getBasePoints() {
-        return masterService.getAllBasePoints();
+    public List<BasePointResponse> getBasePoints(
+            @RequestParam(defaultValue = "normal") String mapId) {
+        return masterService.getBasePointsByMapId(mapId);
     }
 }

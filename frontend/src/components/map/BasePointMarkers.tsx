@@ -5,7 +5,7 @@ import type { BasePoint } from "@/types";
 import { BASE_TYPES } from "@/lib/baseTypes";
 
 /** ?マーカーのサイズ */
-const MARKER_SIZE = 24;
+const MARKER_SIZE = 64;
 
 interface BasePointMarkersProps {
   /** 拠点候補地一覧 */
@@ -116,9 +116,13 @@ export default function BasePointMarkers({
                   />
                   <Text
                     text="?"
-                    x={-6}
-                    y={-8}
-                    fontSize={16}
+                    x={-20}
+                    y={-20}
+                    width={40}
+                    height={48}
+                    align="center"
+                    verticalAlign="middle"
+                    fontSize={40}
                     fontStyle="bold"
                     fill="#C8B87C"
                   />

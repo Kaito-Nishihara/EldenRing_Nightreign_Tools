@@ -48,13 +48,16 @@ export default function AdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  /** マップIDを算出（地変未選択=通常マップ） */
+  const mapId = selectedJihenId ?? "normal";
+
   /** データ取得 */
   const fetchData = useCallback(async () => {
     try {
       const [sp, sz, bp] = await Promise.all([
         getSpawnPoints(),
         getShrinkZones(),
-        getBasePoints(),
+        getBasePoints(mapId),
       ]);
       setSpawnPoints(sp);
       setShrinkZones(sz);
@@ -62,7 +65,7 @@ export default function AdminPage() {
     } catch (err) {
       console.error("マスタデータ取得エラー:", err);
     }
-  }, []);
+  }, [mapId]);
 
   useEffect(() => {
     fetchData();
@@ -76,7 +79,7 @@ export default function AdminPage() {
         setSaving(true);
         setError(null);
         try {
-          await adminCreateBasePoint({ x, y });
+          await adminCreateBasePoint({ mapId, x, y });
           await fetchData();
         } catch (err) {
           setError(err instanceof Error ? err.message : "登録に失敗しました");
@@ -90,7 +93,7 @@ export default function AdminPage() {
       setEditingShrinkZone(null);
       setError(null);
     },
-    [editMode, fetchData]
+    [editMode, mapId, fetchData]
   );
 
   /** BasePoint削除 */

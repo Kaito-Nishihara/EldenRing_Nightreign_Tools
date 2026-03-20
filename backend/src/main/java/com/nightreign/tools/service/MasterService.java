@@ -69,9 +69,9 @@ public class MasterService {
                 .toList();
     }
 
-    /** 拠点候補地一覧を取得する */
-    public List<BasePointResponse> getAllBasePoints() {
-        return basePointRepository.findAll().stream()
+    /** 拠点候補地一覧を取得する（マップIDで絞り込み） */
+    public List<BasePointResponse> getBasePointsByMapId(String mapId) {
+        return basePointRepository.findByMapId(mapId).stream()
                 .map(BasePointResponse::from)
                 .toList();
     }

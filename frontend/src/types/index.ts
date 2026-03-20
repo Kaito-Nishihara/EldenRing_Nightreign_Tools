@@ -43,6 +43,7 @@ export interface SpawnPoint {
 /** 拠点候補地（マップ上の固定座標、?マーク） */
 export interface BasePoint {
   id: number;
+  mapId: string;
   nameJa?: string;
   x: number;
   y: number;

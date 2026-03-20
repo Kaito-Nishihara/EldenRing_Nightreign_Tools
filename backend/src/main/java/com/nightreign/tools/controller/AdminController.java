@@ -94,10 +94,11 @@ public class AdminController {
     // BasePoint CRUD
     // ==========================================
 
-    /** 拠点候補地一覧を取得する */
+    /** 拠点候補地一覧を取得する（マップIDで絞り込み） */
     @GetMapping("/base-points")
-    public List<BasePointResponse> getBasePoints() {
-        return adminService.getAllBasePoints().stream()
+    public List<BasePointResponse> getBasePoints(
+            @RequestParam(defaultValue = "normal") String mapId) {
+        return adminService.getBasePointsByMapId(mapId).stream()
                 .map(BasePointResponse::from)
                 .toList();
     }

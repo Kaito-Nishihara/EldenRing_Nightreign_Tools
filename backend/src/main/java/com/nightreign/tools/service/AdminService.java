@@ -51,7 +51,6 @@ public class AdminService {
         entity.setNameJa(request.nameJa());
         entity.setX(request.x());
         entity.setY(request.y());
-        entity.setNearbyBaseType(request.nearbyBaseType());
         return spawnPointRepository.save(entity);
     }
 
@@ -63,7 +62,6 @@ public class AdminService {
         entity.setNameJa(request.nameJa());
         entity.setX(request.x());
         entity.setY(request.y());
-        entity.setNearbyBaseType(request.nearbyBaseType());
         return spawnPointRepository.save(entity);
     }
 

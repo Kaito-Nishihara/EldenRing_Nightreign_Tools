@@ -37,7 +37,6 @@ export interface SpawnPoint {
   nameJa: string;
   x: number;
   y: number;
-  nearbyBaseType: "church" | "camp";
 }
 
 /** 拠点候補地（マップ上の固定座標、?マーク） */

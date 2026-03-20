@@ -91,7 +91,6 @@ class MasterServiceTest {
         testSpawnPoint.setNameJa("北東・野営地付近");
         testSpawnPoint.setX(new BigDecimal("0.7500"));
         testSpawnPoint.setY(new BigDecimal("0.2500"));
-        testSpawnPoint.setNearbyBaseType("church");
     }
 
     @Test
@@ -149,6 +148,6 @@ class MasterServiceTest {
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().id()).isEqualTo(1);
         assertThat(result.getFirst().nameJa()).isEqualTo("北東・野営地付近");
-        assertThat(result.getFirst().nearbyBaseType()).isEqualTo("church");
+        assertThat(result.getFirst().nameJa()).isEqualTo("北東・野営地付近");
     }
 }

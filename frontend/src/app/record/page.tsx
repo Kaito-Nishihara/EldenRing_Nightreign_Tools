@@ -6,12 +6,14 @@ import Link from "next/link";
 import MapCanvas from "@/components/map/MapCanvas";
 import ZoneOverlay from "@/components/map/ZoneOverlay";
 import ShrinkOverlay from "@/components/map/ShrinkOverlay";
+import SpawnPointMarkers from "@/components/map/SpawnPointMarkers";
+import BasePointMarkers from "@/components/map/BasePointMarkers";
 import RecordForm from "@/components/record/RecordForm";
 import { useMasterData } from "@/hooks/useMasterData";
 import { usePlayRecord, slotKey } from "@/hooks/usePlayRecord";
-import { getShrinkZones } from "@/lib/api";
+import { getShrinkZones, getBasePoints } from "@/lib/api";
 import { getMapImagePath } from "@/lib/mapImage";
-import type { ShrinkZone } from "@/types";
+import type { SpawnPoint, ShrinkZone, BasePoint } from "@/types";
 
 /**
  * プレイ記録入力ページ
@@ -20,6 +22,10 @@ import type { ShrinkZone } from "@/types";
 export default function RecordPage() {
   const router = useRouter();
   const [zones, setZones] = useState<ShrinkZone[]>([]);
+  const [basePoints, setBasePoints] = useState<BasePoint[]>([]);
+
+  /** 拠点タイプの割り当て状態（キー: basePointId, 値: baseTypeId） */
+  const [baseAssignments, setBaseAssignments] = useState<Record<number, string | null>>({});
 
   // マスタデータ
   const {
@@ -58,12 +64,43 @@ export default function RecordPage() {
       .catch((err) => console.error("収縮候補地の取得に失敗:", err));
   }, []);
 
+  // 拠点候補地を取得（現在は全マップ共通で通常マップのデータを使用）
+  useEffect(() => {
+    getBasePoints("normal")
+      .then(setBasePoints)
+      .catch((err) => console.error("拠点候補地の取得に失敗:", err));
+  }, []);
+
   // 保存成功時に3秒後にメイン画面へ遷移
   useEffect(() => {
     if (!saved) return;
     const timer = setTimeout(() => router.push("/"), 3000);
     return () => clearTimeout(timer);
   }, [saved, router]);
+
+  /** 開始地点を選択 */
+  const handleSpawnPointSelect = useCallback(
+    (sp: SpawnPoint) => {
+      if (form.spawnPointId === sp.id) {
+        // 再クリックで選択解除
+        setSpawnPointId(null);
+      } else {
+        setSpawnPointId(sp.id);
+      }
+    },
+    [form.spawnPointId, setSpawnPointId]
+  );
+
+  /** 拠点タイプ割り当て */
+  const handleBaseAssign = useCallback(
+    (basePointId: number, baseTypeId: string | null) => {
+      setBaseAssignments((prev) => ({
+        ...prev,
+        [basePointId]: baseTypeId,
+      }));
+    },
+    []
+  );
 
   /** ゾーンタップ: アクティブスロットに設定 */
   const handleZoneSelect = useCallback(
@@ -158,6 +195,24 @@ export default function RecordPage() {
             mapImagePath={mapImagePath}
             shrinkOverlay={<ShrinkOverlay entry={overlayEntry} />}
           >
+            {/* 開始地点アイコン */}
+            <SpawnPointMarkers
+              spawnPoints={spawnPoints}
+              selectedId={form.spawnPointId}
+              onSelect={handleSpawnPointSelect}
+            />
+
+            {/* 開始地点選択後に拠点候補地を表示 */}
+            {form.spawnPointId && (
+              <BasePointMarkers
+                basePoints={basePoints}
+                assignments={baseAssignments}
+                onAssign={handleBaseAssign}
+                editable
+              />
+            )}
+
+            {/* 収縮候補地ゾーン */}
             <ZoneOverlay
               zones={zones}
               selectedZoneId={selectedZoneId}

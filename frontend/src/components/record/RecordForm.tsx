@@ -83,12 +83,6 @@ export default function RecordForm({
       onJihenSelect(e.target.value || null),
     [onJihenSelect]
   );
-  const handleSpawnChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) =>
-      onSpawnPointSelect(e.target.value ? Number(e.target.value) : null),
-    [onSpawnPointSelect]
-  );
-
   /** ゾーン名を取得 */
   const getZoneName = (zoneId: number | null): string => {
     if (zoneId === null) return "";
@@ -161,23 +155,30 @@ export default function RecordForm({
           </select>
         </div>
 
-        {/* 開始地点 */}
+        {/* 開始地点（マップ上で選択） */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">
             開始地点
           </label>
-          <select
-            value={form.spawnPointId ?? ""}
-            onChange={handleSpawnChange}
-            className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">-- 開始地点を選択 --</option>
-            {spawnPoints.map((sp) => (
-              <option key={sp.id} value={sp.id}>
-                {sp.nameJa}
-              </option>
-            ))}
-          </select>
+          {form.spawnPointId ? (
+            <div className="flex items-center gap-2">
+              <span className="flex-1 bg-gray-700 border border-green-600 rounded-md px-3 py-2 text-green-200 text-sm">
+                {spawnPoints.find((sp) => sp.id === form.spawnPointId)?.nameJa ?? "選択済み"}
+              </span>
+              <button
+                type="button"
+                onClick={() => onSpawnPointSelect(null)}
+                className="text-gray-400 hover:text-red-400 text-xs px-2 py-2"
+                title="変更"
+              >
+                変更
+              </button>
+            </div>
+          ) : (
+            <p className="bg-gray-700/50 border border-gray-600 rounded-md px-3 py-2 text-gray-500 text-sm">
+              マップ上のアイコンをタップして選択
+            </p>
+          )}
         </div>
       </div>
 

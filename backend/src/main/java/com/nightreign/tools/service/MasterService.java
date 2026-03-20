@@ -1,9 +1,11 @@
 package com.nightreign.tools.service;
 
+import com.nightreign.tools.dto.BasePointResponse;
 import com.nightreign.tools.dto.BossResponse;
 import com.nightreign.tools.dto.JihenResponse;
 import com.nightreign.tools.dto.ShrinkZoneResponse;
 import com.nightreign.tools.dto.SpawnPointResponse;
+import com.nightreign.tools.repository.BasePointRepository;
 import com.nightreign.tools.repository.BossRepository;
 import com.nightreign.tools.repository.JihenRepository;
 import com.nightreign.tools.repository.ShrinkZoneRepository;
@@ -21,15 +23,18 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class MasterService {
 
+    private final BasePointRepository basePointRepository;
     private final BossRepository bossRepository;
     private final JihenRepository jihenRepository;
     private final ShrinkZoneRepository shrinkZoneRepository;
     private final SpawnPointRepository spawnPointRepository;
 
-    public MasterService(BossRepository bossRepository,
+    public MasterService(BasePointRepository basePointRepository,
+                         BossRepository bossRepository,
                          JihenRepository jihenRepository,
                          ShrinkZoneRepository shrinkZoneRepository,
                          SpawnPointRepository spawnPointRepository) {
+        this.basePointRepository = basePointRepository;
         this.bossRepository = bossRepository;
         this.jihenRepository = jihenRepository;
         this.shrinkZoneRepository = shrinkZoneRepository;
@@ -61,6 +66,13 @@ public class MasterService {
     public List<SpawnPointResponse> getAllSpawnPoints() {
         return spawnPointRepository.findAll().stream()
                 .map(SpawnPointResponse::from)
+                .toList();
+    }
+
+    /** 拠点候補地一覧を取得する */
+    public List<BasePointResponse> getAllBasePoints() {
+        return basePointRepository.findAll().stream()
+                .map(BasePointResponse::from)
                 .toList();
     }
 }

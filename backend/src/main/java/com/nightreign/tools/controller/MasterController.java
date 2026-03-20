@@ -1,5 +1,6 @@
 package com.nightreign.tools.controller;
 
+import com.nightreign.tools.dto.BasePointResponse;
 import com.nightreign.tools.dto.BossResponse;
 import com.nightreign.tools.dto.JihenResponse;
 import com.nightreign.tools.dto.ShrinkZoneResponse;
@@ -47,5 +48,11 @@ public class MasterController {
     @GetMapping("/spawn-points")
     public List<SpawnPointResponse> getSpawnPoints() {
         return masterService.getAllSpawnPoints();
+    }
+
+    /** 拠点候補地一覧を取得する */
+    @GetMapping("/base-points")
+    public List<BasePointResponse> getBasePoints() {
+        return masterService.getAllBasePoints();
     }
 }

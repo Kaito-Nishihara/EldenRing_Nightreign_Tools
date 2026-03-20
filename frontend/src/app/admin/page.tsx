@@ -10,17 +10,20 @@ import { getMapImagePath } from "@/lib/mapImage";
 import {
   getSpawnPoints,
   getShrinkZones,
+  getBasePoints,
   adminCreateSpawnPoint,
   adminUpdateSpawnPoint,
   adminDeleteSpawnPoint,
   adminCreateShrinkZone,
   adminUpdateShrinkZone,
   adminDeleteShrinkZone,
+  adminCreateBasePoint,
+  adminDeleteBasePoint,
 } from "@/lib/api";
-import type { SpawnPoint, ShrinkZone } from "@/types";
+import type { SpawnPoint, ShrinkZone, BasePoint } from "@/types";
 
 /** 編集モード */
-type EditMode = "spawn-point" | "shrink-zone";
+type EditMode = "spawn-point" | "shrink-zone" | "base-point";
 
 /**
  * 管理画面
@@ -30,6 +33,7 @@ export default function AdminPage() {
   // データ
   const [spawnPoints, setSpawnPoints] = useState<SpawnPoint[]>([]);
   const [shrinkZones, setShrinkZones] = useState<ShrinkZone[]>([]);
+  const [basePoints, setBasePoints] = useState<BasePoint[]>([]);
 
   // 編集状態
   const [editMode, setEditMode] = useState<EditMode>("spawn-point");
@@ -47,9 +51,14 @@ export default function AdminPage() {
   /** データ取得 */
   const fetchData = useCallback(async () => {
     try {
-      const [sp, sz] = await Promise.all([getSpawnPoints(), getShrinkZones()]);
+      const [sp, sz, bp] = await Promise.all([
+        getSpawnPoints(),
+        getShrinkZones(),
+        getBasePoints(),
+      ]);
       setSpawnPoints(sp);
       setShrinkZones(sz);
+      setBasePoints(bp);
     } catch (err) {
       console.error("マスタデータ取得エラー:", err);
     }
@@ -61,13 +70,44 @@ export default function AdminPage() {
 
   /** マップクリック時のハンドラー */
   const handleMapClick = useCallback(
-    (x: number, y: number) => {
+    async (x: number, y: number) => {
+      // base-pointモードではクリックで即座に登録
+      if (editMode === "base-point") {
+        setSaving(true);
+        setError(null);
+        try {
+          await adminCreateBasePoint({ x, y });
+          await fetchData();
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "登録に失敗しました");
+        } finally {
+          setSaving(false);
+        }
+        return;
+      }
       setClickedPosition({ x, y });
       setEditingSpawnPoint(null);
       setEditingShrinkZone(null);
       setError(null);
     },
-    []
+    [editMode, fetchData]
+  );
+
+  /** BasePoint削除 */
+  const handleDeleteBasePoint = useCallback(
+    async (id: number) => {
+      setSaving(true);
+      setError(null);
+      try {
+        await adminDeleteBasePoint(id);
+        await fetchData();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "削除に失敗しました");
+      } finally {
+        setSaving(false);
+      }
+    },
+    [fetchData]
   );
 
   /** 既存SpawnPointの編集 */
@@ -217,6 +257,17 @@ export default function AdminPage() {
             >
               収縮候補地
             </button>
+            <button
+              type="button"
+              onClick={() => setEditMode("base-point")}
+              className={`flex-1 px-3 py-2 text-sm rounded-md border transition-colors ${
+                editMode === "base-point"
+                  ? "bg-yellow-600 border-yellow-500 text-white"
+                  : "bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600"
+              }`}
+            >
+              拠点候補
+            </button>
           </div>
 
           {/* 地変切替 */}
@@ -243,7 +294,17 @@ export default function AdminPage() {
           )}
 
           {/* 登録フォーム */}
-          {editMode === "spawn-point" ? (
+          {editMode === "base-point" ? (
+            <div className="p-4 border border-yellow-700 rounded-lg bg-yellow-900/20">
+              <h3 className="text-sm font-bold text-yellow-300 mb-2">拠点候補地登録</h3>
+              <p className="text-xs text-yellow-200/70">
+                マップをクリックすると拠点候補地（?マーク）が登録されます
+              </p>
+              {saving && (
+                <p className="text-xs text-yellow-400 mt-2">登録中...</p>
+              )}
+            </div>
+          ) : editMode === "spawn-point" ? (
             <SpawnPointForm
               position={clickedPosition}
               editing={editingSpawnPoint}
@@ -272,12 +333,36 @@ export default function AdminPage() {
           {/* 登録済みデータ一覧 */}
           <div className="border border-gray-700 rounded-lg bg-gray-800/50 p-3 space-y-2">
             <h3 className="text-sm font-bold text-gray-300">
-              登録済み{editMode === "spawn-point" ? "開始地点" : "収縮候補地"}
+              登録済み{editMode === "spawn-point" ? "開始地点" : editMode === "shrink-zone" ? "収縮候補地" : "拠点候補地"}
               <span className="text-xs font-normal text-gray-500 ml-1">
-                ({editMode === "spawn-point" ? spawnPoints.length : shrinkZones.length}件)
+                ({editMode === "spawn-point" ? spawnPoints.length : editMode === "shrink-zone" ? shrinkZones.length : basePoints.length}件)
               </span>
             </h3>
-            {editMode === "spawn-point" ? (
+            {editMode === "base-point" ? (
+              basePoints.length === 0 ? (
+                <p className="text-xs text-gray-500">データなし</p>
+              ) : (
+                basePoints.map((bp) => (
+                  <div
+                    key={bp.id}
+                    className="flex items-center justify-between p-2 rounded text-xs border border-gray-600 bg-gray-700/50 text-gray-300"
+                  >
+                    <span>
+                      #{bp.id} ({bp.x}, {bp.y})
+                      {bp.nameJa && <span className="text-gray-400 ml-1">{bp.nameJa}</span>}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteBasePoint(bp.id)}
+                      disabled={saving}
+                      className="text-red-400 hover:text-red-300 text-xs"
+                    >
+                      削除
+                    </button>
+                  </div>
+                ))
+              )
+            ) : editMode === "spawn-point" ? (
               spawnPoints.length === 0 ? (
                 <p className="text-xs text-gray-500">データなし</p>
               ) : (
@@ -329,6 +414,7 @@ export default function AdminPage() {
             <AdminOverlay
               spawnPoints={spawnPoints}
               shrinkZones={shrinkZones}
+              basePoints={basePoints}
               editMode={editMode}
               clickedPosition={clickedPosition}
               editingSpawnPointId={editingSpawnPoint?.id ?? null}

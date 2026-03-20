@@ -1,5 +1,6 @@
 import axios from "axios";
 import type {
+  BasePoint,
   Boss,
   Jihen,
   ShrinkZone,
@@ -168,6 +169,42 @@ export async function adminUpdateShrinkZone(
 /** 管理用: 収縮候補地を削除する */
 export async function adminDeleteShrinkZone(id: number): Promise<void> {
   await apiClient.delete(`/api/v1/admin/shrink-zones/${id}`);
+}
+
+/**
+ * 拠点候補地一覧を取得する
+ */
+export async function getBasePoints(): Promise<BasePoint[]> {
+  const response = await apiClient.get<BasePoint[]>("/api/v1/base-points");
+  return response.data;
+}
+
+/** 管理用: 拠点候補地を登録する */
+export async function adminCreateBasePoint(
+  data: Omit<BasePoint, "id">
+): Promise<BasePoint> {
+  const response = await apiClient.post<BasePoint>(
+    "/api/v1/admin/base-points",
+    data
+  );
+  return response.data;
+}
+
+/** 管理用: 拠点候補地を更新する */
+export async function adminUpdateBasePoint(
+  id: number,
+  data: Omit<BasePoint, "id">
+): Promise<BasePoint> {
+  const response = await apiClient.put<BasePoint>(
+    `/api/v1/admin/base-points/${id}`,
+    data
+  );
+  return response.data;
+}
+
+/** 管理用: 拠点候補地を削除する */
+export async function adminDeleteBasePoint(id: number): Promise<void> {
+  await apiClient.delete(`/api/v1/admin/base-points/${id}`);
 }
 
 export default apiClient;

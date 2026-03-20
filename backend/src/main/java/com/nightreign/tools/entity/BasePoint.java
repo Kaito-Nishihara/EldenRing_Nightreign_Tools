@@ -21,12 +21,12 @@ public class BasePoint {
     @Column(name = "name_ja", length = 100)
     private String nameJa;
 
-    /** X座標（0.0～1.0の正規化座標） */
-    @Column(nullable = false, precision = 5, scale = 4)
+    /** X座標（ピクセル座標） */
+    @Column(nullable = false, precision = 7, scale = 2)
     private BigDecimal x;
 
-    /** Y座標（0.0～1.0の正規化座標） */
-    @Column(nullable = false, precision = 5, scale = 4)
+    /** Y座標（ピクセル座標） */
+    @Column(nullable = false, precision = 7, scale = 2)
     private BigDecimal y;
 
     /** 作成日時 */

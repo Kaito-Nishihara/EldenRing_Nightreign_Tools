@@ -1,14 +1,16 @@
 "use client";
 
-import type { SpawnPoint, ShrinkZone } from "@/types";
+import type { SpawnPoint, ShrinkZone, BasePoint } from "@/types";
 
 interface AdminOverlayProps {
   /** 登録済み開始地点 */
   spawnPoints: SpawnPoint[];
   /** 登録済み収縮候補地 */
   shrinkZones: ShrinkZone[];
+  /** 登録済み拠点候補地 */
+  basePoints: BasePoint[];
   /** 編集モード */
-  editMode: "spawn-point" | "shrink-zone";
+  editMode: "spawn-point" | "shrink-zone" | "base-point";
   /** クリック位置 */
   clickedPosition: { x: number; y: number } | null;
   /** 編集中のSpawnPoint ID */
@@ -29,7 +31,7 @@ interface AdminOverlayProps {
 export default function AdminOverlay({
   spawnPoints,
   shrinkZones,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  basePoints,
   editMode,
   clickedPosition,
   editingSpawnPointId,
@@ -104,6 +106,32 @@ export default function AdminOverlay({
           </Group>
         );
       })}
+
+      {/* 拠点候補地を?マークで表示 */}
+      {basePoints.map((bp) => (
+        <Group key={`bp-${bp.id}`}>
+          <Circle
+            x={bp.x}
+            y={bp.y}
+            radius={32}
+            fill={editMode === "base-point" ? "rgba(80, 70, 50, 0.9)" : "rgba(80, 70, 50, 0.5)"}
+            stroke="#C8B87C"
+            strokeWidth={editMode === "base-point" ? 2 : 1}
+          />
+          <Text
+            x={bp.x - 20}
+            y={bp.y - 20}
+            width={40}
+            height={48}
+            align="center"
+            verticalAlign="middle"
+            text="?"
+            fontSize={40}
+            fontStyle="bold"
+            fill="#C8B87C"
+          />
+        </Group>
+      ))}
 
       {/* クリック位置のカーソル */}
       {clickedPosition && (

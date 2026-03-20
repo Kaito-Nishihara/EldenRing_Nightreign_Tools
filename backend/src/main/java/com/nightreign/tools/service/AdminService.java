@@ -1,9 +1,12 @@
 package com.nightreign.tools.service;
 
+import com.nightreign.tools.dto.BasePointRequest;
 import com.nightreign.tools.dto.ShrinkZoneRequest;
 import com.nightreign.tools.dto.SpawnPointRequest;
+import com.nightreign.tools.entity.BasePoint;
 import com.nightreign.tools.entity.ShrinkZone;
 import com.nightreign.tools.entity.SpawnPoint;
+import com.nightreign.tools.repository.BasePointRepository;
 import com.nightreign.tools.repository.ShrinkZoneRepository;
 import com.nightreign.tools.repository.SpawnPointRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,11 +25,14 @@ public class AdminService {
 
     private final SpawnPointRepository spawnPointRepository;
     private final ShrinkZoneRepository shrinkZoneRepository;
+    private final BasePointRepository basePointRepository;
 
     public AdminService(SpawnPointRepository spawnPointRepository,
-                        ShrinkZoneRepository shrinkZoneRepository) {
+                        ShrinkZoneRepository shrinkZoneRepository,
+                        BasePointRepository basePointRepository) {
         this.spawnPointRepository = spawnPointRepository;
         this.shrinkZoneRepository = shrinkZoneRepository;
+        this.basePointRepository = basePointRepository;
     }
 
     // ==========================================
@@ -109,5 +115,45 @@ public class AdminService {
             throw new EntityNotFoundException("収縮候補地が見つかりません: id=" + id);
         }
         shrinkZoneRepository.deleteById(id);
+    }
+
+    // ==========================================
+    // BasePoint CRUD
+    // ==========================================
+
+    /** 拠点候補地一覧を取得する（マップIDで絞り込み） */
+    @Transactional(readOnly = true)
+    public List<BasePoint> getBasePointsByMapId(String mapId) {
+        return basePointRepository.findByMapId(mapId);
+    }
+
+    /** 拠点候補地を登録する */
+    public BasePoint createBasePoint(BasePointRequest request) {
+        BasePoint entity = new BasePoint();
+        entity.setMapId(request.mapId());
+        entity.setNameJa(request.nameJa());
+        entity.setX(request.x());
+        entity.setY(request.y());
+        return basePointRepository.save(entity);
+    }
+
+    /** 拠点候補地を更新する */
+    public BasePoint updateBasePoint(Integer id, BasePointRequest request) {
+        BasePoint entity = basePointRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "拠点候補地が見つかりません: id=" + id));
+        entity.setMapId(request.mapId());
+        entity.setNameJa(request.nameJa());
+        entity.setX(request.x());
+        entity.setY(request.y());
+        return basePointRepository.save(entity);
+    }
+
+    /** 拠点候補地を削除する */
+    public void deleteBasePoint(Integer id) {
+        if (!basePointRepository.existsById(id)) {
+            throw new EntityNotFoundException("拠点候補地が見つかりません: id=" + id);
+        }
+        basePointRepository.deleteById(id);
     }
 }

@@ -89,4 +89,39 @@ public class AdminController {
     public void deleteShrinkZone(@PathVariable Integer id) {
         adminService.deleteShrinkZone(id);
     }
+
+    // ==========================================
+    // BasePoint CRUD
+    // ==========================================
+
+    /** 拠点候補地一覧を取得する（マップIDで絞り込み） */
+    @GetMapping("/base-points")
+    public List<BasePointResponse> getBasePoints(
+            @RequestParam(defaultValue = "normal") String mapId) {
+        return adminService.getBasePointsByMapId(mapId).stream()
+                .map(BasePointResponse::from)
+                .toList();
+    }
+
+    /** 拠点候補地を登録する */
+    @PostMapping("/base-points")
+    @ResponseStatus(HttpStatus.CREATED)
+    public BasePointResponse createBasePoint(@Valid @RequestBody BasePointRequest request) {
+        return BasePointResponse.from(adminService.createBasePoint(request));
+    }
+
+    /** 拠点候補地を更新する */
+    @PutMapping("/base-points/{id}")
+    public BasePointResponse updateBasePoint(
+            @PathVariable Integer id,
+            @Valid @RequestBody BasePointRequest request) {
+        return BasePointResponse.from(adminService.updateBasePoint(id, request));
+    }
+
+    /** 拠点候補地を削除する */
+    @DeleteMapping("/base-points/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteBasePoint(@PathVariable Integer id) {
+        adminService.deleteBasePoint(id);
+    }
 }

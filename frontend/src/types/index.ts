@@ -40,6 +40,22 @@ export interface SpawnPoint {
   nearbyBaseType: "church" | "camp";
 }
 
+/** 拠点候補地（マップ上の固定座標、?マーク） */
+export interface BasePoint {
+  id: number;
+  mapId: string;
+  nameJa?: string;
+  x: number;
+  y: number;
+}
+
+/** 拠点タイプ定義 */
+export interface BaseType {
+  id: string;
+  nameJa: string;
+  imagePath: string;
+}
+
 /** パターン */
 export interface Pattern {
   patternIndex: number;

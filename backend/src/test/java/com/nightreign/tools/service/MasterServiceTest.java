@@ -5,6 +5,7 @@ import com.nightreign.tools.dto.JihenResponse;
 import com.nightreign.tools.dto.ShrinkZoneResponse;
 import com.nightreign.tools.dto.SpawnPointResponse;
 import com.nightreign.tools.entity.*;
+import com.nightreign.tools.repository.BasePointRepository;
 import com.nightreign.tools.repository.BossRepository;
 import com.nightreign.tools.repository.JihenRepository;
 import com.nightreign.tools.repository.ShrinkZoneRepository;
@@ -27,6 +28,9 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 class MasterServiceTest {
+
+    @Mock
+    private BasePointRepository basePointRepository;
 
     @Mock
     private BossRepository bossRepository;

@@ -3,11 +3,18 @@
 import { useState, useEffect } from "react";
 import type { ShrinkZone } from "@/types";
 
+/** 第1次収縮のデフォルト半径（ピクセル） */
+const DEFAULT_RADIUS = 350;
+
 interface ShrinkZoneFormProps {
   /** クリック位置 */
   position: { x: number; y: number } | null;
   /** 編集中のデータ（null=新規作成） */
   editing: ShrinkZone | null;
+  /** 現在の半径 */
+  radius: number;
+  /** 半径変更 */
+  onRadiusChange: (radius: number) => void;
   /** 保存中 */
   saving: boolean;
   /** 保存ハンドラー */
@@ -21,39 +28,52 @@ interface ShrinkZoneFormProps {
 /**
  * 収縮候補地登録フォーム
  * マップクリックした座標を中心に収縮候補地を登録・編集する
+ * プレビューを見ながら半径を調整して登録する
  */
 export default function ShrinkZoneForm({
   position,
   editing,
+  radius,
+  onRadiusChange,
   saving,
   onSave,
   onDelete,
   onCancel,
 }: ShrinkZoneFormProps) {
   const [nameJa, setNameJa] = useState("");
-  const [iconPath, setIconPath] = useState("");
-  const [radius, setRadius] = useState(80);
 
   /** 編集データが変わったらフォームを更新 */
   useEffect(() => {
     if (editing) {
       setNameJa(editing.nameJa);
-      setIconPath(editing.iconPath ?? "");
-      setRadius(editing.radius);
     } else {
       setNameJa("");
-      setIconPath("");
-      setRadius(80);
     }
   }, [editing]);
 
   if (!position) {
     return (
-      <div className="p-4 border border-gray-700 rounded-lg bg-gray-800/50">
+      <div className="p-4 border border-gray-700 rounded-lg bg-gray-800/50 space-y-3">
         <h3 className="text-sm font-bold text-gray-300 mb-2">収縮候補地登録</h3>
         <p className="text-xs text-gray-500">
           マップをクリックして中心座標を選択してください
         </p>
+
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">
+            半径プレビュー
+          </label>
+          <p className="text-sm text-gray-300">{radius}px</p>
+          <input
+            type="range"
+            min={100}
+            max={500}
+            step={5}
+            value={radius}
+            onChange={(e) => onRadiusChange(Number(e.target.value))}
+            className="mt-2 w-full"
+          />
+        </div>
       </div>
     );
   }
@@ -62,7 +82,6 @@ export default function ShrinkZoneForm({
     e.preventDefault();
     onSave({
       nameJa,
-      iconPath: iconPath || undefined,
       centerX: position.x,
       centerY: position.y,
       radius,
@@ -101,30 +120,20 @@ export default function ShrinkZoneForm({
         />
       </div>
 
-      {/* アイコンパス */}
-      <div>
-        <label className="block text-xs text-gray-400 mb-1">アイコンパス（任意）</label>
-        <input
-          type="text"
-          value={iconPath}
-          onChange={(e) => setIconPath(e.target.value)}
-          className="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 text-sm"
-          placeholder="例: /images/zones/Fort.webp"
-        />
-      </div>
-
-      {/* 半径 */}
+      {/* 半径設定 */}
       <div>
         <label className="block text-xs text-gray-400 mb-1">
-          半径: {radius}
+          半径
         </label>
+        <p className="text-sm text-gray-300">{radius}px</p>
         <input
           type="range"
-          min={20}
-          max={200}
+          min={100}
+          max={500}
+          step={5}
           value={radius}
-          onChange={(e) => setRadius(Number(e.target.value))}
-          className="w-full"
+          onChange={(e) => onRadiusChange(Number(e.target.value))}
+          className="mt-2 w-full"
         />
       </div>
 
@@ -158,3 +167,5 @@ export default function ShrinkZoneForm({
     </form>
   );
 }
+
+export { DEFAULT_RADIUS };

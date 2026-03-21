@@ -25,16 +25,16 @@ public class ShrinkZone {
     @Column(name = "icon_path", length = 200)
     private String iconPath;
 
-    /** 中心X座標（0.0～1.0の正規化座標） */
-    @Column(name = "center_x", nullable = false, precision = 5, scale = 4)
+    /** 中心X座標（ピクセル座標） */
+    @Column(name = "center_x", nullable = false, precision = 7, scale = 2)
     private BigDecimal centerX;
 
-    /** 中心Y座標（0.0～1.0の正規化座標） */
-    @Column(name = "center_y", nullable = false, precision = 5, scale = 4)
+    /** 中心Y座標（ピクセル座標） */
+    @Column(name = "center_y", nullable = false, precision = 7, scale = 2)
     private BigDecimal centerY;
 
-    /** 収縮半径（0.0～1.0の正規化値） */
-    @Column(nullable = false, precision = 5, scale = 4)
+    /** 収縮半径（ピクセル値） */
+    @Column(nullable = false, precision = 7, scale = 2)
     private BigDecimal radius;
 
     /** 作成日時 */

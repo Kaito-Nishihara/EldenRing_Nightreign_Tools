@@ -3,7 +3,9 @@ import type {
   BasePoint,
   Boss,
   Jihen,
+  NightBoss,
   ShrinkZone,
+  SecondShrinkPoint,
   SpawnPoint,
   PatternResponse,
   PlayRecordRequest,
@@ -169,6 +171,50 @@ export async function adminUpdateShrinkZone(
 /** 管理用: 収縮候補地を削除する */
 export async function adminDeleteShrinkZone(id: number): Promise<void> {
   await apiClient.delete(`/api/v1/admin/shrink-zones/${id}`);
+}
+
+/**
+ * 夜ボス一覧を取得する
+ */
+export async function getNightBosses(): Promise<NightBoss[]> {
+  const response = await apiClient.get<NightBoss[]>("/api/v1/night-bosses");
+  return response.data;
+}
+
+/** 管理用: 第二収縮地点候補一覧を取得する */
+export async function getSecondShrinkPoints(): Promise<SecondShrinkPoint[]> {
+  const response = await apiClient.get<SecondShrinkPoint[]>(
+    "/api/v1/admin/second-shrink-points"
+  );
+  return response.data;
+}
+
+/** 管理用: 第二収縮地点候補を登録する */
+export async function adminCreateSecondShrinkPoint(
+  data: Omit<SecondShrinkPoint, "id">
+): Promise<SecondShrinkPoint> {
+  const response = await apiClient.post<SecondShrinkPoint>(
+    "/api/v1/admin/second-shrink-points",
+    data
+  );
+  return response.data;
+}
+
+/** 管理用: 第二収縮地点候補を更新する */
+export async function adminUpdateSecondShrinkPoint(
+  id: number,
+  data: Omit<SecondShrinkPoint, "id">
+): Promise<SecondShrinkPoint> {
+  const response = await apiClient.put<SecondShrinkPoint>(
+    `/api/v1/admin/second-shrink-points/${id}`,
+    data
+  );
+  return response.data;
+}
+
+/** 管理用: 第二収縮地点候補を削除する */
+export async function adminDeleteSecondShrinkPoint(id: number): Promise<void> {
+  await apiClient.delete(`/api/v1/admin/second-shrink-points/${id}`);
 }
 
 /**

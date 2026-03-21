@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { SpawnPoint, ShrinkZone, BasePoint } from "@/types";
+import type { SpawnPoint, ShrinkZone, BasePoint, SecondShrinkPoint } from "@/types";
 
 /** 開始地点アイコンのサイズ */
 const SPAWN_ICON_SIZE = 48;
@@ -13,18 +13,26 @@ interface AdminOverlayProps {
   shrinkZones: ShrinkZone[];
   /** 登録済み拠点候補地 */
   basePoints: BasePoint[];
+  /** 登録済み第二収縮地点候補 */
+  secondShrinkPoints: SecondShrinkPoint[];
   /** 編集モード */
-  editMode: "spawn-point" | "shrink-zone" | "base-point";
+  editMode: "spawn-point" | "shrink-zone" | "second-shrink-point" | "base-point";
   /** クリック位置 */
   clickedPosition: { x: number; y: number } | null;
   /** 編集中のSpawnPoint ID */
   editingSpawnPointId: number | null;
   /** 編集中のShrinkZone ID */
   editingShrinkZoneId: number | null;
+  /** 編集中の第二収縮地点候補ID */
+  editingSecondShrinkPointId: number | null;
+  /** 収縮候補地のプレビュー半径 */
+  shrinkZoneRadius: number;
   /** SpawnPointクリック */
   onSpawnPointClick: (sp: SpawnPoint) => void;
   /** ShrinkZoneクリック */
   onShrinkZoneClick: (sz: ShrinkZone) => void;
+  /** 第二収縮地点候補クリック */
+  onSecondShrinkPointClick: (point: SecondShrinkPoint) => void;
 }
 
 /**
@@ -36,12 +44,16 @@ export default function AdminOverlay({
   spawnPoints,
   shrinkZones,
   basePoints,
+  secondShrinkPoints,
   editMode,
   clickedPosition,
   editingSpawnPointId,
   editingShrinkZoneId,
+  editingSecondShrinkPointId,
+  shrinkZoneRadius,
   onSpawnPointClick,
   onShrinkZoneClick,
+  onSecondShrinkPointClick,
 }: AdminOverlayProps) {
   /* eslint-disable @typescript-eslint/no-require-imports */
   const { Circle, Text, Group, Image: KonvaImage } = require("react-konva");
@@ -59,36 +71,45 @@ export default function AdminOverlay({
 
   return (
     <>
-      {/* 収縮候補地を円で表示 */}
-      {shrinkZones.map((sz) => {
-        const isEditing = editingShrinkZoneId === sz.id;
+      {/* 収縮候補地は選択中または新規作成プレビューのみ表示 */}
+      {(() => {
+        const selectedZone = shrinkZones.find((sz) => sz.id === editingShrinkZoneId) ?? null;
+        const previewPosition =
+          clickedPosition ??
+          (selectedZone
+            ? { x: selectedZone.centerX, y: selectedZone.centerY }
+            : null);
+
+        if (editMode !== "shrink-zone" || !previewPosition) {
+          return null;
+        }
+
         return (
           <Group
-            key={`sz-${sz.id}`}
-            onClick={() => onShrinkZoneClick(sz)}
-            onTap={() => onShrinkZoneClick(sz)}
+            key={selectedZone ? `sz-${selectedZone.id}` : "shrink-zone-preview"}
+            onClick={selectedZone ? () => onShrinkZoneClick(selectedZone) : undefined}
+            onTap={selectedZone ? () => onShrinkZoneClick(selectedZone) : undefined}
           >
             <Circle
-              x={sz.centerX}
-              y={sz.centerY}
-              radius={sz.radius}
-              fill={isEditing ? "rgba(34, 197, 94, 0.3)" : "rgba(34, 197, 94, 0.15)"}
-              stroke={isEditing ? "#22c55e" : "#4ade80"}
-              strokeWidth={isEditing ? 3 : 1.5}
-              hitStrokeWidth={10}
+              x={previewPosition.x}
+              y={previewPosition.y}
+              radius={shrinkZoneRadius}
+              fill={selectedZone ? "rgba(34, 197, 94, 0.3)" : "rgba(34, 197, 94, 0.22)"}
+              stroke={selectedZone ? "#22c55e" : "#4ade80"}
+              strokeWidth={selectedZone ? 3 : 2}
             />
             <Text
-              x={sz.centerX - 40}
-              y={sz.centerY - 6}
-              text={sz.nameJa}
+              x={previewPosition.x - 60}
+              y={previewPosition.y - 6}
+              text={selectedZone ? `${selectedZone.nameJa} r=${shrinkZoneRadius}` : `新規候補 r=${shrinkZoneRadius}`}
               fontSize={11}
-              fill={isEditing ? "#22c55e" : "#86efac"}
+              fill="#86efac"
               align="center"
-              width={80}
+              width={120}
             />
           </Group>
         );
-      })}
+      })()}
 
       {/* 開始地点をアイコンで表示 */}
       {spawnPoints.map((sp) => {
@@ -137,6 +158,49 @@ export default function AdminOverlay({
               fill={isEditing ? "#93c5fd" : "#bfdbfe"}
               align="center"
               width={60}
+            />
+          </Group>
+        );
+      })}
+
+      {/* 第二収縮地点候補をマーカーで表示 */}
+      {secondShrinkPoints.map((point) => {
+        const isEditing = editingSecondShrinkPointId === point.id;
+        return (
+          <Group
+            key={`ssp-${point.id}`}
+            onClick={() => onSecondShrinkPointClick(point)}
+            onTap={() => onSecondShrinkPointClick(point)}
+          >
+            <Circle
+              x={point.x}
+              y={point.y}
+              radius={20}
+              fill="rgba(88, 28, 135, 0.82)"
+              stroke={isEditing ? "#f5d0fe" : "#e879f9"}
+              strokeWidth={isEditing ? 3 : 2}
+              hitStrokeWidth={15}
+            />
+            <Text
+              x={point.x - 16}
+              y={point.y - 11}
+              width={32}
+              text="II"
+              fontSize={16}
+              fontStyle="bold"
+              fill="#fdf4ff"
+              align="center"
+              listening={false}
+            />
+            <Text
+              x={point.x - 48}
+              y={point.y + 24}
+              width={96}
+              text={point.nameJa}
+              fontSize={10}
+              fill={isEditing ? "#f5d0fe" : "#f0abfc"}
+              align="center"
+              listening={false}
             />
           </Group>
         );

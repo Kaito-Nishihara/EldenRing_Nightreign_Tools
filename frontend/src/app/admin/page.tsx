@@ -5,11 +5,13 @@ import Link from "next/link";
 import MapCanvas from "@/components/map/MapCanvas";
 import AdminOverlay from "@/components/admin/AdminOverlay";
 import SpawnPointForm from "@/components/admin/SpawnPointForm";
-import ShrinkZoneForm from "@/components/admin/ShrinkZoneForm";
+import ShrinkZoneForm, { DEFAULT_RADIUS } from "@/components/admin/ShrinkZoneForm";
+import SecondShrinkPointForm from "@/components/admin/SecondShrinkPointForm";
 import { getMapImagePath } from "@/lib/mapImage";
 import {
   getSpawnPoints,
   getShrinkZones,
+  getSecondShrinkPoints,
   getBasePoints,
   adminCreateSpawnPoint,
   adminUpdateSpawnPoint,
@@ -17,13 +19,16 @@ import {
   adminCreateShrinkZone,
   adminUpdateShrinkZone,
   adminDeleteShrinkZone,
+  adminCreateSecondShrinkPoint,
+  adminUpdateSecondShrinkPoint,
+  adminDeleteSecondShrinkPoint,
   adminCreateBasePoint,
   adminDeleteBasePoint,
 } from "@/lib/api";
-import type { SpawnPoint, ShrinkZone, BasePoint } from "@/types";
+import type { SpawnPoint, ShrinkZone, BasePoint, SecondShrinkPoint } from "@/types";
 
 /** 編集モード */
-type EditMode = "spawn-point" | "shrink-zone" | "base-point";
+type EditMode = "spawn-point" | "shrink-zone" | "second-shrink-point" | "base-point";
 
 /**
  * 管理画面
@@ -33,6 +38,7 @@ export default function AdminPage() {
   // データ
   const [spawnPoints, setSpawnPoints] = useState<SpawnPoint[]>([]);
   const [shrinkZones, setShrinkZones] = useState<ShrinkZone[]>([]);
+  const [secondShrinkPoints, setSecondShrinkPoints] = useState<SecondShrinkPoint[]>([]);
   const [basePoints, setBasePoints] = useState<BasePoint[]>([]);
 
   // 編集状態
@@ -40,6 +46,8 @@ export default function AdminPage() {
   const [clickedPosition, setClickedPosition] = useState<{ x: number; y: number } | null>(null);
   const [editingSpawnPoint, setEditingSpawnPoint] = useState<SpawnPoint | null>(null);
   const [editingShrinkZone, setEditingShrinkZone] = useState<ShrinkZone | null>(null);
+  const [editingSecondShrinkPoint, setEditingSecondShrinkPoint] = useState<SecondShrinkPoint | null>(null);
+  const [shrinkZoneRadius, setShrinkZoneRadius] = useState(DEFAULT_RADIUS);
 
   // 地変選択（マップ画像切替用）
   const [selectedJihenId, setSelectedJihenId] = useState<string | null>(null);
@@ -54,13 +62,15 @@ export default function AdminPage() {
   /** データ取得 */
   const fetchData = useCallback(async () => {
     try {
-      const [sp, sz, bp] = await Promise.all([
+      const [sp, sz, ssp, bp] = await Promise.all([
         getSpawnPoints(),
         getShrinkZones(),
+        getSecondShrinkPoints(),
         getBasePoints(mapId),
       ]);
       setSpawnPoints(sp);
       setShrinkZones(sz);
+      setSecondShrinkPoints(ssp);
       setBasePoints(bp);
     } catch (err) {
       console.error("マスタデータ取得エラー:", err);
@@ -90,7 +100,12 @@ export default function AdminPage() {
       }
       setClickedPosition({ x, y });
       setEditingSpawnPoint(null);
-      setEditingShrinkZone(null);
+      if (editMode !== "shrink-zone") {
+        setEditingShrinkZone(null);
+      }
+      if (editMode !== "second-shrink-point") {
+        setEditingSecondShrinkPoint(null);
+      }
       setError(null);
     },
     [editMode, mapId, fetchData]
@@ -118,6 +133,7 @@ export default function AdminPage() {
     setEditMode("spawn-point");
     setEditingSpawnPoint(sp);
     setEditingShrinkZone(null);
+    setEditingSecondShrinkPoint(null);
     setClickedPosition({ x: sp.x, y: sp.y });
     setError(null);
   }, []);
@@ -127,7 +143,19 @@ export default function AdminPage() {
     setEditMode("shrink-zone");
     setEditingShrinkZone(sz);
     setEditingSpawnPoint(null);
+    setEditingSecondShrinkPoint(null);
     setClickedPosition({ x: sz.centerX, y: sz.centerY });
+    setShrinkZoneRadius(sz.radius);
+    setError(null);
+  }, []);
+
+  /** 既存SecondShrinkPointの編集 */
+  const handleEditSecondShrinkPoint = useCallback((point: SecondShrinkPoint) => {
+    setEditMode("second-shrink-point");
+    setEditingSecondShrinkPoint(point);
+    setEditingSpawnPoint(null);
+    setEditingShrinkZone(null);
+    setClickedPosition({ x: point.x, y: point.y });
     setError(null);
   }, []);
 
@@ -187,6 +215,7 @@ export default function AdminPage() {
         await fetchData();
         setClickedPosition(null);
         setEditingShrinkZone(null);
+        setShrinkZoneRadius(DEFAULT_RADIUS);
       } catch (err) {
         setError(err instanceof Error ? err.message : "保存に失敗しました");
       } finally {
@@ -206,6 +235,49 @@ export default function AdminPage() {
         await fetchData();
         setClickedPosition(null);
         setEditingShrinkZone(null);
+        setShrinkZoneRadius(DEFAULT_RADIUS);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "削除に失敗しました");
+      } finally {
+        setSaving(false);
+      }
+    },
+    [fetchData]
+  );
+
+  /** SecondShrinkPoint保存 */
+  const handleSaveSecondShrinkPoint = useCallback(
+    async (data: Omit<SecondShrinkPoint, "id">) => {
+      setSaving(true);
+      setError(null);
+      try {
+        if (editingSecondShrinkPoint) {
+          await adminUpdateSecondShrinkPoint(editingSecondShrinkPoint.id, data);
+        } else {
+          await adminCreateSecondShrinkPoint(data);
+        }
+        await fetchData();
+        setClickedPosition(null);
+        setEditingSecondShrinkPoint(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "保存に失敗しました");
+      } finally {
+        setSaving(false);
+      }
+    },
+    [editingSecondShrinkPoint, fetchData]
+  );
+
+  /** SecondShrinkPoint削除 */
+  const handleDeleteSecondShrinkPoint = useCallback(
+    async (id: number) => {
+      setSaving(true);
+      setError(null);
+      try {
+        await adminDeleteSecondShrinkPoint(id);
+        await fetchData();
+        setClickedPosition(null);
+        setEditingSecondShrinkPoint(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : "削除に失敗しました");
       } finally {
@@ -237,7 +309,7 @@ export default function AdminPage() {
         {/* サイドパネル */}
         <aside className="order-2 md:order-1 md:w-96 md:flex-shrink-0 md:h-full overflow-y-auto bg-gray-900 border-t md:border-t-0 md:border-r border-gray-700 p-4 space-y-4">
           {/* 編集モード切替 */}
-          <div className="flex gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => setEditMode("spawn-point")}
@@ -262,8 +334,19 @@ export default function AdminPage() {
             </button>
             <button
               type="button"
+              onClick={() => setEditMode("second-shrink-point")}
+              className={`px-3 py-2 text-sm rounded-md border transition-colors ${
+                editMode === "second-shrink-point"
+                  ? "bg-fuchsia-600 border-fuchsia-500 text-white"
+                  : "bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600"
+              }`}
+            >
+              第二収縮地点
+            </button>
+            <button
+              type="button"
               onClick={() => setEditMode("base-point")}
-              className={`flex-1 px-3 py-2 text-sm rounded-md border transition-colors ${
+              className={`px-3 py-2 text-sm rounded-md border transition-colors ${
                 editMode === "base-point"
                   ? "bg-yellow-600 border-yellow-500 text-white"
                   : "bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600"
@@ -319,16 +402,31 @@ export default function AdminPage() {
                 setEditingSpawnPoint(null);
               }}
             />
-          ) : (
+          ) : editMode === "shrink-zone" ? (
             <ShrinkZoneForm
               position={clickedPosition}
               editing={editingShrinkZone}
+              radius={shrinkZoneRadius}
+              onRadiusChange={setShrinkZoneRadius}
               saving={saving}
               onSave={handleSaveShrinkZone}
               onDelete={handleDeleteShrinkZone}
               onCancel={() => {
                 setClickedPosition(null);
                 setEditingShrinkZone(null);
+                setShrinkZoneRadius(DEFAULT_RADIUS);
+              }}
+            />
+          ) : (
+            <SecondShrinkPointForm
+              position={clickedPosition}
+              editing={editingSecondShrinkPoint}
+              saving={saving}
+              onSave={handleSaveSecondShrinkPoint}
+              onDelete={handleDeleteSecondShrinkPoint}
+              onCancel={() => {
+                setClickedPosition(null);
+                setEditingSecondShrinkPoint(null);
               }}
             />
           )}
@@ -336,9 +434,21 @@ export default function AdminPage() {
           {/* 登録済みデータ一覧 */}
           <div className="border border-gray-700 rounded-lg bg-gray-800/50 p-3 space-y-2">
             <h3 className="text-sm font-bold text-gray-300">
-              登録済み{editMode === "spawn-point" ? "開始地点" : editMode === "shrink-zone" ? "収縮候補地" : "拠点候補地"}
+              登録済み{editMode === "spawn-point"
+                ? "開始地点"
+                : editMode === "shrink-zone"
+                  ? "収縮候補地"
+                  : editMode === "second-shrink-point"
+                    ? "第二収縮地点"
+                    : "拠点候補地"}
               <span className="text-xs font-normal text-gray-500 ml-1">
-                ({editMode === "spawn-point" ? spawnPoints.length : editMode === "shrink-zone" ? shrinkZones.length : basePoints.length}件)
+                ({editMode === "spawn-point"
+                  ? spawnPoints.length
+                  : editMode === "shrink-zone"
+                    ? shrinkZones.length
+                    : editMode === "second-shrink-point"
+                      ? secondShrinkPoints.length
+                      : basePoints.length}件)
               </span>
             </h3>
             {editMode === "base-point" ? (
@@ -381,30 +491,48 @@ export default function AdminPage() {
                     }`}
                   >
                     <span className="font-bold">{sp.nameJa}</span>
+                    <span className="text-gray-500 ml-2">({sp.x}, {sp.y})</span>
+                  </button>
+                ))
+              )
+            ) : editMode === "shrink-zone" ? (
+              shrinkZones.length === 0 ? (
+                <p className="text-xs text-gray-500">データなし</p>
+              ) : (
+                shrinkZones.map((sz) => (
+                  <button
+                    key={sz.id}
+                    type="button"
+                    onClick={() => handleEditShrinkZone(sz)}
+                    className={`w-full text-left p-2 rounded text-xs border transition-colors ${
+                      editingShrinkZone?.id === sz.id
+                        ? "border-green-500 bg-green-900/30 text-green-200"
+                        : "border-gray-600 bg-gray-700/50 text-gray-300 hover:bg-gray-700"
+                    }`}
+                  >
+                    <span className="font-bold">{sz.nameJa}</span>
                     <span className="text-gray-500 ml-2">
-                      ({sp.x}, {sp.y})
+                      ({sz.centerX}, {sz.centerY}) r={sz.radius}
                     </span>
                   </button>
                 ))
               )
-            ) : shrinkZones.length === 0 ? (
+            ) : secondShrinkPoints.length === 0 ? (
               <p className="text-xs text-gray-500">データなし</p>
             ) : (
-              shrinkZones.map((sz) => (
+              secondShrinkPoints.map((point) => (
                 <button
-                  key={sz.id}
+                  key={point.id}
                   type="button"
-                  onClick={() => handleEditShrinkZone(sz)}
+                  onClick={() => handleEditSecondShrinkPoint(point)}
                   className={`w-full text-left p-2 rounded text-xs border transition-colors ${
-                    editingShrinkZone?.id === sz.id
-                      ? "border-green-500 bg-green-900/30 text-green-200"
+                    editingSecondShrinkPoint?.id === point.id
+                      ? "border-fuchsia-500 bg-fuchsia-900/30 text-fuchsia-200"
                       : "border-gray-600 bg-gray-700/50 text-gray-300 hover:bg-gray-700"
                   }`}
                 >
-                  <span className="font-bold">{sz.nameJa}</span>
-                  <span className="text-gray-500 ml-2">
-                    ({sz.centerX}, {sz.centerY}) r={sz.radius}
-                  </span>
+                  <span className="font-bold">{point.nameJa}</span>
+                  <span className="text-gray-500 ml-2">({point.x}, {point.y})</span>
                 </button>
               ))
             )}
@@ -418,12 +546,16 @@ export default function AdminPage() {
               spawnPoints={spawnPoints}
               shrinkZones={shrinkZones}
               basePoints={basePoints}
+              secondShrinkPoints={secondShrinkPoints}
               editMode={editMode}
               clickedPosition={clickedPosition}
               editingSpawnPointId={editingSpawnPoint?.id ?? null}
               editingShrinkZoneId={editingShrinkZone?.id ?? null}
+              editingSecondShrinkPointId={editingSecondShrinkPoint?.id ?? null}
+              shrinkZoneRadius={shrinkZoneRadius}
               onSpawnPointClick={handleEditSpawnPoint}
               onShrinkZoneClick={handleEditShrinkZone}
+              onSecondShrinkPointClick={handleEditSecondShrinkPoint}
             />
           </MapCanvas>
         </main>

@@ -1,12 +1,15 @@
 package com.nightreign.tools.service;
 
 import com.nightreign.tools.dto.BasePointRequest;
+import com.nightreign.tools.dto.SecondShrinkPointRequest;
 import com.nightreign.tools.dto.ShrinkZoneRequest;
 import com.nightreign.tools.dto.SpawnPointRequest;
 import com.nightreign.tools.entity.BasePoint;
+import com.nightreign.tools.entity.SecondShrinkPoint;
 import com.nightreign.tools.entity.ShrinkZone;
 import com.nightreign.tools.entity.SpawnPoint;
 import com.nightreign.tools.repository.BasePointRepository;
+import com.nightreign.tools.repository.SecondShrinkPointRepository;
 import com.nightreign.tools.repository.ShrinkZoneRepository;
 import com.nightreign.tools.repository.SpawnPointRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,17 +25,19 @@ import java.util.List;
 @Service
 @Transactional
 public class AdminService {
-
     private final SpawnPointRepository spawnPointRepository;
     private final ShrinkZoneRepository shrinkZoneRepository;
     private final BasePointRepository basePointRepository;
+    private final SecondShrinkPointRepository secondShrinkPointRepository;
 
     public AdminService(SpawnPointRepository spawnPointRepository,
                         ShrinkZoneRepository shrinkZoneRepository,
-                        BasePointRepository basePointRepository) {
+                        BasePointRepository basePointRepository,
+                        SecondShrinkPointRepository secondShrinkPointRepository) {
         this.spawnPointRepository = spawnPointRepository;
         this.shrinkZoneRepository = shrinkZoneRepository;
         this.basePointRepository = basePointRepository;
+        this.secondShrinkPointRepository = secondShrinkPointRepository;
     }
 
     // ==========================================
@@ -113,6 +118,40 @@ public class AdminService {
             throw new EntityNotFoundException("収縮候補地が見つかりません: id=" + id);
         }
         shrinkZoneRepository.deleteById(id);
+    }
+
+    // ==========================================
+    // SecondShrinkPoint CRUD
+    // ==========================================
+
+    @Transactional(readOnly = true)
+    public List<SecondShrinkPoint> getAllSecondShrinkPoints() {
+        return secondShrinkPointRepository.findAll();
+    }
+
+    public SecondShrinkPoint createSecondShrinkPoint(SecondShrinkPointRequest request) {
+        SecondShrinkPoint entity = new SecondShrinkPoint();
+        entity.setNameJa(request.nameJa());
+        entity.setX(request.x());
+        entity.setY(request.y());
+        return secondShrinkPointRepository.save(entity);
+    }
+
+    public SecondShrinkPoint updateSecondShrinkPoint(Integer id, SecondShrinkPointRequest request) {
+        SecondShrinkPoint entity = secondShrinkPointRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "第二収縮地点候補が見つかりません: id=" + id));
+        entity.setNameJa(request.nameJa());
+        entity.setX(request.x());
+        entity.setY(request.y());
+        return secondShrinkPointRepository.save(entity);
+    }
+
+    public void deleteSecondShrinkPoint(Integer id) {
+        if (!secondShrinkPointRepository.existsById(id)) {
+            throw new EntityNotFoundException("第二収縮地点候補が見つかりません: id=" + id);
+        }
+        secondShrinkPointRepository.deleteById(id);
     }
 
     // ==========================================

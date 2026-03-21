@@ -21,6 +21,8 @@ interface RecordFormProps {
   zones: ShrinkZone[];
   /** フォーム状態 */
   form: PlayRecordFormState;
+  /** 表示中の日 */
+  visibleDay: 1 | 2;
   /** アクティブスロット */
   activeSlot: { day: 1 | 2; phase: 1 | 2 } | null;
   /** 保存中 */
@@ -40,6 +42,7 @@ interface RecordFormProps {
   onJihenSelect: (id: string | null) => void;
   onSpawnPointSelect: (id: number | null) => void;
   onNoteChange: (note: string) => void;
+  onVisibleDayChange: (day: 1 | 2) => void;
   onSlotSelect: (slot: { day: 1 | 2; phase: 1 | 2 } | null) => void;
   onEntryRemove: (day: 1 | 2, phase: 1 | 2) => void;
   onSubmit: () => void;
@@ -56,6 +59,7 @@ export default function RecordForm({
   spawnPoints,
   zones,
   form,
+  visibleDay,
   activeSlot,
   saving,
   error,
@@ -67,6 +71,7 @@ export default function RecordForm({
   onJihenSelect,
   onSpawnPointSelect,
   onNoteChange,
+  onVisibleDayChange,
   onSlotSelect,
   onEntryRemove,
   onSubmit,
@@ -89,6 +94,8 @@ export default function RecordForm({
     const zone = zones.find((z) => z.id === zoneId);
     return zone?.nameJa ?? `Zone #${zoneId}`;
   };
+
+  const visibleSlots = SLOTS.filter(({ day }) => day === visibleDay);
 
   if (masterError) {
     return (
@@ -194,7 +201,32 @@ export default function RecordForm({
           スロットを選んでマップ上のゾーンをタップ
         </p>
 
-        {SLOTS.map(({ day, phase, label }) => {
+        <div className="flex gap-2 mb-2">
+          <button
+            type="button"
+            onClick={() => onVisibleDayChange(1)}
+            className={`flex-1 rounded-md border px-3 py-2 text-sm transition-colors ${
+              visibleDay === 1
+                ? "border-blue-500 bg-blue-900/30 text-blue-200"
+                : "border-gray-600 bg-gray-700/50 text-gray-400 hover:bg-gray-700"
+            }`}
+          >
+            Day1
+          </button>
+          <button
+            type="button"
+            onClick={() => onVisibleDayChange(2)}
+            className={`flex-1 rounded-md border px-3 py-2 text-sm transition-colors ${
+              visibleDay === 2
+                ? "border-blue-500 bg-blue-900/30 text-blue-200"
+                : "border-gray-600 bg-gray-700/50 text-gray-400 hover:bg-gray-700"
+            }`}
+          >
+            Day2
+          </button>
+        </div>
+
+        {visibleSlots.map(({ day, phase, label }) => {
           const key = slotKey(day, phase);
           const zoneId = form.entries[key];
           const isActive =

@@ -91,6 +91,41 @@ public class AdminController {
     }
 
     // ==========================================
+    // SecondShrinkPoint CRUD
+    // ==========================================
+
+    /** 第二収縮地点候補一覧を取得する */
+    @GetMapping("/second-shrink-points")
+    public List<SecondShrinkPointResponse> getSecondShrinkPoints() {
+        return adminService.getAllSecondShrinkPoints().stream()
+                .map(SecondShrinkPointResponse::from)
+                .toList();
+    }
+
+    /** 第二収縮地点候補を登録する */
+    @PostMapping("/second-shrink-points")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SecondShrinkPointResponse createSecondShrinkPoint(
+            @Valid @RequestBody SecondShrinkPointRequest request) {
+        return SecondShrinkPointResponse.from(adminService.createSecondShrinkPoint(request));
+    }
+
+    /** 第二収縮地点候補を更新する */
+    @PutMapping("/second-shrink-points/{id}")
+    public SecondShrinkPointResponse updateSecondShrinkPoint(
+            @PathVariable Integer id,
+            @Valid @RequestBody SecondShrinkPointRequest request) {
+        return SecondShrinkPointResponse.from(adminService.updateSecondShrinkPoint(id, request));
+    }
+
+    /** 第二収縮地点候補を削除する */
+    @DeleteMapping("/second-shrink-points/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteSecondShrinkPoint(@PathVariable Integer id) {
+        adminService.deleteSecondShrinkPoint(id);
+    }
+
+    // ==========================================
     // BasePoint CRUD
     // ==========================================
 

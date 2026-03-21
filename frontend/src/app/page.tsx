@@ -131,7 +131,7 @@ export default function HomePage() {
           >
             <ZoneOverlay
               zones={zones}
-              selectedZoneId={selectedZoneId}
+              activeZoneId={selectedZoneId}
               onZoneSelect={handleZoneSelect}
             />
             {patternData && (

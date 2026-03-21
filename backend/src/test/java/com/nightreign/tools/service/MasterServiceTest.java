@@ -2,12 +2,14 @@ package com.nightreign.tools.service;
 
 import com.nightreign.tools.dto.BossResponse;
 import com.nightreign.tools.dto.JihenResponse;
+import com.nightreign.tools.dto.NightBossResponse;
 import com.nightreign.tools.dto.ShrinkZoneResponse;
 import com.nightreign.tools.dto.SpawnPointResponse;
 import com.nightreign.tools.entity.*;
 import com.nightreign.tools.repository.BasePointRepository;
 import com.nightreign.tools.repository.BossRepository;
 import com.nightreign.tools.repository.JihenRepository;
+import com.nightreign.tools.repository.NightBossRepository;
 import com.nightreign.tools.repository.ShrinkZoneRepository;
 import com.nightreign.tools.repository.SpawnPointRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +39,9 @@ class MasterServiceTest {
 
     @Mock
     private JihenRepository jihenRepository;
+
+    @Mock
+    private NightBossRepository nightBossRepository;
 
     @Mock
     private ShrinkZoneRepository shrinkZoneRepository;
@@ -149,5 +154,21 @@ class MasterServiceTest {
         assertThat(result.getFirst().id()).isEqualTo(1);
         assertThat(result.getFirst().nameJa()).isEqualTo("北東・野営地付近");
         assertThat(result.getFirst().nameJa()).isEqualTo("北東・野営地付近");
+    }
+
+    @Test
+    void getAllNightBosses_夜ボス一覧を返す() {
+        var nightBoss = new NightBoss();
+        nightBoss.setId(1);
+        nightBoss.setNameJa("鈴玉狩り");
+        nightBoss.setDay(1);
+        when(nightBossRepository.findAll()).thenReturn(List.of(nightBoss));
+
+        List<NightBossResponse> result = masterService.getAllNightBosses();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().id()).isEqualTo(1);
+        assertThat(result.getFirst().nameJa()).isEqualTo("鈴玉狩り");
+        assertThat(result.getFirst().day()).isEqualTo(1);
     }
 }

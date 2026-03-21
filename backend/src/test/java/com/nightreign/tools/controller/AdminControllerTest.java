@@ -1,6 +1,7 @@
 package com.nightreign.tools.controller;
 
 import com.nightreign.tools.config.ServiceKeyFilter;
+import com.nightreign.tools.entity.SecondShrinkPoint;
 import com.nightreign.tools.entity.ShrinkZone;
 import com.nightreign.tools.entity.SpawnPoint;
 import com.nightreign.tools.service.AdminService;
@@ -243,6 +244,85 @@ class AdminControllerTest {
 
             mockMvc.perform(delete("/api/v1/admin/shrink-zones/999"))
                     .andExpect(status().isNotFound());
+        }
+    }
+
+    @Nested
+    @DisplayName("SecondShrinkPoint API")
+    class SecondShrinkPointApiTests {
+
+        @Test
+        @DisplayName("GET /api/v1/admin/second-shrink-points: 一覧取得")
+        void listSecondShrinkPoints() throws Exception {
+            var point = new SecondShrinkPoint();
+            point.setId(1);
+            point.setNameJa("北側崖上");
+            point.setX(new BigDecimal("640"));
+            point.setY(new BigDecimal("280"));
+            when(adminService.getAllSecondShrinkPoints()).thenReturn(List.of(point));
+
+            mockMvc.perform(get("/api/v1/admin/second-shrink-points"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].nameJa").value("北側崖上"))
+                    .andExpect(jsonPath("$[0].x").value(640));
+        }
+
+        @Test
+        @DisplayName("POST /api/v1/admin/second-shrink-points: 登録で201")
+        void createSecondShrinkPoint() throws Exception {
+            var saved = new SecondShrinkPoint();
+            saved.setId(1);
+            saved.setNameJa("北側崖上");
+            saved.setX(new BigDecimal("640"));
+            saved.setY(new BigDecimal("280"));
+            when(adminService.createSecondShrinkPoint(any())).thenReturn(saved);
+
+            mockMvc.perform(post("/api/v1/admin/second-shrink-points")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("""
+                                    {"nameJa":"北側崖上","x":640,"y":280}
+                                    """))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.nameJa").value("北側崖上"));
+        }
+
+        @Test
+        @DisplayName("POST: nameJa空でバリデーションエラー400")
+        void createSecondShrinkPointInvalidName() throws Exception {
+            mockMvc.perform(post("/api/v1/admin/second-shrink-points")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("""
+                                    {"nameJa":"","x":640,"y":280}
+                                    """))
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @DisplayName("PUT /api/v1/admin/second-shrink-points/{id}: 更新で200")
+        void updateSecondShrinkPoint() throws Exception {
+            var updated = new SecondShrinkPoint();
+            updated.setId(1);
+            updated.setNameJa("南側広場");
+            updated.setX(new BigDecimal("520"));
+            updated.setY(new BigDecimal("760"));
+            when(adminService.updateSecondShrinkPoint(eq(1), any())).thenReturn(updated);
+
+            mockMvc.perform(put("/api/v1/admin/second-shrink-points/1")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("""
+                                    {"nameJa":"南側広場","x":520,"y":760}
+                                    """))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.nameJa").value("南側広場"));
+        }
+
+        @Test
+        @DisplayName("DELETE /api/v1/admin/second-shrink-points/{id}: 削除で204")
+        void deleteSecondShrinkPoint() throws Exception {
+            doNothing().when(adminService).deleteSecondShrinkPoint(1);
+
+            mockMvc.perform(delete("/api/v1/admin/second-shrink-points/1"))
+                    .andExpect(status().isNoContent());
         }
     }
 }

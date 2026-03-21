@@ -2,6 +2,7 @@ package com.nightreign.tools.controller;
 
 import com.nightreign.tools.dto.BossResponse;
 import com.nightreign.tools.dto.JihenResponse;
+import com.nightreign.tools.dto.NightBossResponse;
 import com.nightreign.tools.dto.ShrinkZoneResponse;
 import com.nightreign.tools.dto.SpawnPointResponse;
 import com.nightreign.tools.service.MasterService;
@@ -90,5 +91,17 @@ class MasterControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].nameJa").value("北東・野営地付近"));
+    }
+
+    @Test
+    void getNightBosses_200で夜ボス一覧を返す() throws Exception {
+        var nb = new NightBossResponse(1, "鈴玉狩り", 1);
+        when(masterService.getAllNightBosses()).thenReturn(List.of(nb));
+
+        mockMvc.perform(get("/api/v1/night-bosses"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].nameJa").value("鈴玉狩り"))
+                .andExpect(jsonPath("$[0].day").value(1));
     }
 }

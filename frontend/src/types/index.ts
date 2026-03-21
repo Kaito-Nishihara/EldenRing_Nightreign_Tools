@@ -31,6 +31,21 @@ export interface ShrinkZone {
   radius: number;
 }
 
+/** 夜ボス（最終ボス=夜の王とは別） */
+export interface NightBoss {
+  id: number;
+  nameJa: string;
+  day: number;
+}
+
+/** 第二収縮地点候補（座標のみ管理、夜ボスとの紐付けは記録画面で行う） */
+export interface SecondShrinkPoint {
+  id: number;
+  nameJa: string;
+  x: number;
+  y: number;
+}
+
 /** 開始地点 */
 export interface SpawnPoint {
   id: number;

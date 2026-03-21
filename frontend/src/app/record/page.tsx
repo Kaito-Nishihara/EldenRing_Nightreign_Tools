@@ -23,6 +23,8 @@ export default function RecordPage() {
   const router = useRouter();
   const [zones, setZones] = useState<ShrinkZone[]>([]);
   const [basePoints, setBasePoints] = useState<BasePoint[]>([]);
+  const [visibleDay, setVisibleDay] = useState<1 | 2>(1);
+  const [showShrinkZones, setShowShrinkZones] = useState(true);
 
   /** 拠点タイプの割り当て状態（キー: basePointId, 値: baseTypeId） */
   const [baseAssignments, setBaseAssignments] = useState<Record<number, string | null>>({});
@@ -78,6 +80,12 @@ export default function RecordPage() {
     return () => clearTimeout(timer);
   }, [saved, router]);
 
+  useEffect(() => {
+    if (activeSlot) {
+      setVisibleDay(activeSlot.day);
+    }
+  }, [activeSlot]);
+
   /** 開始地点を選択 */
   const handleSpawnPointSelect = useCallback(
     (sp: SpawnPoint) => {
@@ -122,8 +130,29 @@ export default function RecordPage() {
     (day: 1 | 2, phase: 1 | 2) => {
       setEntry(day, phase, null);
       setActiveSlot({ day, phase });
+      setVisibleDay(day);
     },
     [setEntry, setActiveSlot]
+  );
+
+  const handleSlotSelect = useCallback(
+    (slot: { day: 1 | 2; phase: 1 | 2 } | null) => {
+      setActiveSlot(slot);
+      if (slot) {
+        setVisibleDay(slot.day);
+      }
+    },
+    [setActiveSlot]
+  );
+
+  const handleVisibleDayChange = useCallback(
+    (day: 1 | 2) => {
+      setVisibleDay(day);
+      if (!activeSlot || activeSlot.day !== day) {
+        setActiveSlot({ day, phase: 1 });
+      }
+    },
+    [activeSlot, setActiveSlot]
   );
 
   /** アクティブスロットに対応するゾーンのShrinkOverlay用エントリ */
@@ -141,10 +170,21 @@ export default function RecordPage() {
   })();
 
   /** 選択済みゾーンIDのセット（ハイライト表示用） */
-  const selectedZoneId = (() => {
+  const activeZoneId = (() => {
     if (!activeSlot) return null;
     return form.entries[slotKey(activeSlot.day, activeSlot.phase)] ?? null;
   })();
+
+  const visibleDaySelectedEntries = ([1, 2] as const)
+    .map((phase) => {
+      const zoneId = form.entries[slotKey(visibleDay, phase)];
+      if (zoneId === null) return null;
+      return {
+        zoneId,
+        label: `D${visibleDay}-P${phase}`,
+      };
+    })
+    .filter((entry): entry is { zoneId: number; label: string } => entry !== null);
 
   return (
     <div className="h-screen flex flex-col">
@@ -171,6 +211,7 @@ export default function RecordPage() {
             spawnPoints={spawnPoints}
             zones={zones}
             form={form}
+            visibleDay={visibleDay}
             activeSlot={activeSlot}
             saving={saving}
             error={error}
@@ -182,7 +223,8 @@ export default function RecordPage() {
             onJihenSelect={setJihenId}
             onSpawnPointSelect={setSpawnPointId}
             onNoteChange={setNote}
-            onSlotSelect={setActiveSlot}
+            onVisibleDayChange={handleVisibleDayChange}
+            onSlotSelect={handleSlotSelect}
             onEntryRemove={handleEntryRemove}
             onSubmit={submit}
             onReset={reset}
@@ -190,10 +232,45 @@ export default function RecordPage() {
         </aside>
 
         {/* マップ */}
-        <main className="order-1 md:order-2 flex-1 min-h-[50vh] md:min-h-0">
+        <main className="order-1 md:order-2 flex-1 min-h-[50vh] md:min-h-0 relative">
+          <div className="absolute left-3 top-3 z-10 flex gap-2">
+            <button
+              type="button"
+              onClick={() => handleVisibleDayChange(1)}
+              className={`rounded-md border px-3 py-2 text-xs font-medium backdrop-blur transition-colors ${
+                visibleDay === 1
+                  ? "border-blue-500 bg-blue-600/80 text-white"
+                  : "border-gray-600 bg-gray-900/70 text-gray-300 hover:bg-gray-800/80"
+              }`}
+            >
+              Day1表示
+            </button>
+            <button
+              type="button"
+              onClick={() => handleVisibleDayChange(2)}
+              className={`rounded-md border px-3 py-2 text-xs font-medium backdrop-blur transition-colors ${
+                visibleDay === 2
+                  ? "border-blue-500 bg-blue-600/80 text-white"
+                  : "border-gray-600 bg-gray-900/70 text-gray-300 hover:bg-gray-800/80"
+              }`}
+            >
+              Day2表示
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowShrinkZones((prev) => !prev)}
+              className={`rounded-md border px-3 py-2 text-xs font-medium backdrop-blur transition-colors ${
+                showShrinkZones
+                  ? "border-cyan-500 bg-cyan-600/80 text-white"
+                  : "border-gray-600 bg-gray-900/70 text-gray-300 hover:bg-gray-800/80"
+              }`}
+            >
+              {showShrinkZones ? "収縮表示ON" : "収縮表示OFF"}
+            </button>
+          </div>
           <MapCanvas
             mapImagePath={mapImagePath}
-            shrinkOverlay={<ShrinkOverlay entry={overlayEntry} />}
+            shrinkOverlay={showShrinkZones ? <ShrinkOverlay entry={overlayEntry} /> : null}
           >
             {/* 開始地点アイコン */}
             <SpawnPointMarkers
@@ -213,11 +290,14 @@ export default function RecordPage() {
             )}
 
             {/* 収縮候補地ゾーン */}
-            <ZoneOverlay
-              zones={zones}
-              selectedZoneId={selectedZoneId}
-              onZoneSelect={handleZoneSelect}
-            />
+            {showShrinkZones && (
+              <ZoneOverlay
+                zones={zones}
+                selectedEntries={visibleDaySelectedEntries}
+                activeZoneId={activeZoneId}
+                onZoneSelect={handleZoneSelect}
+              />
+            )}
           </MapCanvas>
         </main>
       </div>

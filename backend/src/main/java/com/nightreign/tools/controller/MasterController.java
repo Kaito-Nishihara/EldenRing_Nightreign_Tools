@@ -4,6 +4,7 @@ import com.nightreign.tools.dto.BasePointResponse;
 import com.nightreign.tools.dto.BossResponse;
 import com.nightreign.tools.dto.JihenResponse;
 import com.nightreign.tools.dto.NightBossResponse;
+import com.nightreign.tools.dto.RelicEffectResponse;
 import com.nightreign.tools.dto.ShrinkZoneResponse;
 import com.nightreign.tools.dto.SpawnPointResponse;
 import com.nightreign.tools.service.MasterService;
@@ -63,5 +64,11 @@ public class MasterController {
     public List<BasePointResponse> getBasePoints(
             @RequestParam(defaultValue = "normal") String mapId) {
         return masterService.getBasePointsByMapId(mapId);
+    }
+
+    /** 遺物効果一覧を取得する */
+    @GetMapping("/relic-effects")
+    public List<RelicEffectResponse> getRelicEffects() {
+        return masterService.getAllRelicEffects();
     }
 }

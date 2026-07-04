@@ -4,12 +4,14 @@ import com.nightreign.tools.dto.BasePointResponse;
 import com.nightreign.tools.dto.BossResponse;
 import com.nightreign.tools.dto.JihenResponse;
 import com.nightreign.tools.dto.NightBossResponse;
+import com.nightreign.tools.dto.RelicEffectResponse;
 import com.nightreign.tools.dto.ShrinkZoneResponse;
 import com.nightreign.tools.dto.SpawnPointResponse;
 import com.nightreign.tools.repository.BasePointRepository;
 import com.nightreign.tools.repository.BossRepository;
 import com.nightreign.tools.repository.JihenRepository;
 import com.nightreign.tools.repository.NightBossRepository;
+import com.nightreign.tools.repository.RelicEffectRepository;
 import com.nightreign.tools.repository.ShrinkZoneRepository;
 import com.nightreign.tools.repository.SpawnPointRepository;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class MasterService {
     private final BossRepository bossRepository;
     private final JihenRepository jihenRepository;
     private final NightBossRepository nightBossRepository;
+    private final RelicEffectRepository relicEffectRepository;
     private final ShrinkZoneRepository shrinkZoneRepository;
     private final SpawnPointRepository spawnPointRepository;
 
@@ -36,12 +39,14 @@ public class MasterService {
                          BossRepository bossRepository,
                          JihenRepository jihenRepository,
                          NightBossRepository nightBossRepository,
+                         RelicEffectRepository relicEffectRepository,
                          ShrinkZoneRepository shrinkZoneRepository,
                          SpawnPointRepository spawnPointRepository) {
         this.basePointRepository = basePointRepository;
         this.bossRepository = bossRepository;
         this.jihenRepository = jihenRepository;
         this.nightBossRepository = nightBossRepository;
+        this.relicEffectRepository = relicEffectRepository;
         this.shrinkZoneRepository = shrinkZoneRepository;
         this.spawnPointRepository = spawnPointRepository;
     }
@@ -85,6 +90,13 @@ public class MasterService {
     public List<BasePointResponse> getBasePointsByMapId(String mapId) {
         return basePointRepository.findByMapId(mapId).stream()
                 .map(BasePointResponse::from)
+                .toList();
+    }
+
+    /** 遺物効果一覧をカテゴリ順で取得する */
+    public List<RelicEffectResponse> getAllRelicEffects() {
+        return relicEffectRepository.findAllOrderByCategorySort().stream()
+                .map(RelicEffectResponse::from)
                 .toList();
     }
 }

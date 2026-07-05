@@ -4,6 +4,7 @@ import type {
   Boss,
   Jihen,
   NightBoss,
+  RelicEffect,
   ShrinkZone,
   SecondShrinkPoint,
   SpawnPoint,
@@ -254,6 +255,14 @@ export async function adminUpdateBasePoint(
 /** 管理用: 拠点候補地を削除する */
 export async function adminDeleteBasePoint(id: number): Promise<void> {
   await apiClient.delete(`/api/v1/admin/base-points/${id}`);
+}
+
+/**
+ * 遺物効果マスタ一覧を取得する
+ */
+export async function getRelicEffects(): Promise<RelicEffect[]> {
+  const response = await apiClient.get<RelicEffect[]>("/api/v1/relic-effects");
+  return response.data;
 }
 
 export default apiClient;

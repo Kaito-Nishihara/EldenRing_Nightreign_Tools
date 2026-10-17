@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +31,9 @@ public static class ServiceDefaultsExtensions
                 $"{ServiceKeyOptions.ConfigKey} が設定されていません。環境変数で渡してください")
             .ValidateOnStart();
 
-        // 例外は ApiExceptionHandler が ErrorResponse の形に変える
+        // 例外は ApiExceptionHandler が ErrorResponse の形に変える。
+        // 入力の検証の誤りなど、ASP.NET Core が ProblemDetails で書くものも、同じ形に書き替える(既定の書き手より先に登録する)
+        services.AddSingleton<IProblemDetailsWriter, ErrorResponseProblemDetailsWriter>();
         services.AddProblemDetails();
         services.AddExceptionHandler<ApiExceptionHandler>();
 

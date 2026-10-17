@@ -117,21 +117,24 @@ public class MasterEndpointsTests(MasterServiceFactory factory) : IClassFixture<
     }
 
     [Fact]
-    public async Task AC_SVC_07_api_v1の下のすべてのエンドポイントはキーなしで401を返す()
+    public async Task AC_SVC_07_api_v1とinternal_v1の下のすべてのエンドポイントはキーなしで401を返す()
     {
         var client = factory.CreateClient();
-        var paths = factory.Services.GetRequiredService<EndpointDataSource>().Endpoints
+        var endpoints = factory.Services.GetRequiredService<EndpointDataSource>().Endpoints
             .OfType<RouteEndpoint>()
-            .Select(e => "/" + e.RoutePattern.RawText!.TrimStart('/'))
-            .Where(p => p.StartsWith("/api/v1", StringComparison.Ordinal))
+            .Select(e => (
+                Path: "/" + e.RoutePattern.RawText!.TrimStart('/'),
+                Methods: e.Metadata.GetMetadata<HttpMethodMetadata>()?.HttpMethods ?? ["GET"]))
+            .Where(e => e.Path.StartsWith("/api/v1", StringComparison.Ordinal) || e.Path.StartsWith("/internal/v1", StringComparison.Ordinal))
+            .SelectMany(e => e.Methods.Select(method => (e.Path, Method: method)))
             .Distinct()
             .ToList();
 
-        Assert.NotEmpty(paths);
-        foreach (var path in paths)
+        Assert.Contains(endpoints, e => e.Path.StartsWith("/internal/v1", StringComparison.Ordinal));
+        foreach (var (path, method) in endpoints)
         {
-            var response = await client.GetAsync(path);
-            Assert.True(response.StatusCode == HttpStatusCode.Unauthorized, path + " が " + (int)response.StatusCode + " を返した");
+            var response = await client.SendAsync(new HttpRequestMessage(new HttpMethod(method), path));
+            Assert.True(response.StatusCode == HttpStatusCode.Unauthorized, method + " " + path + " が " + (int)response.StatusCode + " を返した");
         }
     }
 

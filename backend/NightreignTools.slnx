@@ -11,4 +11,8 @@
     <Project Path="master/NightreignTools.Master.Api/NightreignTools.Master.Api.csproj" />
     <Project Path="master/NightreignTools.Master.Tests/NightreignTools.Master.Tests.csproj" />
   </Folder>
+  <Folder Name="/record/">
+    <Project Path="record/NightreignTools.Record.Domain/NightreignTools.Record.Domain.csproj" />
+    <Project Path="record/NightreignTools.Record.Tests/NightreignTools.Record.Tests.csproj" />
+  </Folder>
 </Solution>

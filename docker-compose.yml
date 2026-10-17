@@ -15,8 +15,11 @@ services:
     depends_on:
       master-service:
         condition: service_healthy
+      record-service:
+        condition: service_healthy
     environment:
       - MASTER_SERVICE_URL=http://master-service:8081
+      - RECORD_SERVICE_URL=http://record-service:8082
       - SERVICE_KEY=${SERVICE_KEY}
       - CORS_ORIGINS=${CORS_ORIGINS:-}
 

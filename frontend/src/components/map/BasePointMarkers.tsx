@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import type { BasePoint } from "@/types";
 import { BASE_TYPES } from "@/lib/baseTypes";
+import { MAP_STYLE, THEME } from "@/lib/theme";
 
 /** ?マーカーのサイズ */
 const MARKER_SIZE = 64;
@@ -93,8 +94,8 @@ export default function BasePointMarkers({
                 <>
                   <Circle
                     radius={MARKER_SIZE / 2 + 2}
-                    fill="rgba(0,0,0,0.6)"
-                    stroke="#FFD700"
+                    fill={MAP_STYLE.zoneMarkerFill}
+                    stroke={THEME.goldBright}
                     strokeWidth={2}
                   />
                   <KonvaImage
@@ -110,8 +111,8 @@ export default function BasePointMarkers({
                 <>
                   <Circle
                     radius={MARKER_SIZE / 2}
-                    fill="rgba(80, 70, 50, 0.8)"
-                    stroke="#C8B87C"
+                    fill={MAP_STYLE.baseMarkerFill}
+                    stroke={THEME.lineStrong}
                     strokeWidth={2}
                   />
                   <Text
@@ -124,7 +125,7 @@ export default function BasePointMarkers({
                     verticalAlign="middle"
                     fontSize={40}
                     fontStyle="bold"
-                    fill="#C8B87C"
+                    fill={THEME.lineStrong}
                   />
                 </>
               )}
@@ -162,9 +163,9 @@ export default function BasePointMarkers({
                             y={-padY}
                             width={totalWidth + padX * 2}
                             height={totalHeight + padY * 2}
-                            fill="rgba(30, 35, 50, 0.95)"
+                            fill={THEME.nightRaised}
                             cornerRadius={6}
-                            stroke="#555"
+                            stroke={THEME.line}
                             strokeWidth={1}
                           />
                         );
@@ -192,7 +193,7 @@ export default function BasePointMarkers({
                                 x={iconSize / 2}
                                 y={iconSize / 2}
                                 radius={iconSize / 2 + 2}
-                                stroke="#FFD700"
+                                stroke={THEME.goldBright}
                                 strokeWidth={2}
                               />
                             )}

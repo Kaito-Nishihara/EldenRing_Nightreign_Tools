@@ -2,6 +2,7 @@
 
 import { useRef, useState, useCallback, useEffect, type ReactNode } from "react";
 import dynamic from "next/dynamic";
+import { THEME } from "@/lib/theme";
 
 /** マップキャンバスのデフォルトサイズ */
 const DEFAULT_MAP_WIDTH = 1024;
@@ -147,7 +148,7 @@ function MapCanvasInner({
   return (
     <div
       ref={containerRef}
-      className="w-full h-full bg-gray-900 overflow-hidden relative"
+      className="relative h-full w-full overflow-hidden bg-abyss"
     >
       <Stage
         width={stageSize.width}
@@ -166,13 +167,7 @@ function MapCanvasInner({
           {mapImage ? (
             <KonvaImage image={mapImage} width={width} height={height} />
           ) : (
-            <Rect
-              width={width}
-              height={height}
-              fill="#374151"
-              stroke="#6B7280"
-              strokeWidth={2}
-            />
+            <Rect width={width} height={height} fill={THEME.abyss} stroke={THEME.line} strokeWidth={2} />
           )}
         </Layer>
         {/* 収縮暗転レイヤー（destination-outで円形切り抜きするため専用Layer） */}
@@ -181,7 +176,7 @@ function MapCanvasInner({
       </Stage>
 
       {/* ズーム表示 */}
-      <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+      <div className="absolute bottom-2 right-2 border border-line bg-night/85 px-2 font-display text-xs tracking-display text-gold-bright">
         {Math.round(scale * 100)}%
       </div>
     </div>
@@ -195,8 +190,8 @@ function MapCanvasInner({
 const MapCanvas = dynamic(() => Promise.resolve(MapCanvasInner), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full bg-gray-900 flex items-center justify-center">
-      <span className="text-gray-500 text-sm">マップを読み込み中...</span>
+    <div className="flex h-full w-full items-center justify-center bg-abyss">
+      <span className="text-sm text-ash-soft">マップを読み込み中...</span>
     </div>
   ),
 });

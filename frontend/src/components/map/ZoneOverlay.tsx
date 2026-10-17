@@ -1,20 +1,7 @@
 "use client";
 
 import type { ShrinkZone } from "@/types";
-
-/** 候補マーカーのサイズ */
-const CANDIDATE_MARKER_RADIUS = 18;
-
-/** ゾーンの表示色 */
-const ZONE_COLOR = {
-  candidateFill: "rgba(17, 24, 39, 0.75)",
-  candidateStroke: "rgba(148, 163, 184, 0.95)",
-  candidateText: "#E2E8F0",
-  filled: "rgba(34, 197, 94, 0.32)",
-  filledStroke: "rgba(34, 197, 94, 0.95)",
-  active: "rgba(234, 179, 8, 0.42)",
-  activeStroke: "rgba(234, 179, 8, 0.95)",
-};
+import { MAP_STYLE, THEME } from "@/lib/theme";
 
 interface SelectedZoneEntry {
   zoneId: number;
@@ -24,90 +11,73 @@ interface SelectedZoneEntry {
 interface ZoneOverlayProps {
   /** 表示する収縮候補地の一覧 */
   zones: ShrinkZone[];
-  /** 現在表示中の日で選択済みのゾーン */
+  /** 今表示している日で選んだ収縮先。実際の大きさの円で出す */
   selectedEntries?: SelectedZoneEntry[];
-  /** 現在アクティブなゾーンID */
+  /** 今入力しているスロットの収縮先 */
   activeZoneId?: number | null;
-  /** ゾーンクリック時のコールバック */
+  /** 中心の印を押したときの動き */
   onZoneSelect?: (zone: ShrinkZone) => void;
 }
 
 /**
- * 収縮候補地オーバーレイコンポーネント
- * マップ上に12ゾーンを半透明の円で表示する
- * 親のMapCanvasがdynamic importでSSR隔離済みのため、requireで直接取得する
+ * 収縮候補地(画面の共通仕様 3.8)。
+ * 12 の円をすべて実際の大きさで描くと重なって押せないので、中心の丸の印と名前で出し、選んだものだけを円で描く。
+ * 円の中は動ける場所なので塗らない(外の暗がりは ShrinkOverlay が塗る)。
+ * 親の MapCanvas が dynamic import で SSR から隔離しているので、require で react-konva を取る。
  */
-export default function ZoneOverlay({
-  zones,
-  selectedEntries = [],
-  activeZoneId,
-  onZoneSelect,
-}: ZoneOverlayProps) {
+export default function ZoneOverlay({ zones, selectedEntries = [], activeZoneId, onZoneSelect }: ZoneOverlayProps) {
   /* eslint-disable @typescript-eslint/no-require-imports */
   const { Circle, Text, Group } = require("react-konva");
   /* eslint-enable @typescript-eslint/no-require-imports */
 
+  const markerRadius = MAP_STYLE.zoneMarkerRadius;
+
   return (
     <>
-      {zones.map((zone: ShrinkZone) => {
+      {zones.map((zone) => {
         const selectedEntry = selectedEntries.find((entry) => entry.zoneId === zone.id);
-        const isFilled = Boolean(selectedEntry);
+        const isSelected = Boolean(selectedEntry);
         const isActive = zone.id === activeZoneId;
+        const label = selectedEntry ? `${selectedEntry.label} ${zone.nameJa}` : zone.nameJa;
 
         return (
           <Group key={zone.id}>
-            {selectedEntry && (
-              <>
-                <Circle
-                  x={zone.centerX}
-                  y={zone.centerY}
-                  radius={zone.radius}
-                  fill={isActive ? ZONE_COLOR.active : ZONE_COLOR.filled}
-                  stroke={isActive ? ZONE_COLOR.activeStroke : ZONE_COLOR.filledStroke}
-                  strokeWidth={isActive ? 3 : 2.5}
-                  listening={false}
-                />
-                <Text
-                  x={zone.centerX - 44}
-                  y={zone.centerY - 22}
-                  width={88}
-                  text={`${selectedEntry.label}\n${zone.nameJa}`}
-                  fontSize={13}
-                  fontStyle={isActive ? "bold" : "normal"}
-                  fill={isActive ? "#FDE047" : "#86EFAC"}
-                  align="center"
-                  listening={false}
-                />
-              </>
+            {isSelected && (
+              <Circle
+                x={zone.centerX}
+                y={zone.centerY}
+                radius={zone.radius}
+                stroke={THEME.tide}
+                strokeWidth={MAP_STYLE.zoneStrokeWidth}
+                listening={false}
+              />
             )}
 
+            {/* 中心の印。選んだものは tide で塗り、今入力しているスロットの収縮先は gold-bright の線にする */}
             <Circle
               x={zone.centerX}
               y={zone.centerY}
-              radius={CANDIDATE_MARKER_RADIUS}
-              fill={ZONE_COLOR.candidateFill}
-              stroke={isActive ? ZONE_COLOR.activeStroke : ZONE_COLOR.candidateStroke}
-              strokeWidth={isActive ? 3 : 2}
+              radius={markerRadius}
+              fill={isSelected ? THEME.tide : MAP_STYLE.zoneMarkerFill}
+              stroke={isActive ? THEME.goldBright : THEME.tide}
+              strokeWidth={MAP_STYLE.zoneStrokeWidth}
+              hitStrokeWidth={18}
               onClick={() => onZoneSelect?.(zone)}
               onTap={() => onZoneSelect?.(zone)}
-              hitStrokeWidth={18}
             />
-            <Circle
-              x={zone.centerX}
-              y={zone.centerY}
-              radius={5}
-              fill={isFilled ? (isActive ? "#FDE047" : "#86EFAC") : ZONE_COLOR.candidateText}
-              listening={false}
-            />
+
             <Text
-              x={zone.centerX - 18}
-              y={zone.centerY - 9}
-              width={36}
-              text={isFilled ? "" : "?"}
-              fontSize={20}
-              fontStyle="bold"
-              fill={ZONE_COLOR.candidateText}
+              x={zone.centerX - 60}
+              y={zone.centerY - markerRadius - 24}
+              width={120}
               align="center"
+              text={label}
+              fontSize={16}
+              fontStyle="bold"
+              fill={isActive ? THEME.goldBright : THEME.ash}
+              stroke={THEME.night}
+              strokeWidth={MAP_STYLE.labelStrokeWidth}
+              fillAfterStrokeEnabled
               listening={false}
             />
           </Group>

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getPatternColor } from "@/components/map/PatternLayer";
+import { getPatternColor } from "@/lib/theme";
 
 describe("getPatternColor", () => {
   it("インデックス0は青を返す", () => {

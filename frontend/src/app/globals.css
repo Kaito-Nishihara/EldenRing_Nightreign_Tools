@@ -21,6 +21,8 @@
   --color-grace: #9cc08a;
   --color-line: #3a3226;
   --color-line-strong: #7a6a4e;
+  /* マップの画像の下の地。画像の背景が透けるので、night より暗くする(3.8) */
+  --color-abyss: #07060a;
 
   /* 書体(3.3)。値は layout.tsx の next/font が CSS の変数で渡す */
   --font-sans: var(--font-noto-sans-jp), "Hiragino Sans", "Yu Gothic", sans-serif;

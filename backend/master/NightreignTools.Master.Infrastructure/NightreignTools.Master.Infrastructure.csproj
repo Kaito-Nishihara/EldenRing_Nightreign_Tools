@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- master-service の Infrastructure。データベースとの出し入れを受け持つ(サービスの共通構成 5.3) -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\NightreignTools.Master.Application\NightreignTools.Master.Application.csproj" />
+    <ProjectReference Include="..\NightreignTools.Master.Domain\NightreignTools.Master.Domain.csproj" />
+    <ProjectReference Include="..\..\shared\NightreignTools.ServiceDefaults\NightreignTools.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>

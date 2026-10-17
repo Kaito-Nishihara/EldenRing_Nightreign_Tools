@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- 業務の例外。Domain と Application から使うので、どのパッケージにも頼らない -->
+
+</Project>

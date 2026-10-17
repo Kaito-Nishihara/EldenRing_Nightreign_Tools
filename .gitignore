@@ -19,12 +19,9 @@ frontend/node_modules/
 frontend/.next/
 frontend/out/
 
-# Java (backend)
-backend/.gradle/
-backend/build/
-backend/bin/
-backend/out/
-backend/gradle/wrapper/gradle-wrapper.jar
+# .NET (backend)
+backend/**/bin/
+backend/**/obj/
 
 # .NET (gateway)
 gateway/bin/

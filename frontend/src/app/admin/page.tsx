@@ -59,22 +59,31 @@ export default function AdminPage() {
   /** マップIDを算出（地変未選択=通常マップ） */
   const mapId = selectedJihenId ?? "normal";
 
-  /** データ取得 */
+  /**
+   * データ取得。マスタごとに取り、1 つが失敗してもほかは出す。
+   * 失敗したものは、どのマスタかと理由を誤りの欄に出す
+   */
   const fetchData = useCallback(async () => {
-    try {
-      const [sp, sz, ssp, bp] = await Promise.all([
-        getSpawnPoints(),
-        getShrinkZones(),
-        getSecondShrinkPoints(),
-        getBasePoints(mapId),
-      ]);
-      setSpawnPoints(sp);
-      setShrinkZones(sz);
-      setSecondShrinkPoints(ssp);
-      setBasePoints(bp);
-    } catch (err) {
-      console.error("マスタデータ取得エラー:", err);
-    }
+    const [sp, sz, ssp, bp] = await Promise.allSettled([
+      getSpawnPoints(),
+      getShrinkZones(),
+      getSecondShrinkPoints(),
+      getBasePoints(mapId),
+    ]);
+    const failures: string[] = [];
+    const apply = <T,>(result: PromiseSettledResult<T>, label: string, set: (value: T) => void) => {
+      if (result.status === "fulfilled") {
+        set(result.value);
+      } else {
+        const reason = result.reason instanceof Error ? result.reason.message : "取得に失敗しました";
+        failures.push(`${label}: ${reason}`);
+      }
+    };
+    apply(sp, "開始地点", setSpawnPoints);
+    apply(sz, "収縮候補地", setShrinkZones);
+    apply(ssp, "第二収縮地点", setSecondShrinkPoints);
+    apply(bp, "拠点候補地", setBasePoints);
+    setError(failures.length > 0 ? failures.join(" / ") : null);
   }, [mapId]);
 
   useEffect(() => {

@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { getRelicEffects } from "@/lib/api";
 import { calcBuildResult } from "@/lib/buildCalc";
+import { createId } from "@/lib/id";
 import type {
   RelicEffect,
   BuildRelicSlot,
@@ -15,7 +16,7 @@ const EFFECTS_PER_SECTION = 3;
 
 /** 空の効果エントリを生成する */
 function emptyEntry(): BuildEffectEntry {
-  return { id: crypto.randomUUID(), effectId: null, rank: 0 };
+  return { id: createId(), effectId: null, rank: 0 };
 }
 
 /** 固定3枠の初期スロットを生成する */
@@ -43,7 +44,9 @@ export function useBuildSimulator() {
   useEffect(() => {
     getRelicEffects()
       .then(setEffects)
-      .catch(() => setError("遺物効果データの取得に失敗しました"))
+      .catch((err: unknown) =>
+        setError(err instanceof Error ? err.message : "遺物効果データの取得に失敗しました")
+      )
       .finally(() => setLoading(false));
   }, []);
 

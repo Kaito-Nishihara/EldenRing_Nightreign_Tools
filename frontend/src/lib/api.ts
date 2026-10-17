@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toApiError } from "@/lib/apiError";
 import type {
   BasePoint,
   Boss,
@@ -26,21 +27,15 @@ const apiClient = axios.create({
 
 /**
  * レスポンスインターセプター
- * エラーハンドリングを共通化する
+ * 誤りを、画面に出してよい文言を持つ ApiError に変える(画面の共通仕様 3.10)。
+ * 画面とフックは、受け取った誤りの message をそのまま出せばよい。
  */
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    // ネットワークエラーやタイムアウトの場合
-    if (!error.response) {
-      console.error("ネットワークエラーが発生しました:", error.message);
-    } else {
-      console.error(
-        `APIエラー [${error.response.status}]:`,
-        error.response.data?.message || error.message
-      );
-    }
-    return Promise.reject(error);
+  (error: unknown) => {
+    const apiError = toApiError(error);
+    console.error(`APIエラー [${apiError.status ?? "通信の失敗"}]:`, apiError.message);
+    return Promise.reject(apiError);
   }
 );
 
@@ -182,10 +177,10 @@ export async function getNightBosses(): Promise<NightBoss[]> {
   return response.data;
 }
 
-/** 管理用: 第二収縮地点候補一覧を取得する */
+/** 第二収縮地点の一覧を取得する(プレイヤー向け。マスタの管理 4.1) */
 export async function getSecondShrinkPoints(): Promise<SecondShrinkPoint[]> {
   const response = await apiClient.get<SecondShrinkPoint[]>(
-    "/api/v1/admin/second-shrink-points"
+    "/api/v1/second-shrink-points"
   );
   return response.data;
 }

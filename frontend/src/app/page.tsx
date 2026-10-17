@@ -1,138 +1,166 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import MapCanvas from "@/components/map/MapCanvas";
-import ZoneOverlay from "@/components/map/ZoneOverlay";
-import PatternLayer from "@/components/map/PatternLayer";
-import ConditionPanel from "@/components/sidebar/ConditionPanel";
-import PatternList from "@/components/sidebar/PatternList";
 import ShrinkOverlay from "@/components/map/ShrinkOverlay";
+import SpawnPointMarkers from "@/components/map/SpawnPointMarkers";
+import PatternRouteLayer from "@/components/map/PatternRouteLayer";
+import ConditionPanel from "@/components/pattern/ConditionPanel";
+import PatternListPanel from "@/components/pattern/PatternListPanel";
+import MapLegend from "@/components/pattern/MapLegend";
+import Panel from "@/components/ui/Panel";
+import BottomSheet from "@/components/ui/BottomSheet";
+import SegmentedControl from "@/components/ui/SegmentedControl";
+import { ErrorNotice, Skeleton } from "@/components/ui/StatusViews";
 import { useMasterData } from "@/hooks/useMasterData";
 import { usePatterns } from "@/hooks/usePatterns";
-import { getShrinkZones } from "@/lib/api";
+import { useSearchConditions } from "@/hooks/useSearchConditions";
 import { getMapImagePath } from "@/lib/mapImage";
-import type { ShrinkZone } from "@/types";
+import { DAY_FILTER_OPTIONS, patternMapView, type DayFilter } from "@/lib/patternMap";
+import { getPatternColor } from "@/lib/theme";
 
 /**
- * メインページ
- * 左パネル（条件選択・パターン一覧）+ 右マップキャンバスのレイアウト
- * スマホ時はマップが全幅、パネルはボトムシート
+ * パターン検索の画面(パターン検索 3 章)。
+ * 広い幅では左に条件とパターンの一覧、右にマップを並べる。狭い幅ではマップを全面に出し、操作は下から引き出す。
  */
-export default function HomePage() {
-  const [selectedZoneId, setSelectedZoneId] = useState<number | null>(null);
-  const [zones, setZones] = useState<ShrinkZone[]>([]);
-
-  // 条件選択の状態
-  const [selectedBossId, setSelectedBossId] = useState<string | null>(null);
-  const [selectedJihenId, setSelectedJihenId] = useState<string | null>(null);
-  const [selectedSpawnPointId, setSelectedSpawnPointId] = useState<number | null>(null);
-
-  // パターン選択の状態（マップ⇔リスト連動）
-  const [selectedPatternIndex, setSelectedPatternIndex] = useState<number | null>(null);
-
-  // マスタデータ取得
+function PatternSearchPage() {
   const { bosses, jihenList, spawnPoints, loading: masterLoading, error: masterError } = useMasterData();
+  const { data, loading, error, search, clear } = usePatterns();
 
-  // パターン検索
-  const { data: patternData, loading: patternLoading, error: patternError, search, clear } = usePatterns();
+  const bossIds = useMemo(() => bosses.map((boss) => boss.id), [bosses]);
+  const spawnPointIds = useMemo(() => spawnPoints.map((spawn) => spawn.id), [spawnPoints]);
+  const jihenIds = useMemo(() => jihenList.map((jihen) => jihen.id), [jihenList]);
+  const { bossId, spawnPointId, jihenId, update } = useSearchConditions({
+    bossIds,
+    spawnPointIds,
+    jihenIds,
+    ready: !masterLoading && !masterError,
+  });
 
-  // 地変に応じたマップ画像パス
-  const mapImagePath = getMapImagePath(selectedJihenId);
+  const [selectedPatternIndex, setSelectedPatternIndex] = useState<number | null>(null);
+  const [dayFilter, setDayFilter] = useState<DayFilter>("all");
+  const ready = bossId !== null && spawnPointId !== null;
 
-  // 収縮候補地をAPI経由で取得
-  useEffect(() => {
-    getShrinkZones()
-      .then(setZones)
-      .catch((err) => {
-        console.error("収縮候補地の取得に失敗:", err);
-      });
-  }, []);
-
-  // ボスと開始地点が揃ったら自動検索
-  useEffect(() => {
-    if (selectedBossId && selectedSpawnPointId) {
-      search(selectedBossId, selectedSpawnPointId, selectedJihenId ?? undefined);
+  /** 今の条件で検索する。条件がそろっていなければ、結果を消す */
+  const runSearch = useCallback(() => {
+    if (bossId && spawnPointId !== null) {
+      void search(bossId, spawnPointId, jihenId ?? undefined);
     } else {
       clear();
     }
-    // 検索条件変更時にパターン選択をリセット
-    setSelectedPatternIndex(null);
-  }, [selectedBossId, selectedSpawnPointId, selectedJihenId, search, clear]);
+  }, [bossId, spawnPointId, jihenId, search, clear]);
 
-  // 選択中パターンの最初のエントリ（収縮暗転表示用）
-  const selectedEntry = (() => {
-    if (!patternData || selectedPatternIndex === null) return null;
-    const pattern = patternData.patterns.find(
-      (p) => p.patternIndex === selectedPatternIndex
-    );
-    if (!pattern || pattern.entries.length === 0) return null;
-    // Day1-Phase1を優先表示
-    const sorted = [...pattern.entries].filter((e) => e.zone !== null).sort((a, b) =>
-      a.day !== b.day ? a.day - b.day : a.phase - b.phase
-    );
-    return sorted[0];
-  })();
+  // 夜の王と開始地点がそろうと、検索のボタンを押さずに検索する(AC-PAT-10)
+  useEffect(runSearch, [runSearch]);
 
-  /** ゾーン選択ハンドラー */
-  const handleZoneSelect = (zone: ShrinkZone) => {
-    setSelectedZoneId((prev) => (prev === zone.id ? null : zone.id));
-  };
+  // 結果が替わったら、1 番のパターンを選んだ状態にする(パターン検索 3.2)
+  useEffect(() => {
+    setSelectedPatternIndex(data?.patterns[0]?.patternIndex ?? null);
+  }, [data]);
+
+  const selectedPattern = data?.patterns.find((p) => p.patternIndex === selectedPatternIndex) ?? null;
+  const selectedSpawn = spawnPoints.find((spawn) => spawn.id === spawnPointId) ?? null;
+  const view = patternMapView(selectedPattern, dayFilter, selectedSpawn);
+  const patternColor = selectedPattern ? getPatternColor(selectedPattern.patternIndex - 1) : null;
+
+  const conditionText = [
+    bosses.find((boss) => boss.id === bossId)?.nameJa ?? "夜の王を選んでください",
+    jihenList.find((jihen) => jihen.id === jihenId)?.nameJa ?? "地変なし",
+    selectedSpawn?.nameJa ?? "開始地点を選んでください",
+  ].join(" ／ ");
+
+  const recordParams = new URLSearchParams();
+  if (bossId) recordParams.set("boss", bossId);
+  if (spawnPointId !== null) recordParams.set("spawn", String(spawnPointId));
+  if (jihenId) recordParams.set("jihen", jihenId);
+  const recordHref = `/record?${recordParams.toString()}`;
+
+  const controls = masterError ? (
+    <Panel>
+      <ErrorNotice message={masterError} onRetry={() => window.location.reload()} />
+    </Panel>
+  ) : masterLoading ? (
+    <Panel aria-busy>
+      <Skeleton className="mb-3 h-6 w-24" />
+      <Skeleton className="h-48" />
+    </Panel>
+  ) : (
+    <>
+      <ConditionPanel
+        bosses={bosses}
+        jihenList={jihenList}
+        spawnPoints={spawnPoints}
+        bossId={bossId}
+        jihenId={jihenId}
+        spawnPointId={spawnPointId}
+        onChange={update}
+      />
+      <PatternListPanel
+        ready={ready}
+        data={data}
+        loading={loading}
+        error={error}
+        selectedPatternIndex={selectedPatternIndex}
+        onSelect={setSelectedPatternIndex}
+        onRetry={runSearch}
+        recordHref={recordHref}
+      />
+    </>
+  );
 
   return (
-    <div className="h-full flex flex-col">
+    // 狭い幅では、畳んだ操作の枠の取っ手(高さ 64px)にマップの下端が隠れないよう、下を空ける
+    <div className="flex h-full flex-col gap-4 pb-16 md:flex-row md:p-4">
       <h1 className="sr-only">パターン検索</h1>
 
-      {/* メインコンテンツ */}
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-        {/* サイドパネル（PC: 左カラム / SP: ボトムシート） */}
-        <aside className="order-2 md:order-1 md:w-80 md:flex-shrink-0 md:h-full overflow-y-auto bg-gray-900 border-t md:border-t-0 md:border-r border-gray-700 p-4 space-y-4">
-          <ConditionPanel
-            bosses={bosses}
-            jihenList={jihenList}
-            spawnPoints={spawnPoints}
-            selectedBossId={selectedBossId}
-            selectedJihenId={selectedJihenId}
-            selectedSpawnPointId={selectedSpawnPointId}
-            onBossSelect={setSelectedBossId}
-            onJihenSelect={setSelectedJihenId}
-            onSpawnPointSelect={setSelectedSpawnPointId}
-            loading={masterLoading}
-            error={masterError}
-          />
-          <PatternList
-            data={patternData}
-            loading={patternLoading}
-            error={patternError}
-            selectedPatternIndex={selectedPatternIndex}
-            onPatternSelect={setSelectedPatternIndex}
-          />
-        </aside>
-
-        {/* マップキャンバス */}
-        <main className="order-1 md:order-2 flex-1 min-h-[50vh] md:min-h-0">
-          <MapCanvas
-            mapImagePath={mapImagePath}
-            shrinkOverlay={
-              <ShrinkOverlay
-                circles={selectedEntry?.zone ? [{ x: selectedEntry.zone.centerX, y: selectedEntry.zone.centerY, radius: selectedEntry.zone.radius }] : []}
-              />
-            }
-          >
-            <ZoneOverlay
-              zones={zones}
-              activeZoneId={selectedZoneId}
-              onZoneSelect={handleZoneSelect}
+      <section aria-label="マップ" className="flex min-h-0 flex-1 flex-col md:order-2">
+        <Panel ornate className="flex min-h-0 flex-1 flex-col !p-2 md:!p-4">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <p className="flex min-w-0 items-center gap-2">
+              <span aria-hidden className="font-display text-xs uppercase tracking-display text-ash-soft">
+                Limveld
+              </span>
+              <span className="truncate font-serif text-sm font-extrabold text-gold-bright">{conditionText}</span>
+            </p>
+            <SegmentedControl
+              ariaLabel="マップに出す日"
+              options={DAY_FILTER_OPTIONS}
+              value={dayFilter}
+              onChange={setDayFilter}
+              className="w-56"
             />
-            {patternData && (
-              <PatternLayer
-                patterns={patternData.patterns}
-                selectedPatternIndex={selectedPatternIndex}
-                onPatternSelect={setSelectedPatternIndex}
+          </div>
+          <div className="relative min-h-0 flex-1 border border-line">
+            <MapCanvas
+              mapImagePath={getMapImagePath(jihenId)}
+              shrinkOverlay={<ShrinkOverlay circles={view.rainCircles} />}
+            >
+              {patternColor && <PatternRouteLayer view={view} color={patternColor} />}
+              <SpawnPointMarkers
+                spawnPoints={spawnPoints}
+                selectedId={spawnPointId}
+                onSelect={(spawn) => update({ spawnPointId: spawn.id })}
               />
-            )}
-          </MapCanvas>
-        </main>
-      </div>
+            </MapCanvas>
+            {patternColor && <MapLegend color={patternColor} />}
+          </div>
+        </Panel>
+      </section>
+
+      <aside className="md:order-1 md:w-[360px] md:flex-none md:overflow-y-auto">
+        <BottomSheet handleLabel="条件とパターン">
+          <div className="flex flex-col gap-4 p-4 md:p-0">{controls}</div>
+        </BottomSheet>
+      </aside>
     </div>
+  );
+}
+
+/** useSearchParams を使うので、Suspense で包む(Next.js の決まり) */
+export default function HomePage() {
+  return (
+    <Suspense>
+      <PatternSearchPage />
+    </Suspense>
   );
 }

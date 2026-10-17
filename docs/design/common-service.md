@@ -147,6 +147,7 @@ api.MapGroup("/admin").MapAdminEndpoints();
 
 - 秘密の値を `appsettings.json` に書かない。
 - 必要な値がないときは、起動の時点で例外を投げて止める。動いてから失敗させない。
+- 起動できなかったときは、理由をログに 1 回だけ出し、終了コード 1 で終わる。
 
 ### 5.6 ログ
 
@@ -164,7 +165,8 @@ api.MapGroup("/admin").MapAdminEndpoints();
 | API | エンドポイント | `Tests/Endpoints/` | `WebApplicationFactory` で起動し、テスト用のデータベースにつなぐ |
 
 - テストの名前かコメントに、受け入れ条件の識別子を書く。
-- テスト用のデータベースは `nightreign_test` とし、テストの始めにマイグレーションを適用する。
+- テスト用のデータベースは `nightreign_test` とし、接続文字列を環境変数 `ConnectionStrings__Test` で渡す。テストの始めにデータベースを消し、起動のときのマイグレーションで作り直す。
+- テストは 1 つのデータベースを共有するので、並べて走らせない。
 
 ## 6. サービスの間のやり取り
 

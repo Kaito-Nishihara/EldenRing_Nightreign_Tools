@@ -41,7 +41,8 @@
 | `frontend-dev` | `node:20-alpine` | なし | 型検査、lint、テストを走らせる道具。`tools` のプロファイル |
 
 - `backend` は `db` の稼働の確認が通ってから起動する。`gateway` は `backend` の稼働の確認(`/health`)が通ってから起動する。
-- `backend-sdk` と `frontend-dev` は、ソースのディレクトリをコンテナに渡し、NuGet と npm の置き場を名前付きのボリュームに持つ。2 回目からの取得を速くするためである。
+- `backend-sdk` と `frontend-dev` は、ソースのディレクトリをコンテナに渡し、NuGet の置き場と `node_modules` を名前付きのボリュームに持つ。2 回目からの取得を速くし、ホストの `node_modules` と分けるためである。
+- `backend-sdk` は `db` の稼働の確認を待って起動し、テスト用のデータベースへの接続文字列(`ConnectionStrings__Test`)を受け取る。
 - `db` の 5432 番を外に出すのは、手元で中身を見るためである。公開する環境では出さない。
 
 ### 5.2 環境変数
@@ -68,7 +69,8 @@ docker compose run --rm backend-sdk dotnet build
 docker compose run --rm backend-sdk dotnet test
 
 # マイグレーションを足す
-docker compose run --rm backend-sdk dotnet ef migrations add <名前> --project NightreignTools.Backend --output-dir Data/Migrations
+# dotnet-ef は backend/.config/dotnet-tools.json で版を固定している。コンテナは毎回新しいので、先に復元する
+docker compose run --rm backend-sdk sh -c "dotnet tool restore && dotnet ef migrations add <名前> --project NightreignTools.Backend --output-dir Data/Migrations"
 
 # 画面の検査とテスト
 docker compose run --rm frontend-dev npx tsc --noEmit

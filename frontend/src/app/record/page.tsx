@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import MapCanvas from "@/components/map/MapCanvas";
 import ZoneOverlay from "@/components/map/ZoneOverlay";
 import ShrinkOverlay from "@/components/map/ShrinkOverlay";
@@ -187,19 +186,8 @@ export default function RecordPage() {
     .filter((entry): entry is { zoneId: number; label: string } => entry !== null);
 
   return (
-    <div className="h-screen flex flex-col">
-      {/* ヘッダー */}
-      <header className="flex-shrink-0 bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center gap-4">
-        <Link
-          href="/"
-          className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
-        >
-          &larr; 戻る
-        </Link>
-        <h1 className="text-xl font-bold text-gray-100">
-          プレイ記録入力
-        </h1>
-      </header>
+    <div className="h-full flex flex-col">
+      <h1 className="sr-only">プレイ記録</h1>
 
       {/* メインコンテンツ */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">

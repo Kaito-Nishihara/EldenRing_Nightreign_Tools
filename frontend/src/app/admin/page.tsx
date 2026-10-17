@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
 import MapCanvas from "@/components/map/MapCanvas";
 import AdminOverlay from "@/components/admin/AdminOverlay";
 import SpawnPointForm from "@/components/admin/SpawnPointForm";
@@ -299,19 +298,8 @@ export default function AdminPage() {
   const mapImagePath = getMapImagePath(selectedJihenId);
 
   return (
-    <div className="h-screen flex flex-col">
-      {/* ヘッダー */}
-      <header className="flex-shrink-0 bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-100">
-          管理画面
-          <span className="text-sm font-normal text-gray-400 ml-2">
-            マスタデータ座標登録
-          </span>
-        </h1>
-        <Link href="/" className="text-sm text-blue-400 hover:text-blue-300">
-          メインページへ戻る
-        </Link>
-      </header>
+    <div className="h-full flex flex-col">
+      <h1 className="sr-only">マスタの管理</h1>
 
       {/* メインコンテンツ */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import MapCanvas from "@/components/map/MapCanvas";
 import ZoneOverlay from "@/components/map/ZoneOverlay";
 import PatternLayer from "@/components/map/PatternLayer";
@@ -80,30 +79,8 @@ export default function HomePage() {
   };
 
   return (
-    <div className="h-screen flex flex-col">
-      {/* ヘッダー */}
-      <header className="flex-shrink-0 bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-100">
-          Nightreign Tools
-          <span className="text-sm font-normal text-gray-400 ml-2">
-            マップ収縮パターン検索
-          </span>
-        </h1>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/build"
-            className="bg-amber-700 hover:bg-amber-600 text-white text-sm px-4 py-2 rounded-md transition-colors font-medium"
-          >
-            ビルドシミュレーター
-          </Link>
-          <Link
-            href="/record"
-            className="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-md transition-colors font-medium"
-          >
-            記録入力
-          </Link>
-        </div>
-      </header>
+    <div className="h-full flex flex-col">
+      <h1 className="sr-only">パターン検索</h1>
 
       {/* メインコンテンツ */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">

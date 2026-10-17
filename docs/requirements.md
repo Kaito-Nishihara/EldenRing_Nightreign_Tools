@@ -173,19 +173,16 @@
 ### 構成とデータの持ち主
 
 ```
-                                   ┌→ master-service (8081) ─┐
-Next.js (3000) → .NET Gateway (8080) ┼→ record-service (8082) ─┼→ PostgreSQL (5432)
-                                   └→ relic-service  (8083) ─┘
-                 record-service → master-service(参照の確かめ)
+Next.js (3000) → .NET Gateway (8080) → 3 つのサービス(master、record、relic) → PostgreSQL (5432)
 ```
 
 | サービス | 受け持つもの | 持つデータ |
 |---|---|---|
 | `frontend` | 画面。ビルドシミュレーターの計算 | なし。入力中の記録をブラウザに持つ |
 | `gateway` | 入口。CORS、管理用の鍵の確認、パスによる振り分け、サービス間キーの付与 | なし |
-| `master-service` | マスタの取得、マスタの管理 | `nightreign_master`: 夜の王、地変、開始地点、収縮候補地、第二収縮地点、拠点候補地、夜ボス |
-| `record-service` | プレイ記録、パターン検索 | `nightreign_record`: 記録、収縮先 |
-| `relic-service` | ビルドシミュレーターの効果のマスタ | `nightreign_relic`: 遺物の効果 |
+| `master-service`(8081) | マスタの取得、マスタの管理 | `nightreign_master`: 夜の王、地変、開始地点、収縮候補地、第二収縮地点、拠点候補地、夜ボス |
+| `record-service`(8082) | プレイ記録、パターン検索 | `nightreign_record`: 記録、収縮先 |
+| `relic-service`(8083) | ビルドシミュレーターの効果のマスタ | `nightreign_relic`: 遺物の効果 |
 | `db` | データの保存 | サービスごとのデータベース |
 
 決まりは次のとおりとする。

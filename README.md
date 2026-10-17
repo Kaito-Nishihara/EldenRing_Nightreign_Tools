@@ -12,18 +12,16 @@
 ## システム構成
 
 ```
-                                     ┌→ master-service (8081) ─┐
-Next.js (3000) → .NET Gateway (8080) ┼→ record-service (8082) ─┼→ PostgreSQL (5432)
-                                     └→ relic-service  (8083) ─┘
+Next.js (3000) → .NET Gateway (8080) → 3 つのサービス(master、record、relic) → PostgreSQL (5432)
 ```
 
 | サービス | 技術 | 責務 |
 |---------|------|------|
 | frontend | Next.js 15 + TypeScript | UI・マップ描画 |
 | gateway | ASP.NET Core 10 + YARP | API Gateway・管理用の鍵の確認・サービス間キーの付与 |
-| master-service | ASP.NET Core 10 + EF Core | マスタの取得と管理 |
-| record-service | ASP.NET Core 10 + EF Core | プレイ記録とパターン検索 |
-| relic-service | ASP.NET Core 10 + EF Core | ビルドシミュレーターの遺物の効果 |
+| master-service (8081) | ASP.NET Core 10 + EF Core | マスタの取得と管理 |
+| record-service (8082) | ASP.NET Core 10 + EF Core | プレイ記録とパターン検索 |
+| relic-service (8083) | ASP.NET Core 10 + EF Core | ビルドシミュレーターの遺物の効果 |
 | db | PostgreSQL 16 | データ永続化 |
 
 バックエンドは NestJS から .NET へ作り直している途中である。

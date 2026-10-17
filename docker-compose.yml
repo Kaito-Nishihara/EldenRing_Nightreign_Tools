@@ -16,9 +16,9 @@ services:
       master-service:
         condition: service_healthy
     environment:
-      - BACKEND_URL=http://master-service:8081
-      - JWT_SECRET=${JWT_SECRET}
+      - MASTER_SERVICE_URL=http://master-service:8081
       - SERVICE_KEY=${SERVICE_KEY}
+      - CORS_ORIGINS=${CORS_ORIGINS:-}
 
   # master-service: マスタの取得と管理(サービスの共通構成 5.1)
   master-service:

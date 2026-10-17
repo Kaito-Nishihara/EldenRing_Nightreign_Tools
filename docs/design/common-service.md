@@ -193,6 +193,7 @@ ServiceDefaults の共通の例外ハンドラ(`IExceptionHandler`)が、これ�
 ### 5.9 テスト
 
 サービスごとに 1 つのテストのプロジェクト(`NightreignTools.<サービス>.Tests`)を持つ。
+共通の部品(`shared/`)の単体のテストは、`shared/NightreignTools.Shared.Tests` に置く。
 
 | 種類 | 対象 | 置き場 | 決まり |
 |---|---|---|---|

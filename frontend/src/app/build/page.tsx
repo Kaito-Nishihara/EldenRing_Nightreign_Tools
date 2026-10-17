@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Button from "@/components/ui/Button";
 import { useBuildSimulator } from "@/hooks/useBuildSimulator";
 import RelicSlotPanel from "@/components/build/RelicSlotPanel";
 import BuildResultPanel from "@/components/build/BuildResultPanel";
@@ -24,26 +24,14 @@ export default function BuildPage() {
   } = useBuildSimulator();
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100">
-      {/* ヘッダー */}
-      <header className="border-b border-gray-800 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="text-gray-400 hover:text-gray-200 text-sm">
-            ← トップ
-          </Link>
-          <h1 className="text-lg font-bold text-amber-400">
-            ビルドシミュレーター
-          </h1>
-        </div>
-
-        <button
-          type="button"
-          onClick={resetAll}
-          className="text-xs text-gray-400 hover:text-red-400 border border-gray-700 hover:border-red-700 rounded px-2 py-1 transition-colors"
-        >
-          リセット
-        </button>
-      </header>
+    <div className="min-h-full">
+      <div className="flex items-center justify-between gap-3 px-4 pt-4">
+        <h1 className="font-serif text-2xl font-extrabold text-gold-bright">ビルドシミュレーター</h1>
+        {/* 保存していないので失うものが少なく、確かめの枠は出さない(ビルドシミュレーター 3.1) */}
+        <Button variant="ghost" onClick={resetAll}>
+          すべて外す
+        </Button>
+      </div>
 
       {error && (
         <div className="m-4 p-3 bg-red-900/50 border border-red-700 rounded text-sm text-red-300">

@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- master-service の入口。登録の組み立てとエンドポイントだけを書く(サービスの共通構成 5.3) -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\NightreignTools.Master.Application\NightreignTools.Master.Application.csproj" />
+    <ProjectReference Include="..\NightreignTools.Master.Infrastructure\NightreignTools.Master.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\shared\NightreignTools.ServiceDefaults\NightreignTools.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>

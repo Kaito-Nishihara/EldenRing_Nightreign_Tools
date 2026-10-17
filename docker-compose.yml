@@ -13,39 +13,97 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - backend
+      master-service:
+        condition: service_healthy
     environment:
-      - BACKEND_URL=http://backend:8081
-      - JWT_SECRET=${JWT_SECRET}
+      - MASTER_SERVICE_URL=http://master-service:8081
       - SERVICE_KEY=${SERVICE_KEY}
+      - CORS_ORIGINS=${CORS_ORIGINS:-}
 
-  backend:
-    build: ./backend
+  # master-service: マスタの取得と管理(サービスの共通構成 5.1)
+  master-service:
+    # 共通の部品(backend/shared)を使うので、ビルドの文脈は backend/ にする
+    build:
+      context: ./backend
+      dockerfile: master/Dockerfile
+    # 8081 はコンテナの間だけに公開する(実行環境 5.1)
     expose:
       - "8081"
     depends_on:
       db:
         condition: service_healthy
     environment:
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/nightreign
       - SERVICE_KEY=${SERVICE_KEY}
-      - NODE_ENV=production
+      - ConnectionStrings__Default=Host=db;Port=5432;Database=nightreign_master;Username=nightreign_master;Password=${MASTER_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8081/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
 
   db:
     image: postgres:16
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_DB=nightreign
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=postgres
+      # db/init/ の手順が、サービスごとの利用者を作るときに使う
+      - MASTER_DB_PASSWORD=${MASTER_DB_PASSWORD}
+      - RECORD_DB_PASSWORD=${RECORD_DB_PASSWORD}
+      - RELIC_DB_PASSWORD=${RELIC_DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # ボリュームが空のときにだけ走り、サービスごとのデータベースと利用者を作る(データベースの共通仕様 5.1)
+      - ./db/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d nightreign"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
 
+  # ==========================================
+  # 道具のコンテナ(tools のプロファイル)。ホストに .NET の SDK と Node を入れずに、ビルドとテストを走らせる
+  #   docker compose run --rm backend-sdk dotnet test
+  #   docker compose run --rm frontend-dev npm run test
+  # ==========================================
+
+  backend-sdk:
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    profiles: ["tools"]
+    working_dir: /src/backend
+    volumes:
+      - ./backend:/src/backend
+      # NuGet の置き場を残し、2 回目からの取得を速くする
+      - nuget_packages:/root/.nuget/packages
+    # テストは本物の PostgreSQL に対して走らせる(サービスの共通構成 5.9)。
+    # 管理者でつなぎ、各テストのプロジェクトが nightreign_<サービス>_test を作り直す
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DOTNET_CLI_TELEMETRY_OPTOUT=1
+      - DOTNET_NOLOGO=1
+      - ConnectionStrings__Test=Host=db;Port=5432;Username=${DB_USER};Password=${DB_PASSWORD}
+
+  frontend-dev:
+    image: node:20-alpine
+    profiles: ["tools"]
+    working_dir: /src/frontend
+    volumes:
+      - ./frontend:/src/frontend
+      # ホストの node_modules(Windows 向けの物を含む)と分けるため、コンテナの中の物を別に持つ
+      - frontend_node_modules:/src/frontend/node_modules
+    # package-lock.json が前回の npm ci から変わっていたら、入れ直してからコマンドを走らせる
+    entrypoint:
+      - sh
+      - -c
+      - cmp -s package-lock.json node_modules/.installed-lock || { npm ci --no-audit --no-fund && cp package-lock.json node_modules/.installed-lock; }; exec "$$@"
+      - --
+
 volumes:
   postgres_data:
+  nuget_packages:
+  frontend_node_modules:

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- master-service の Application。アプリケーションサービス、ポート、DTO を持ち、EF Core と ASP.NET Core を知らない(サービスの共通構成 5.3) -->
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NightreignTools.Master.Domain\NightreignTools.Master.Domain.csproj" />
+    <ProjectReference Include="..\..\shared\NightreignTools.SharedKernel\NightreignTools.SharedKernel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="NightreignTools.Master.Tests" />
+  </ItemGroup>
+
+</Project>

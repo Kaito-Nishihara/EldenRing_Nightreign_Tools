@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- master-service の Domain。エンティティと業務の規則だけを持ち、EF Core と ASP.NET Core を知らない(サービスの共通構成 5.3) -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\shared\NightreignTools.SharedKernel\NightreignTools.SharedKernel.csproj" />
+  </ItemGroup>
+
+</Project>

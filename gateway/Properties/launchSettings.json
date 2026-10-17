@@ -8,8 +8,7 @@
       "applicationUrl": "http://localhost:8080",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "BACKEND_URL": "http://localhost:8081",
-        "JWT_SECRET": "dev-secret-key-minimum-32-characters-long",
+        "MASTER_SERVICE_URL": "http://localhost:8081",
         "SERVICE_KEY": "dev-service-key"
       }
     }

@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 
-エルデンリング ナイトレインのマップ収縮パターンを実プレイデータで蓄積・検索するWebアプリ。
+エルデンリング ナイトレインのマップ収縮パターンを実プレイデータで蓄積し、検索するWebアプリ。
 
 ## ドキュメント
 
@@ -29,8 +29,8 @@ Next.js (3000) → .NET Gateway (8080) → 3 つのサービス(master、record�
 
 | サービス | 技術 | 責務 |
 |---------|------|------|
-| frontend | Next.js 15 + TypeScript + Tailwind CSS 4 + react-konva | UI・マップ描画・ビルドの計算 |
-| gateway | ASP.NET Core 10 (Minimal API) + YARP | API Gateway・CORS・管理用の鍵の確認・サービス間キーの付与 |
+| frontend | Next.js 15 + TypeScript + Tailwind CSS 4 + react-konva | UI、マップ描画、ビルドの計算 |
+| gateway | ASP.NET Core 10 (Minimal API) + YARP | API Gateway、CORS、管理用の鍵の確認、サービス間キーの付与 |
 | master-service (8081) | ASP.NET Core 10 + EF Core (Npgsql) | マスタの取得と管理。DB `nightreign_master` |
 | record-service (8082) | ASP.NET Core 10 + EF Core (Npgsql) | プレイ記録とパターン検索。DB `nightreign_record`。master-service の内部 API を呼ぶ |
 | relic-service (8083) | ASP.NET Core 10 + EF Core (Npgsql) | 遺物の効果のマスタ。DB `nightreign_relic` |
@@ -44,8 +44,8 @@ Next.js (3000) → .NET Gateway (8080) → 3 つのサービス(master、record�
 
 ### 共通
 - コメントは日本語で書く
-- オブジェクト指向で拡張性・再利用性を考えて実装する
-- 常に実運用を想定した実装にする（バリデーション・エラーハンドリング必須）
+- オブジェクト指向で拡張性と再利用性を考えて実装する
+- 常に実運用を想定した実装にする（バリデーションとエラーハンドリング必須）
 - 実装の前に、対象の機能の仕様書があり、利用者が承認していることを確かめる（`.claude/rules/spec-authoring.md`）
 - テストの名前かコメントに、受け入れ条件の識別子（例: `AC-REC-03`）を書く
 
@@ -54,7 +54,7 @@ Next.js (3000) → .NET Gateway (8080) → 3 つのサービス(master、record�
 - コンポーネントは `components/` 配下に機能単位で分類する。共通の部品は `components/ui/`
 - APIアクセスは `lib/api.ts` のAxiosクライアントを通じて行う
 - カスタムフックは `hooks/` に切り出す
-- 色・書体・余白は `globals.css` の `@theme` の名前で指定し、値を直接書かない（`docs/design/common-frontend.md`）
+- 色、書体、余白は `globals.css` の `@theme` の名前で指定し、値を直接書かない（`docs/design/common-frontend.md`）
 - `any` を使わない
 
 ### バックエンド（ASP.NET Core / C#）

@@ -29,11 +29,18 @@ builder.Services.AddCors(options =>
 // ヘルスチェック
 builder.Services.AddHealthChecks();
 
-// 振り分け先のサービスの URL を環境変数で上書きする(サービスの共通構成 5.7)
-var masterServiceUrl = Environment.GetEnvironmentVariable("MASTER_SERVICE_URL");
-if (!string.IsNullOrEmpty(masterServiceUrl))
+// 振り分け先のサービスの URL を環境変数で上書きする(サービスの共通構成 5.7)。
+// record-service は master-service を呼ぶので(最長 10 秒)、record-cluster の期限は 15 秒にしてある
+OverrideDestination("MASTER_SERVICE_URL", "master-cluster", "master");
+OverrideDestination("RECORD_SERVICE_URL", "record-cluster", "record");
+
+void OverrideDestination(string variable, string cluster, string destination)
 {
-    builder.Configuration["ReverseProxy:Clusters:master-cluster:Destinations:master:Address"] = masterServiceUrl;
+    var url = Environment.GetEnvironmentVariable(variable);
+    if (!string.IsNullOrEmpty(url))
+    {
+        builder.Configuration[$"ReverseProxy:Clusters:{cluster}:Destinations:{destination}:Address"] = url;
+    }
 }
 
 // サービス間認証キーを取得

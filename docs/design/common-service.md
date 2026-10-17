@@ -175,7 +175,7 @@ ServiceDefaults の共通の例外ハンドラ(`IExceptionHandler`)が、これ�
 |---|---|---|
 | `ConnectionStrings__Default` | 各サービス | 環境変数。compose がサービスごとのデータベースの名前と利用者から組み立てる |
 | `SERVICE_KEY` | Gateway、各サービス | 環境変数 |
-| `MASTER_SERVICE_URL` | `record-service` | 環境変数 |
+| `MASTER_SERVICE_URL` | Gateway、`record-service` | 環境変数。`RECORD_SERVICE_URL`、`RELIC_SERVICE_URL` は Gateway だけが使い、それぞれのサービスを作る段階で足す |
 | `ADMIN_KEY` | Gateway | 環境変数。16 文字以上 |
 | `CORS_ORIGINS` | Gateway | 環境変数。既定は `http://localhost:3000` |
 

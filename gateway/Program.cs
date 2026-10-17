@@ -1,7 +1,4 @@
-using System.Text;
-using Gateway.Auth;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using Gateway.Errors;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,54 +7,33 @@ var builder = WebApplication.CreateBuilder(args);
 // サービス登録
 // ==========================================
 
-// JWT サービスをシングルトンとして登録（認証ミドルウェアと共有するため先にインスタンス化）
-var jwtServiceInstance = new JwtService(builder.Configuration);
-builder.Services.AddSingleton(jwtServiceInstance);
+// CORS 設定。許すオリジンは環境変数 CORS_ORIGINS(カンマ区切り)で渡す。省いたら http://localhost:3000(API の共通仕様 4.6)
+var corsOrigins = (Environment.GetEnvironmentVariable("CORS_ORIGINS") ?? "")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+if (corsOrigins.Length == 0)
+{
+    corsOrigins = ["http://localhost:3000"];
+}
 
-// CORS 設定（フロントエンドからのアクセスを許可）
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
     {
         policy
-            .WithOrigins("http://localhost:3000")
+            .WithOrigins(corsOrigins)
             .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+            .AllowAnyMethod();
     });
 });
-
-// JWT Bearer 認証ミドルウェア
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = jwtServiceInstance.Issuer,
-            ValidateAudience = true,
-            ValidAudience = jwtServiceInstance.Audience,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = jwtServiceInstance.GetSigningKey(),
-            ClockSkew = TimeSpan.FromMinutes(1)
-        };
-    });
-
-builder.Services.AddAuthorization();
 
 // ヘルスチェック
 builder.Services.AddHealthChecks();
 
-// YARP リバースプロキシ設定（appsettings.json から読み込み）
-var reverseProxyConfig = builder.Configuration.GetSection("ReverseProxy");
-
-// 環境変数 BACKEND_URL でバックエンドURLをオーバーライド
-var backendUrl = Environment.GetEnvironmentVariable("BACKEND_URL");
-if (!string.IsNullOrEmpty(backendUrl))
+// 振り分け先のサービスの URL を環境変数で上書きする(サービスの共通構成 5.7)
+var masterServiceUrl = Environment.GetEnvironmentVariable("MASTER_SERVICE_URL");
+if (!string.IsNullOrEmpty(masterServiceUrl))
 {
-    // appsettings.json のクラスター設定を環境変数の値で上書き
-    builder.Configuration["ReverseProxy:Clusters:backend-cluster:Destinations:backend:Address"] = backendUrl;
+    builder.Configuration["ReverseProxy:Clusters:master-cluster:Destinations:master:Address"] = masterServiceUrl;
 }
 
 // サービス間認証キーを取得
@@ -65,12 +41,13 @@ var serviceKey = Environment.GetEnvironmentVariable("SERVICE_KEY")
     ?? builder.Configuration["ServiceKey"]
     ?? throw new InvalidOperationException("SERVICE_KEY が設定されていません。環境変数または appsettings.json で設定してください。");
 
+// YARP リバースプロキシ設定(appsettings.json から読み込み)。振り分けの表は API の共通仕様 4.6
 builder.Services
     .AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
     .AddTransforms(transformContext =>
     {
-        // プロキシ時に X-Service-Key ヘッダーを自動付与
+        // 画面から来た X-Service-Key を消し、Gateway の値を付け直す
         transformContext.AddRequestTransform(context =>
         {
             context.ProxyRequest.Headers.Remove("X-Service-Key");
@@ -88,31 +65,17 @@ var app = builder.Build();
 // CORS を最初に適用
 app.UseCors("FrontendPolicy");
 
-// 認証・認可ミドルウェア
-app.UseAuthentication();
-app.UseAuthorization();
+// Gateway が自分で返す、本文のない 404、502、504 にも、エラーの形の本文を付ける(API の共通仕様 4.3)
+app.UseStatusCodePages(GatewayErrorResponse.WriteStatusCodePageAsync);
 
 // ==========================================
-// エンドポイント定義（Minimal API）
+// エンドポイント定義(Minimal API)
 // ==========================================
 
 // ヘルスチェックエンドポイント
 app.MapHealthChecks("/health");
 
-// 匿名トークン発行エンドポイント（v1ではユーザー認証なし）
-app.MapPost("/auth/token", (JwtService jwtService) =>
-{
-    var token = jwtService.GenerateAnonymousToken();
-    return Results.Ok(new
-    {
-        token,
-        tokenType = "Bearer",
-        expiresIn = 3600 // 秒（デフォルト60分）
-    });
-});
-
-// YARP リバースプロキシをマッピング
-// v1では全APIエンドポイントは認証不要（将来のv2でPOST系に認証必須を追加予定）
+// YARP リバースプロキシをマッピング。/internal/v1 は振り分けないので、Gateway が 404 を返す
 app.MapReverseProxy();
 
 app.Run();

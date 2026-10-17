@@ -29,8 +29,12 @@ services:
     # 8081 はコンテナの間だけに公開する(実行環境 5.1)
     expose:
       - "8081"
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
       - SERVICE_KEY=${SERVICE_KEY}
+      - ConnectionStrings__Default=Host=db;Port=5432;Database=nightreign_master;Username=nightreign_master;Password=${MASTER_DB_PASSWORD}
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8081/health"]
       interval: 5s
@@ -43,13 +47,19 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_DB=nightreign
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=postgres
+      # db/init/ の手順が、サービスごとの利用者を作るときに使う
+      - MASTER_DB_PASSWORD=${MASTER_DB_PASSWORD}
+      - RECORD_DB_PASSWORD=${RECORD_DB_PASSWORD}
+      - RELIC_DB_PASSWORD=${RELIC_DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # ボリュームが空のときにだけ走り、サービスごとのデータベースと利用者を作る(データベースの共通仕様 5.1)
+      - ./db/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d nightreign"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -68,9 +78,15 @@ services:
       - ./backend:/src/backend
       # NuGet の置き場を残し、2 回目からの取得を速くする
       - nuget_packages:/root/.nuget/packages
+    # テストは本物の PostgreSQL に対して走らせる(サービスの共通構成 5.9)。
+    # 管理者でつなぎ、各テストのプロジェクトが nightreign_<サービス>_test を作り直す
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
       - DOTNET_CLI_TELEMETRY_OPTOUT=1
       - DOTNET_NOLOGO=1
+      - ConnectionStrings__Test=Host=db;Port=5432;Username=${DB_USER};Password=${DB_PASSWORD}
 
   frontend-dev:
     image: node:20-alpine

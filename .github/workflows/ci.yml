@@ -18,6 +18,22 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    # テストは本物の PostgreSQL に対して走らせる(サービスの共通構成 5.9)
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      ConnectionStrings__Test: Host=localhost;Port=5432;Username=postgres;Password=postgres
     steps:
       - uses: actions/checkout@v4
 

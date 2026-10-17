@@ -1,4 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
+using NightreignTools.Master.Infrastructure.Persistence;
+using NightreignTools.ServiceDefaults.Persistence;
 
 namespace NightreignTools.Master.Infrastructure;
 
@@ -7,6 +9,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
+        // nightreign_master への接続と、起動のときのマイグレーション(データベースの共通仕様 5.5)
+        services.AddServiceDatabase<MasterDbContext>();
         return services;
     }
 }

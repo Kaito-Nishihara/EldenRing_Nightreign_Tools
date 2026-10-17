@@ -73,12 +73,14 @@ nav:
   - はじめに: index.md
   - 要件定義: requirements.md
   - アーキテクチャ図: architecture.html
+  - CI/CD の流れ: deploy.html
   - 共通の設計:
       - API の共通仕様: design/common-api.md
       - データベースの共通仕様: design/common-database.md
       - サービスの共通構成: design/common-service.md
       - 画面の共通仕様: design/common-frontend.md
       - 実行環境: design/common-runtime.md
+      - CI/CD と AWS への配置: design/common-delivery.md
   - 画面の設計:
       - 画面の一覧と遷移: design/screens.md
   - 画面一覧:
@@ -107,3 +109,5 @@ nav:
       - 0011 サービスの中をクリーンアーキテクチャで分ける: decisions/0011-clean-architecture.md
       - 0012 バックエンドを機能ごとに 3 つのサービスに分ける: decisions/0012-split-services-by-feature.md
       - 0013 マスタを消さずに非表示にする: decisions/0013-hide-masters-instead-of-delete.md
+      - 0014 AWS の ECS on Fargate に配置する: decisions/0014-deploy-to-aws-ecs.md
+      - 0015 配置の前にマイグレーションを適用する: decisions/0015-migrate-before-deploy.md

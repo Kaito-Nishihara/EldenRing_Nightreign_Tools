@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CI/CD の流れ | 収縮パターン帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;700&family=Shippori+Mincho+B1:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  /* 色は「画面の共通仕様」3.2 の値。アーキテクチャ図と同じく、暗い配色だけで描く */
+  :root {
+    --night: #0e0c0a; --raised: #1a1612; --sunk: #24201a;
+    --ash: #e8dfcc; --ash-soft: #a89c86;
+    --gold: #c9a45c; --gold-bright: #e6c886; --gold-deep: #8a6d32;
+    --tide: #8c7cf0; --ember: #d0654a; --grace: #9cc08a; --line: #3a3226; --line-strong: #7a6a4e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--night); color: var(--ash);
+    background-image: radial-gradient(ellipse 70% 40% at 50% -10%, rgba(201,164,92,.08), transparent 70%);
+    font-family: "Noto Sans JP", "Hiragino Sans", sans-serif; line-height: 1.8;
+  }
+  main { max-width: 1080px; margin: 0 auto; padding: 32px 16px 64px; }
+  .eyebrow { font-family: "Cinzel", serif; font-size: 12px; letter-spacing: .18em; color: var(--ash-soft); text-transform: uppercase; }
+  h1, h2, h3 { font-family: "Shippori Mincho B1", serif; font-weight: 800; color: var(--gold-bright); margin: 0 0 8px; letter-spacing: .04em; }
+  h1 { font-size: 28px; }
+  h2 { font-size: 20px; margin-top: 48px; padding-top: 8px; border-top: 1px solid var(--line); }
+  h3 { font-size: 16px; margin-top: 24px; }
+  p { margin: 0 0 12px; }
+  .soft { color: var(--ash-soft); font-size: 14px; }
+  .figure { background: var(--raised); border: 1px solid var(--line); padding: 16px; margin-top: 16px; overflow-x: auto; }
+  svg { display: block; width: 100%; min-width: 760px; height: auto; }
+  svg text { font-family: "Noto Sans JP", sans-serif; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 12px; background: var(--raised); }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--ash-soft); font-weight: 400; background: var(--sunk); }
+  td.mark { text-align: center; color: var(--gold-bright); white-space: nowrap; }
+  td.none { text-align: center; color: var(--line-strong); }
+  /* 狭い幅では、表を潰さずに枠の中で横に送る */
+  .table-wrap { overflow-x: auto; }
+  .table-wrap table { min-width: 640px; }
+  code { font-family: Consolas, monospace; font-size: 13px; background: var(--sunk); padding: 1px 4px; }
+  a { color: var(--gold); }
+
+  /* 目次 */
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; }
+  nav.toc a { border: 1px solid var(--line-strong); padding: 4px 12px; text-decoration: none; font-size: 14px; color: var(--ash); }
+  nav.toc a:hover { border-color: var(--gold); color: var(--gold-bright); }
+
+  /* 凡例 */
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--ash-soft); margin-top: 12px; }
+  .legend i { display: inline-block; width: 14px; height: 10px; margin-right: 6px; vertical-align: -1px; border: 1.5px solid; }
+
+  /* データベースの更新の段 */
+  ol.steps { list-style: none; margin: 16px 0 0; padding: 0; counter-reset: step; }
+  ol.steps > li { position: relative; padding: 12px 16px 12px 56px; margin: 0 0 10px; background: var(--raised); border: 1px solid var(--line); counter-increment: step; }
+  ol.steps > li::before {
+    content: counter(step); position: absolute; left: 14px; top: 12px; width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center; border: 1px solid var(--gold); color: var(--gold-bright);
+    font-family: "Cinzel", serif; font-weight: 700;
+  }
+  ol.steps > li.gate { border-color: var(--gold-deep); }
+  ol.steps strong { color: var(--gold-bright); }
+  .fail { display: block; margin-top: 6px; font-size: 13px; color: var(--ash); border-left: 3px solid var(--ember); padding-left: 8px; }
+  .env-tag { display: inline-block; font-size: 12px; border: 1px solid var(--line-strong); color: var(--ash-soft); padding: 0 6px; margin-left: 6px; }
+  .env-tag.prod { border-color: var(--ember); color: var(--ember); }
+
+  .note { border: 1px solid var(--gold-deep); background: var(--sunk); padding: 12px 16px; margin-top: 16px; font-size: 14px; }
+  .note strong { color: var(--gold-bright); }
+</style>
+</head>
+<body>
+<main>
+  <span class="eyebrow">Delivery</span>
+  <h1>CI/CD の流れ</h1>
+  <p class="soft">
+    <a href="design/common-delivery/">CI/CD と AWS への配置</a> を絵にしたものである。
+    図と仕様書が食い違ったら、仕様書が正しい。
+    この設計は承認を待っている(<a href="#approval">承認を待つ決定</a>)。
+  </p>
+  <nav class="toc" aria-label="この文書の目次">
+    <a href="#pipeline">パイプライン</a>
+    <a href="#aws">AWS の構成</a>
+    <a href="#db">データベースの更新</a>
+    <a href="#tests">テストの計画</a>
+    <a href="#rollback">戻し方</a>
+    <a href="#approval">承認を待つ決定</a>
+  </nav>
+
+  <!-- ==================== パイプライン ==================== -->
+  <h2 id="pipeline">パイプライン</h2>
+  <p>PR、<code>main</code> へのマージ、リリースのタグの 3 つの契機で、それぞれ何が走るかと、本番には承認とスナップショットの 2 つの関門があることを読み取ってほしい。</p>
+  <div class="figure">
+    <svg viewBox="0 0 1000 560" role="img" aria-label="PR、main へのマージ、リリースの 3 段のパイプラインの図">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M0 0 L10 5 L0 10 Z" fill="#c9a45c"/>
+        </marker>
+        <marker id="arrow-tide" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M0 0 L10 5 L0 10 Z" fill="#8c7cf0"/>
+        </marker>
+      </defs>
+
+      <!-- 段 1: PR -->
+      <rect x="10" y="20" width="980" height="150" fill="#1a1612" stroke="#3a3226"/>
+      <text x="26" y="48" fill="#a89c86" font-size="12" font-family="Cinzel, serif" letter-spacing="2">PULL REQUEST</text>
+      <text x="26" y="72" fill="#e6c886" font-size="16" font-weight="700">PR のとき</text>
+      <text x="26" y="94" fill="#a89c86" font-size="12">配置はしない</text>
+
+      <rect x="150" y="60" width="130" height="70" fill="#24201a" stroke="#7a6a4e"/>
+      <text x="215" y="90" fill="#e8dfcc" font-size="14" text-anchor="middle">PR を出す</text>
+      <text x="215" y="110" fill="#a89c86" font-size="12" text-anchor="middle">draft でも走る</text>
+
+      <rect x="310" y="40" width="440" height="110" fill="#24201a" stroke="#c9a45c"/>
+      <text x="530" y="62" fill="#e6c886" font-size="14" font-weight="700" text-anchor="middle">7 つの検査を並べて走らせる(すべて必須)</text>
+      <g font-size="12" fill="#e8dfcc">
+        <text x="326" y="88">・frontend 型検査 lint Vitest build</text>
+        <text x="326" y="108">・backend ビルドとテスト(実 DB)</text>
+        <text x="326" y="128">・gateway ビルドとテスト</text>
+        <text x="560" y="88">・マイグレーションの検査</text>
+        <text x="560" y="108">・イメージのビルドと Trivy</text>
+        <text x="560" y="128">・compose 一式と Playwright</text>
+        <text x="560" y="146">・gitleaks</text>
+      </g>
+
+      <rect x="780" y="60" width="190" height="70" fill="#24201a" stroke="#7a6a4e"/>
+      <text x="875" y="90" fill="#e8dfcc" font-size="14" text-anchor="middle">レビューと承認</text>
+      <text x="875" y="110" fill="#a89c86" font-size="12" text-anchor="middle">利用者がマージする</text>
+
+      <line x1="280" y1="95" x2="306" y2="95" stroke="#c9a45c" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="750" y1="95" x2="776" y2="95" stroke="#c9a45c" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <!-- 段 1 から段 2 へ -->
+      <path d="M875 130 L875 178 L215 178 L215 222" fill="none" stroke="#c9a45c" stroke-width="2" marker-end="url(#arrow)"/>
+      <text x="545" y="172" fill="#a89c86" font-size="12" text-anchor="middle">main へマージ</text>
+
+      <!-- 段 2: main → ステージング -->
+      <rect x="10" y="200" width="980" height="150" fill="#1a1612" stroke="#3a3226"/>
+      <text x="26" y="228" fill="#a89c86" font-size="12" font-family="Cinzel, serif" letter-spacing="2">STAGING</text>
+      <text x="26" y="252" fill="#e6c886" font-size="16" font-weight="700">main のとき</text>
+      <text x="26" y="274" fill="#a89c86" font-size="12">承認は要らない</text>
+
+      <rect x="150" y="226" width="150" height="80" fill="#24201a" stroke="#7a6a4e"/>
+      <text x="225" y="256" fill="#e8dfcc" font-size="14" text-anchor="middle">イメージと束を作る</text>
+      <text x="225" y="276" fill="#a89c86" font-size="12" text-anchor="middle">ECR へ送る</text>
+      <text x="225" y="294" fill="#a89c86" font-size="12" text-anchor="middle">名前はコミットの値</text>
+
+      <rect x="330" y="226" width="150" height="80" fill="#24201a" stroke="#8c7cf0"/>
+      <text x="405" y="256" fill="#e8dfcc" font-size="14" text-anchor="middle">マイグレーション</text>
+      <text x="405" y="276" fill="#a89c86" font-size="12" text-anchor="middle">master → record</text>
+      <text x="405" y="294" fill="#a89c86" font-size="12" text-anchor="middle">→ relic の順</text>
+
+      <rect x="510" y="226" width="200" height="80" fill="#24201a" stroke="#7a6a4e"/>
+      <text x="610" y="256" fill="#e8dfcc" font-size="14" text-anchor="middle">サービスを入れ替える</text>
+      <text x="610" y="276" fill="#a89c86" font-size="12" text-anchor="middle">master → record → relic</text>
+      <text x="610" y="294" fill="#a89c86" font-size="12" text-anchor="middle">→ gateway → frontend</text>
+
+      <rect x="740" y="226" width="230" height="80" fill="#24201a" stroke="#9cc08a"/>
+      <text x="855" y="256" fill="#e8dfcc" font-size="14" text-anchor="middle">配置の後の確かめ</text>
+      <text x="855" y="276" fill="#a89c86" font-size="12" text-anchor="middle">API の応答と /health</text>
+      <text x="855" y="294" fill="#a89c86" font-size="12" text-anchor="middle">ステージングへ Playwright</text>
+
+      <line x1="300" y1="266" x2="326" y2="266" stroke="#c9a45c" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="480" y1="266" x2="506" y2="266" stroke="#c9a45c" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="710" y1="266" x2="736" y2="266" stroke="#c9a45c" stroke-width="2" marker-end="url(#arrow)"/>
+      <text x="405" y="330" fill="#d0654a" font-size="12" text-anchor="middle">失敗したら入れ替えずに止める</text>
+
+      <!-- 段 3: リリース → 本番 -->
+      <rect x="10" y="380" width="980" height="160" fill="#1a1612" stroke="#3a3226"/>
+      <text x="26" y="408" fill="#a89c86" font-size="12" font-family="Cinzel, serif" letter-spacing="2">PRODUCTION</text>
+      <text x="26" y="432" fill="#e6c886" font-size="16" font-weight="700">v タグのとき</text>
+      <text x="26" y="454" fill="#a89c86" font-size="12">例: v1.2.0</text>
+
+      <rect x="150" y="456" width="110" height="64" fill="#24201a" stroke="#7a6a4e"/>
+      <text x="205" y="484" fill="#e8dfcc" font-size="14" text-anchor="middle">v タグ</text>
+      <text x="205" y="504" fill="#a89c86" font-size="12" text-anchor="middle">待ちに入る</text>
+
+      <rect x="280" y="456" width="120" height="64" fill="#24201a" stroke="#e6c886" stroke-width="2"/>
+      <text x="340" y="484" fill="#e6c886" font-size="14" font-weight="700" text-anchor="middle">利用者の承認</text>
+      <text x="340" y="504" fill="#a89c86" font-size="12" text-anchor="middle">Environment</text>
+
+      <rect x="420" y="456" width="130" height="64" fill="#24201a" stroke="#e6c886" stroke-width="2"/>
+      <text x="485" y="484" fill="#e6c886" font-size="14" font-weight="700" text-anchor="middle">スナップショット</text>
+      <text x="485" y="504" fill="#a89c86" font-size="12" text-anchor="middle">RDS の手動</text>
+
+      <rect x="570" y="456" width="120" height="64" fill="#24201a" stroke="#8c7cf0"/>
+      <text x="630" y="484" fill="#e8dfcc" font-size="14" text-anchor="middle">マイグレーション</text>
+      <text x="630" y="504" fill="#a89c86" font-size="12" text-anchor="middle">ステージングと同じ</text>
+
+      <rect x="710" y="456" width="120" height="64" fill="#24201a" stroke="#7a6a4e"/>
+      <text x="770" y="484" fill="#e8dfcc" font-size="14" text-anchor="middle">入れ替える</text>
+      <text x="770" y="504" fill="#a89c86" font-size="12" text-anchor="middle">同じ順</text>
+
+      <rect x="850" y="456" width="120" height="64" fill="#24201a" stroke="#9cc08a"/>
+      <text x="910" y="484" fill="#e8dfcc" font-size="14" text-anchor="middle">確かめ</text>
+      <text x="910" y="504" fill="#a89c86" font-size="12" text-anchor="middle">記録は保存しない</text>
+
+      <line x1="260" y1="488" x2="276" y2="488" stroke="#c9a45c" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="400" y1="488" x2="416" y2="488" stroke="#c9a45c" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="550" y1="488" x2="566" y2="488" stroke="#c9a45c" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="690" y1="488" x2="706" y2="488" stroke="#c9a45c" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="830" y1="488" x2="846" y2="488" stroke="#c9a45c" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <!-- 段 2 のイメージを段 3 でそのまま使う。段の枠に隠れないよう、最後に描く -->
+      <path d="M225 306 L225 368 L770 368 L770 452" fill="none" stroke="#8c7cf0" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-tide)"/>
+      <text x="497" y="362" fill="#8c7cf0" font-size="12" text-anchor="middle">同じイメージを作り直さずに使う</text>
+    </svg>
+    <div class="legend" aria-hidden="true">
+      <span><i style="border-color:#e6c886"></i>本番の関門</span>
+      <span><i style="border-color:#8c7cf0"></i>データベースを変える段</span>
+      <span><i style="border-color:#9cc08a"></i>確かめの段</span>
+    </div>
+  </div>
+
+  <!-- ==================== AWS の構成 ==================== -->
+  <h2 id="aws">AWS の構成</h2>
+  <p>外から届くのは CloudFront と ALB だけで、3 つのサービスとデータベースは非公開のサブネットに置き、GitHub Actions は期限のない鍵を持たずに OIDC で入ることを読み取ってほしい。</p>
+  <div class="figure">
+    <svg viewBox="0 0 1000 520" role="img" aria-label="CloudFront、ALB、ECS の 5 つのサービス、RDS、Secrets Manager、ECR、GitHub Actions の構成図">
+      <defs>
+        <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M0 0 L10 5 L0 10 Z" fill="#c9a45c"/>
+        </marker>
+        <marker id="a2-tide" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M0 0 L10 5 L0 10 Z" fill="#8c7cf0"/>
+        </marker>
+      </defs>
+
+      <!-- 利用者 -->
+      <rect x="20" y="70" width="110" height="56" fill="#24201a" stroke="#7a6a4e"/>
+      <text x="75" y="103" fill="#e8dfcc" font-size="14" text-anchor="middle">ブラウザ</text>
+
+      <!-- VPC -->
+      <rect x="170" y="20" width="810" height="360" fill="none" stroke="#3a3226" stroke-dasharray="6 6"/>
+      <text x="186" y="42" fill="#a89c86" font-size="12" font-family="Cinzel, serif" letter-spacing="2">AWS  VPC  ap-northeast-1</text>
+
+      <!-- 公開のサブネット -->
+      <rect x="186" y="56" width="180" height="300" fill="#1a1612" stroke="#3a3226"/>
+      <text x="196" y="76" fill="#a89c86" font-size="12">公開のサブネット</text>
+      <rect x="206" y="90" width="140" height="50" fill="#24201a" stroke="#c9a45c"/>
+      <text x="276" y="112" fill="#e8dfcc" font-size="13" text-anchor="middle">CloudFront</text>
+      <text x="276" y="130" fill="#a89c86" font-size="11" text-anchor="middle">HTTPS(ACM)</text>
+      <rect x="206" y="180" width="140" height="66" fill="#24201a" stroke="#c9a45c"/>
+      <text x="276" y="204" fill="#e8dfcc" font-size="13" text-anchor="middle">ALB</text>
+      <text x="276" y="222" fill="#a89c86" font-size="11" text-anchor="middle">/api/ → gateway</text>
+      <text x="276" y="238" fill="#a89c86" font-size="11" text-anchor="middle">ほか → frontend</text>
+
+      <!-- 非公開のサブネット: ECS -->
+      <rect x="390" y="56" width="400" height="300" fill="#1a1612" stroke="#3a3226"/>
+      <text x="400" y="76" fill="#a89c86" font-size="12">非公開のサブネット(ECS on Fargate)</text>
+      <rect x="410" y="90" width="160" height="50" fill="#24201a" stroke="#7a6a4e"/>
+      <text x="490" y="120" fill="#e8dfcc" font-size="13" text-anchor="middle">frontend</text>
+      <rect x="410" y="188" width="160" height="50" fill="#24201a" stroke="#c9a45c"/>
+      <text x="490" y="218" fill="#e8dfcc" font-size="13" text-anchor="middle">gateway</text>
+
+      <rect x="610" y="90" width="160" height="50" fill="#24201a" stroke="#7a6a4e"/>
+      <text x="690" y="120" fill="#e8dfcc" font-size="13" text-anchor="middle">master-service</text>
+      <rect x="610" y="188" width="160" height="50" fill="#24201a" stroke="#7a6a4e"/>
+      <text x="690" y="218" fill="#e8dfcc" font-size="13" text-anchor="middle">record-service</text>
+      <rect x="610" y="286" width="160" height="50" fill="#24201a" stroke="#7a6a4e"/>
+      <text x="690" y="316" fill="#e8dfcc" font-size="13" text-anchor="middle">relic-service</text>
+      <rect x="410" y="286" width="160" height="50" fill="#24201a" stroke="#8c7cf0"/>
+      <text x="490" y="308" fill="#e8dfcc" font-size="13" text-anchor="middle">マイグレーション</text>
+      <text x="490" y="326" fill="#a89c86" font-size="11" text-anchor="middle">単発のタスク</text>
+
+      <!-- 非公開のサブネット: RDS -->
+      <rect x="814" y="56" width="150" height="300" fill="#1a1612" stroke="#3a3226"/>
+      <text x="824" y="76" fill="#a89c86" font-size="12">非公開(DB)</text>
+      <rect x="828" y="110" width="122" height="200" fill="#24201a" stroke="#8c7cf0"/>
+      <text x="889" y="136" fill="#e8dfcc" font-size="13" text-anchor="middle">RDS</text>
+      <text x="889" y="154" fill="#a89c86" font-size="11" text-anchor="middle">PostgreSQL 16</text>
+      <text x="889" y="196" fill="#e8dfcc" font-size="11" text-anchor="middle">nightreign_master</text>
+      <text x="889" y="226" fill="#e8dfcc" font-size="11" text-anchor="middle">nightreign_record</text>
+      <text x="889" y="256" fill="#e8dfcc" font-size="11" text-anchor="middle">nightreign_relic</text>
+      <text x="889" y="290" fill="#a89c86" font-size="11" text-anchor="middle">スナップショット</text>
+
+      <!-- 線: 要求の流れ -->
+      <line x1="130" y1="98" x2="202" y2="112" stroke="#c9a45c" stroke-width="2" marker-end="url(#a2)"/>
+      <line x1="276" y1="140" x2="276" y2="176" stroke="#c9a45c" stroke-width="2" marker-end="url(#a2)"/>
+      <line x1="346" y1="200" x2="406" y2="122" stroke="#c9a45c" stroke-width="2" marker-end="url(#a2)"/>
+      <line x1="346" y1="216" x2="406" y2="214" stroke="#c9a45c" stroke-width="2" marker-end="url(#a2)"/>
+      <line x1="570" y1="204" x2="606" y2="124" stroke="#c9a45c" stroke-width="2" marker-end="url(#a2)"/>
+      <line x1="570" y1="213" x2="606" y2="213" stroke="#c9a45c" stroke-width="2" marker-end="url(#a2)"/>
+      <line x1="570" y1="222" x2="606" y2="304" stroke="#c9a45c" stroke-width="2" marker-end="url(#a2)"/>
+      <!-- record → master(内部の API) -->
+      <line x1="690" y1="188" x2="690" y2="144" stroke="#8c7cf0" stroke-width="2" marker-end="url(#a2-tide)"/>
+      <text x="698" y="170" fill="#8c7cf0" font-size="11">/internal/v1</text>
+      <!-- サービス → RDS -->
+      <line x1="770" y1="115" x2="824" y2="190" stroke="#8c7cf0" stroke-width="1.5" marker-end="url(#a2-tide)"/>
+      <line x1="770" y1="213" x2="824" y2="221" stroke="#8c7cf0" stroke-width="1.5" marker-end="url(#a2-tide)"/>
+      <line x1="770" y1="311" x2="824" y2="254" stroke="#8c7cf0" stroke-width="1.5" marker-end="url(#a2-tide)"/>
+      <!-- マイグレーション → RDS -->
+      <path d="M490 336 L490 368 L889 368 L889 314" fill="none" stroke="#8c7cf0" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#a2-tide)"/>
+      <text x="600" y="362" fill="#8c7cf0" font-size="11" text-anchor="middle">配置の前に 1 回だけ適用</text>
+
+      <!-- VPC の外の AWS の部品 -->
+      <rect x="390" y="410" width="180" height="56" fill="#24201a" stroke="#7a6a4e"/>
+      <text x="480" y="434" fill="#e8dfcc" font-size="13" text-anchor="middle">ECR</text>
+      <text x="480" y="452" fill="#a89c86" font-size="11" text-anchor="middle">6 つのイメージと束</text>
+      <rect x="610" y="410" width="180" height="56" fill="#24201a" stroke="#7a6a4e"/>
+      <text x="700" y="434" fill="#e8dfcc" font-size="13" text-anchor="middle">Secrets Manager</text>
+      <text x="700" y="452" fill="#a89c86" font-size="11" text-anchor="middle">SERVICE_KEY ADMIN_KEY DB</text>
+      <line x1="700" y1="410" x2="700" y2="342" stroke="#7a6a4e" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <text x="706" y="396" fill="#a89c86" font-size="11">起動のときに渡す</text>
+
+      <!-- GitHub Actions -->
+      <rect x="20" y="410" width="200" height="80" fill="#24201a" stroke="#e6c886" stroke-width="2"/>
+      <text x="120" y="438" fill="#e6c886" font-size="14" font-weight="700" text-anchor="middle">GitHub Actions</text>
+      <text x="120" y="458" fill="#a89c86" font-size="11" text-anchor="middle">OIDC で IAM ロールを引き受ける</text>
+      <text x="120" y="476" fill="#a89c86" font-size="11" text-anchor="middle">期限のない鍵を置かない</text>
+      <line x1="220" y1="438" x2="386" y2="438" stroke="#c9a45c" stroke-width="2" marker-end="url(#a2)"/>
+      <text x="300" y="430" fill="#a89c86" font-size="11" text-anchor="middle">イメージを送る</text>
+      <path d="M220 470 L340 470 L340 320 L406 316" fill="none" stroke="#c9a45c" stroke-width="2" marker-end="url(#a2)"/>
+      <text x="300" y="490" fill="#a89c86" font-size="11" text-anchor="middle">タスクを走らせ入れ替える</text>
+    </svg>
+  </div>
+  <table>
+    <thead><tr><th>部品</th><th>置く場所</th><th>決め手</th></tr></thead>
+    <tbody>
+      <tr><td>frontend、gateway、3 つのサービス</td><td>ECS on Fargate</td><td>compose と同じイメージをそのまま動かす。ヘルスチェックを通らない版から自動で戻る</td></tr>
+      <tr><td>サービスの間の呼び出し</td><td>ECS Service Connect</td><td><code>MASTER_SERVICE_URL</code> の形を変えずに、名前で呼び先を引く</td></tr>
+      <tr><td>データベース</td><td>RDS for PostgreSQL 16、1 台</td><td>手元と同じく、サービスごとにデータベースと利用者を分ける。スナップショットと指定時刻への復元</td></tr>
+      <tr><td>秘密の値</td><td>Secrets Manager</td><td>リポジトリにもイメージにも入れない</td></tr>
+      <tr><td>AWS の資源</td><td>Terraform(承認待ち)</td><td>ステージングと本番を同じ定義から大きさだけ変えて作る</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== データベースの更新 ==================== -->
+  <h2 id="db">データベースの更新</h2>
+  <p>
+    ステージングと本番では、サービスの起動のときにマイグレーションを適用しない。
+    配置の前に、単発のタスクで 1 回だけ適用し、失敗したらサービスを入れ替えない(決定の記録 <a href="decisions/0015-migrate-before-deploy/">0015</a>)。
+    手元の compose は、今のとおり起動のときに適用する。
+  </p>
+
+  <h3>配置のときの順序</h3>
+  <ol class="steps">
+    <li><strong>マイグレーションの束を作る</strong><span class="env-tag">main</span>
+      <br>サービスごとに <code>dotnet ef migrations bundle</code> で、マイグレーションを 1 つの実行ファイルにまとめ、イメージとして ECR へ送る。</li>
+    <li class="gate"><strong>RDS のスナップショットを取る</strong><span class="env-tag prod">本番だけ</span>
+      <br>手動のスナップショットを取り、終わるまで待つ。名前にタグの版を入れる。
+      <span class="fail">取れなければ、ここで止める。</span></li>
+    <li><strong>master、record、relic の順に、1 つずつ適用する</strong>
+      <br>ECS の単発のタスクで束を走らせる。各サービスは自分のデータベースの利用者で適用する。
+      <span class="fail">1 つでも失敗したら、残りを適用せず、サービスを入れ替えない。古いタスクが動き続ける。</span></li>
+    <li><strong>サービスを入れ替える</strong>
+      <br>サービスは <code>Database__MigrateOnStartup=false</code> で起動し、適用しない。入れ替えの間は、古いタスクと新しいタスクが同じデータベースを使う。</li>
+    <li><strong>配置の後の確かめ</strong>
+      <br>今ある API を呼んで応答を確かめる。本番では記録を保存しない。</li>
+  </ol>
+
+  <h3>マイグレーションの互換の規則</h3>
+  <p>入れ替えの間は古いコードと新しいコードが同時に動き、コードだけを前の版に戻すこともあるので、マイグレーションは 1 つ前の版のコードでも動く形にする。</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>変更</th><th>やり方</th><th>出す回数</th></tr></thead>
+      <tbody>
+        <tr><td>列やテーブルを足す</td><td>そのまま足す。<code>NOT NULL</code> の列は既定値を付ける</td><td>1 回</td></tr>
+        <tr><td>列やテーブルを消す</td><td>先にコードから使うのをやめて出し、次の版で消す</td><td>2 回</td></tr>
+        <tr><td>列の名前や型を変える</td><td>新しい列を足して写し、コードを替え、後の版で古い列を消す</td><td>2 回から 3 回</td></tr>
+        <tr><td>制約を強める</td><td>今ある行が満たすことを確かめるマイグレーションを先に出す</td><td>2 回</td></tr>
+        <tr><td>記録の行を消す</td><td>書かない(決定の記録 0005)</td><td>なし</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>PR でのマイグレーションの検査</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>検査</th><th>落とす条件</th><th>受け入れ条件</th></tr></thead>
+      <tbody>
+        <tr><td>作り忘れ</td><td><code>dotnet ef migrations has-pending-model-changes</code> が、モデルとマイグレーションの食い違いを見つけた</td><td><code>AC-CD-01</code></td></tr>
+        <tr><td>書き換え</td><td><code>main</code> にあるマイグレーションのファイルが変わった(スナップショットを除く)</td><td><code>AC-CD-02</code></td></tr>
+        <tr><td>壊す変更</td><td><code>DropTable</code>、<code>DropColumn</code>、<code>RenameColumn</code>、<code>RenameTable</code> があり、<code>db-breaking</code> の印がない</td><td><code>AC-CD-03</code></td></tr>
+        <tr><td>前の版からの適用</td><td><code>main</code> の版に初期データと試しの記録を入れたデータベースへ、PR のマイグレーションを適用できない</td><td></td></tr>
+        <tr><td>空からの適用</td><td>空のデータベースに、すべてのマイグレーションを適用できない</td><td><code>AC-DB-01</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="soft">PR には、足したマイグレーションの SQL(<code>dotnet ef migrations script --idempotent</code>)を成果物として添え、レビューで読めるようにする。</p>
+
+  <!-- ==================== テストの計画 ==================== -->
+  <h2 id="tests">テストの計画</h2>
+  <p>同じ検査をどの段階で走らせるかを表にした。PR で落とせるものは PR で落とし、ステージングと本番では、配置したものが動くことだけを確かめる。</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>検査</th><th>書いている間</th><th>PR</th><th>ステージング</th><th>本番</th><th>守るもの</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>型検査、lint</td><td class="mark">●</td><td class="mark">●</td><td class="none">-</td><td class="none">-</td><td>書き間違い</td></tr>
+        <tr><td>単体のテスト(エンティティ、計算、部品)</td><td class="mark">●</td><td class="mark">●</td><td class="none">-</td><td class="none">-</td><td>業務の規則。受け入れ条件の識別子をテストの名前に書く</td></tr>
+        <tr><td>結合のテスト(API と本物の PostgreSQL)</td><td class="mark">●</td><td class="mark">●</td><td class="none">-</td><td class="none">-</td><td>API の入出力、エラーの形、データベースの制約</td></tr>
+        <tr><td>層のテスト</td><td class="mark">●</td><td class="mark">●</td><td class="none">-</td><td class="none">-</td><td>クリーンアーキテクチャの向き(<code>AC-SVC-06</code>)</td></tr>
+        <tr><td>マイグレーションの検査</td><td class="none">-</td><td class="mark">●</td><td class="none">-</td><td class="none">-</td><td>データベースの更新が、今あるデータに対して通る</td></tr>
+        <tr><td>イメージのビルドと Trivy</td><td class="none">-</td><td class="mark">●</td><td class="none">-</td><td class="none">-</td><td>イメージが作れること、既知の脆弱性</td></tr>
+        <tr><td>gitleaks</td><td class="none">-</td><td class="mark">●</td><td class="none">-</td><td class="none">-</td><td>秘密の値をリポジトリに入れない</td></tr>
+        <tr><td>Playwright(主な流れ)</td><td>画面を変えたとき</td><td class="mark">● compose</td><td class="mark">● 配置したもの</td><td class="none">-</td><td>サービスをまたいだ流れ</td></tr>
+        <tr><td>マイグレーションの適用</td><td class="none">-</td><td class="none">-</td><td class="mark">●</td><td class="mark">●</td><td>適用に失敗したら入れ替えない</td></tr>
+        <tr><td>配置の後の確かめ</td><td class="none">-</td><td class="none">-</td><td class="mark">●</td><td class="mark">●</td><td>配置したものが応答する</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Playwright で通す流れ</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>流れ</th><th>確かめること</th><th>受け入れ条件</th><th>走らせる所</th></tr></thead>
+      <tbody>
+        <tr><td>パターン検索</td><td>夜の王と開始地点を選ぶと、一覧が出る</td><td><code>AC-PAT-10</code></td><td>PR、ステージング</td></tr>
+        <tr><td>記録して検索</td><td>記録を保存すると、同じ条件の件数が 1 増える</td><td><code>AC-REC-08</code></td><td>PR、ステージング</td></tr>
+        <tr><td>保存の失敗</td><td>record-service を止めて保存すると、入力が残る</td><td><code>AC-REC-14</code></td><td>PR</td></tr>
+        <tr><td>管理の鍵</td><td>鍵なしで管理の API を呼ぶと 401</td><td><code>AC-ADM-09</code></td><td>PR、ステージング</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>配置の後の確かめ</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>呼ぶもの</th><th>期待する結果</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET /api/v1/bosses</code></td><td>200 と、空でない配列</td></tr>
+        <tr><td><code>GET /api/v1/patterns?bossId=gladius&amp;spawnPointId=1</code></td><td>200</td></tr>
+        <tr><td><code>POST /internal/v1/references/resolve</code>(Gateway へ)</td><td>404。内部の API が外から届かない(<code>AC-ADM-20</code>)</td></tr>
+        <tr><td>各サービスの <code>/health</code></td><td>ECS のヘルスチェックが通る</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ==================== 戻し方 ==================== -->
+  <h2 id="rollback">戻し方</h2>
+  <p>データベースは戻さず、コードだけを戻すのが基本である。マイグレーションの互換の規則で、前の版のコードが新しいデータベースで動くためである。</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>失敗</th><th>戻し方</th><th>誰が</th></tr></thead>
+      <tbody>
+        <tr><td>新しいタスクがヘルスチェックを通らない</td><td>ECS の配置のサーキットブレーカーが、前のタスク定義へ戻す(<code>AC-CD-09</code>)</td><td>自動</td></tr>
+        <tr><td>配置の後に誤りが見つかった</td><td>配置のワークフローを、前の版のコミットの値で走らせる</td><td>利用者</td></tr>
+        <tr><td>マイグレーションが途中で失敗した</td><td>サービスは入れ替わっていない。直したマイグレーションを足して出し直す</td><td>利用者と Claude</td></tr>
+        <tr><td>データが壊れた</td><td>配置の前のスナップショットか、指定時刻への復元で新しいインスタンスを作り、切り替える</td><td>利用者</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="soft">本番で <code>Down</code> のマイグレーションは走らせない。</p>
+
+  <!-- ==================== 承認を待つ決定 ==================== -->
+  <h2 id="approval">承認を待つ決定</h2>
+  <div class="note">
+    <p><strong>配置の先</strong>: ECS on Fargate と RDS for PostgreSQL(決定の記録 <a href="decisions/0014-deploy-to-aws-ecs/">0014</a>)。却下した案は EKS、App Runner、EC2 に compose。</p>
+    <p><strong>マイグレーションの適用</strong>: 配置の前に単発のタスクで適用し、起動のときに適用しない(決定の記録 <a href="decisions/0015-migrate-before-deploy/">0015</a>)。手元は今のまま。</p>
+    <p><strong>IaC</strong>: Terraform を選んだ。AWS CDK にするかは決めてほしい。</p>
+    <p style="margin:0"><strong>本番を作る時期</strong>: マップ画像の権利が決まるまで、ステージングだけを作る。</p>
+  </div>
+</main>
+</body>
+</html>

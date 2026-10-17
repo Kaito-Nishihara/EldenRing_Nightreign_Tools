@@ -258,7 +258,13 @@ export default function RecordPage() {
           </div>
           <MapCanvas
             mapImagePath={mapImagePath}
-            shrinkOverlay={showShrinkZones ? <ShrinkOverlay entry={overlayEntry} /> : null}
+            shrinkOverlay={
+              showShrinkZones && overlayEntry ? (
+                <ShrinkOverlay
+                  circles={[{ x: overlayEntry.zone.centerX, y: overlayEntry.zone.centerY, radius: overlayEntry.zone.radius }]}
+                />
+              ) : null
+            }
           >
             {/* 開始地点アイコン */}
             <SpawnPointMarkers

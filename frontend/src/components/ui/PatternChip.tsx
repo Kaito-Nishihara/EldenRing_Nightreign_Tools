@@ -1,4 +1,4 @@
-import { getPatternColor } from "@/components/map/PatternLayer";
+import { getPatternColor } from "@/lib/theme";
 
 /**
  * パターンの番号の丸(画面の共通仕様 3.2)。パターンの色の丸の中に、night の文字で番号を書く。

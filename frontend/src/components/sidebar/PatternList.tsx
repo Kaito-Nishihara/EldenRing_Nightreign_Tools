@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import type { PatternResponse } from "@/types";
-import { getPatternColor } from "@/components/map/PatternLayer";
+import { getPatternColor } from "@/lib/theme";
 
 interface PatternListProps {
   /** パターン検索結果 */

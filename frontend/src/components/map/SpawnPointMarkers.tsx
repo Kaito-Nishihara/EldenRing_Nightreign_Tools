@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { SpawnPoint } from "@/types";
-
-/** 開始地点アイコンのサイズ */
-const ICON_SIZE = 48;
+import { MAP_STYLE, THEME } from "@/lib/theme";
 
 interface SpawnPointMarkersProps {
   /** 表示する開始地点一覧 */
@@ -16,15 +14,11 @@ interface SpawnPointMarkersProps {
 }
 
 /**
- * 開始地点マーカーコンポーネント
- * マップ上にspawn.webpアイコンを表示する
- * 選択後は選択した地点のみ表示する
+ * 開始地点の印(画面の共通仕様 3.8)。spawn.webp のアイコンを置く。
+ * 選んだものは大きくして gold-bright の輪で囲み、ほかは薄く出す。選び直せるよう、選んだ後もほかを消さない。
+ * 親の MapCanvas が dynamic import で SSR から隔離しているので、require で react-konva を取る。
  */
-export default function SpawnPointMarkers({
-  spawnPoints,
-  selectedId,
-  onSelect,
-}: SpawnPointMarkersProps) {
+export default function SpawnPointMarkers({ spawnPoints, selectedId, onSelect }: SpawnPointMarkersProps) {
   /* eslint-disable @typescript-eslint/no-require-imports */
   const { Circle, Text, Group, Image: KonvaImage } = require("react-konva");
   /* eslint-enable @typescript-eslint/no-require-imports */
@@ -39,59 +33,52 @@ export default function SpawnPointMarkers({
     img.onload = () => setIcon(img);
   }, []);
 
-  /** 選択済みの場合は選択した地点のみ表示 */
-  const visiblePoints = selectedId
-    ? spawnPoints.filter((sp) => sp.id === selectedId)
-    : spawnPoints;
-
   return (
     <>
-      {visiblePoints.map((sp) => {
+      {spawnPoints.map((sp) => {
         const isSelected = sp.id === selectedId;
+        const dimmed = selectedId !== null && !isSelected;
+        const size = isSelected ? MAP_STYLE.spawnIconSizeSelected : MAP_STYLE.spawnIconSize;
+
         return (
           <Group
             key={sp.id}
+            opacity={dimmed ? MAP_STYLE.spawnDimmedOpacity : 1}
             onClick={() => onSelect(sp)}
             onTap={() => onSelect(sp)}
           >
-            {icon ? (
-              <>
-                <Circle
-                  x={sp.x}
-                  y={sp.y}
-                  radius={ICON_SIZE / 2 + 2}
-                  fill="rgba(0,0,0,0.5)"
-                  stroke={isSelected ? "#FFD700" : "#93c5fd"}
-                  strokeWidth={isSelected ? 3 : 2}
-                  hitStrokeWidth={15}
-                />
-                <KonvaImage
-                  image={icon}
-                  x={sp.x - ICON_SIZE / 2}
-                  y={sp.y - ICON_SIZE / 2}
-                  width={ICON_SIZE}
-                  height={ICON_SIZE}
-                />
-              </>
-            ) : (
+            {isSelected && (
               <Circle
                 x={sp.x}
                 y={sp.y}
-                radius={6}
-                fill="#60a5fa"
-                stroke="#93c5fd"
-                strokeWidth={2}
-                hitStrokeWidth={15}
+                radius={size / 2 + 4}
+                fill={MAP_STYLE.zoneMarkerFill}
+                stroke={THEME.goldBright}
+                strokeWidth={3}
+                shadowColor={THEME.gold}
+                shadowBlur={12}
               />
             )}
+            {icon ? (
+              <KonvaImage image={icon} x={sp.x - size / 2} y={sp.y - size / 2} width={size} height={size} />
+            ) : (
+              <Circle x={sp.x} y={sp.y} radius={8} fill={THEME.goldBright} stroke={THEME.night} strokeWidth={2} />
+            )}
+            {/* 押しやすくするため、アイコンより少し広い当たりを置く */}
+            <Circle x={sp.x} y={sp.y} radius={size / 2 + 6} fill={MAP_STYLE.maskClear} />
             <Text
-              x={sp.x - 30}
-              y={sp.y + ICON_SIZE / 2 + 4}
-              text={sp.nameJa}
-              fontSize={10}
-              fill={isSelected ? "#FFD700" : "#bfdbfe"}
+              x={sp.x - 60}
+              y={sp.y + size / 2 + 4}
+              width={120}
               align="center"
-              width={60}
+              text={sp.nameJa}
+              fontSize={14}
+              fontStyle="bold"
+              fill={isSelected ? THEME.goldBright : THEME.ash}
+              stroke={THEME.night}
+              strokeWidth={MAP_STYLE.labelStrokeWidth}
+              fillAfterStrokeEnabled
+              listening={false}
             />
           </Group>
         );

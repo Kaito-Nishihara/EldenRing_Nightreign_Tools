@@ -2,27 +2,7 @@
 
 import { useCallback } from "react";
 import type { Pattern } from "@/types";
-
-/**
- * 色覚多様性対応カラーパレット
- * 赤緑のみの区別に依存しないよう設計
- * Paul Tol's色覚バリアフリーパレットをベースに選定
- */
-const PATTERN_COLORS = [
-  "#4477AA", // 青
-  "#EE6677", // ローズ
-  "#228833", // 緑
-  "#CCBB44", // 黄
-  "#66CCEE", // シアン
-  "#AA3377", // 紫
-  "#BBBBBB", // グレー
-  "#EE8866", // オレンジ
-];
-
-/** パターンの色を取得 */
-export function getPatternColor(index: number): string {
-  return PATTERN_COLORS[index % PATTERN_COLORS.length];
-}
+import { getPatternColor } from "@/lib/theme";
 
 interface PatternLayerProps {
   /** パターン一覧 */

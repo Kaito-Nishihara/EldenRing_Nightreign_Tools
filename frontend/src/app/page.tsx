@@ -112,7 +112,11 @@ export default function HomePage() {
         <main className="order-1 md:order-2 flex-1 min-h-[50vh] md:min-h-0">
           <MapCanvas
             mapImagePath={mapImagePath}
-            shrinkOverlay={<ShrinkOverlay entry={selectedEntry} />}
+            shrinkOverlay={
+              <ShrinkOverlay
+                circles={selectedEntry ? [{ x: selectedEntry.zone.centerX, y: selectedEntry.zone.centerY, radius: selectedEntry.zone.radius }] : []}
+              />
+            }
           >
             <ZoneOverlay
               zones={zones}

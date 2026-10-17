@@ -6,6 +6,11 @@
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.13" />
   </ItemGroup>
 
+  <!-- サービスの間の呼び出しの期限と再試行(サービスの共通構成 5.5) -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.10.0" />
+  </ItemGroup>
+
   <!-- データベース。Npgsql が引く EF Core を、Design と同じ最新の修正版にそろえる -->
   <ItemGroup>
     <PackageVersion Include="EFCore.NamingConventions" Version="10.0.1" />

@@ -24,18 +24,16 @@
 バックエンドは機能ごとに 3 つのサービスに分け、どのサービスも中はクリーンアーキテクチャにする(`docs/decisions/0011`、`0012`)。
 
 ```
-                                     ┌→ master-service (8081) ─┐
-Next.js (3000) → .NET Gateway (8080) ┼→ record-service (8082) ─┼→ PostgreSQL (5432)
-                                     └→ relic-service  (8083) ─┘
+Next.js (3000) → .NET Gateway (8080) → 3 つのサービス(master、record、relic) → PostgreSQL (5432)
 ```
 
 | サービス | 技術 | 責務 |
 |---------|------|------|
 | frontend | Next.js 15 + TypeScript + Tailwind CSS 4 + react-konva | UI・マップ描画・ビルドの計算 |
 | gateway | ASP.NET Core 10 (Minimal API) + YARP | API Gateway・CORS・管理用の鍵の確認・サービス間キーの付与 |
-| master-service | ASP.NET Core 10 + EF Core (Npgsql) | マスタの取得と管理。DB `nightreign_master` |
-| record-service | ASP.NET Core 10 + EF Core (Npgsql) | プレイ記録とパターン検索。DB `nightreign_record`。master-service の内部 API を呼ぶ |
-| relic-service | ASP.NET Core 10 + EF Core (Npgsql) | 遺物の効果のマスタ。DB `nightreign_relic` |
+| master-service (8081) | ASP.NET Core 10 + EF Core (Npgsql) | マスタの取得と管理。DB `nightreign_master` |
+| record-service (8082) | ASP.NET Core 10 + EF Core (Npgsql) | プレイ記録とパターン検索。DB `nightreign_record`。master-service の内部 API を呼ぶ |
+| relic-service (8083) | ASP.NET Core 10 + EF Core (Npgsql) | 遺物の効果のマスタ。DB `nightreign_relic` |
 | db | PostgreSQL 16 | データ永続化。サービスごとにデータベースと利用者を分ける |
 
 バックエンドは 2026-10-17 に NestJS から .NET への作り直しを決めた(`docs/decisions/0001-dotnet-backend.md`)。

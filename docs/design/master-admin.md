@@ -85,6 +85,14 @@
 受け持ちはすべて `master-service` である。
 開始地点、収縮候補地、第二収縮地点、拠点候補地の一覧には、非表示の行を入れない。
 
+**エラー**
+
+| 状態 | 条件 | `message` の例 |
+|---|---|---|
+| 404 | `mapId` が `normal` でも地変の識別子でもない | `mapId 'unknown' は存在しません` |
+
+`mapId` が地変の識別子で、その地変の拠点候補地がまだないときは、200 と空の配列を返す。
+
 ### 4.2 管理用
 
 必要な役割: 管理者(Gateway が `X-Admin-Key` を確かめる)
@@ -201,6 +209,8 @@ Gateway は振り分けない。
 | `AC-ADM-04` | 第二収縮地点を `isHidden: true` で修正すると 200 が返り、`GET /api/v1/second-shrink-points` から消え、`GET /api/v1/admin/second-shrink-points` には `isHidden: true` で残る |
 | `AC-ADM-05` | 非表示の開始地点を `isHidden: false` で修正すると、`GET /api/v1/spawn-points` に戻る |
 | `AC-ADM-06` | `GET /api/v1/base-points?mapId=crater` は、`map_id` が `crater` の行だけを返す |
+| `AC-ADM-21` | `GET /api/v1/base-points?mapId=unknown` は 404 を返す |
+| `AC-ADM-22` | 非表示の開始地点は、`GET /api/v1/spawn-points` に入らない |
 | `AC-ADM-07` | 画面でマップを押すと、X と Y にその場所の座標が小数 2 桁で入る |
 | `AC-ADM-08` | 画面で「非表示にする」を押すと確かめの枠が出て、確かめると一覧の行に「非表示」の印が付く |
 | `AC-ADM-09` | Gateway に `X-Admin-Key` なしで `POST /api/v1/admin/spawn-points` を送ると 401 が返り、行が増えない |

@@ -21,17 +21,22 @@
 ## アーキテクチャ
 
 マイクロサービス構成。フロントエンドは必ず.NET Gatewayを経由する。
+バックエンドは機能ごとに 3 つのサービスに分け、どのサービスも中はクリーンアーキテクチャにする(`docs/decisions/0011`、`0012`)。
 
 ```
-Next.js (3000) → .NET Gateway (8080) → .NET バックエンド (8081) → PostgreSQL (5432)
+                                     ┌→ master-service (8081) ─┐
+Next.js (3000) → .NET Gateway (8080) ┼→ record-service (8082) ─┼→ PostgreSQL (5432)
+                                     └→ relic-service  (8083) ─┘
 ```
 
 | サービス | 技術 | 責務 |
 |---------|------|------|
 | frontend | Next.js 15 + TypeScript + Tailwind CSS 4 + react-konva | UI・マップ描画・ビルドの計算 |
 | gateway | ASP.NET Core 10 (Minimal API) + YARP | API Gateway・CORS・管理用の鍵の確認・サービス間キーの付与 |
-| backend | ASP.NET Core 10 (Minimal API) + EF Core (Npgsql) + EF Core Migrations | マスタ管理・パターン検索・記録保存・DBマイグレーション |
-| db | PostgreSQL 16 | データ永続化 |
+| master-service | ASP.NET Core 10 + EF Core (Npgsql) | マスタの取得と管理。DB `nightreign_master` |
+| record-service | ASP.NET Core 10 + EF Core (Npgsql) | プレイ記録とパターン検索。DB `nightreign_record`。master-service の内部 API を呼ぶ |
+| relic-service | ASP.NET Core 10 + EF Core (Npgsql) | 遺物の効果のマスタ。DB `nightreign_relic` |
+| db | PostgreSQL 16 | データ永続化。サービスごとにデータベースと利用者を分ける |
 
 バックエンドは 2026-10-17 に NestJS から .NET への作り直しを決めた(`docs/decisions/0001-dotnet-backend.md`)。
 `backend/` の NestJS のコードは、段階 0(Issue #50)で .NET のコードに置き換える。
@@ -55,14 +60,16 @@ Next.js (3000) → .NET Gateway (8080) → .NET バックエンド (8081) → Po
 - `any` を使わない
 
 ### バックエンド（ASP.NET Core / C#）
-- プロジェクト: `backend/NightreignTools.Backend/`、テストは `backend/NightreignTools.Backend.Tests/`（xUnit）
-- 名前空間: `NightreignTools.Backend.<ディレクトリ>`
-- ディレクトリ構成: `Endpoints / Dtos / Services / Repositories（EfCore/） / Entities / Data / Common`
+- サービス: `backend/<master|record|relic>/`。共通の部品は `backend/shared/`（`SharedKernel`、`ServiceDefaults`）
+- 各サービスのプロジェクト: `NightreignTools.<Service>.Domain / .Application / .Infrastructure / .Api / .Tests`（xUnit）
+- 頼る向き: Api → Application → Domain、Infrastructure → Application。Domain と Application は EF Core と ASP.NET Core を参照しない
+- 業務の規則はエンティティ（Domain）に書く。アプリケーションサービスとポート（リポジトリ、ほかのサービスの呼び出し）は Application に書く
+- EF Core、マイグレーション、初期データ、ほかのサービスを呼ぶ HttpClient は Infrastructure に置く
 - エンドポイントは Minimal API で、機能ごとに `Map<機能>Endpoints` の拡張メソッドにまとめる
-- サービスとリポジトリはインターフェースと実装に分ける。サービスから EF Core を直接使わない
-- エンティティを応答に返さず、`Dtos/` の record に詰め替える
+- エンティティを応答に返さず、Application の DTO（record）に詰め替える
 - バリデーションは DTO の注釈と .NET 10 の Minimal API の検証で行う
-- 例外は `NotFoundException`（404）、`BusinessRuleException`（400）、`ConflictException`（409）を使い、共通の例外ハンドラで変換する
+- 例外は SharedKernel の `NotFoundException`（404）、`BusinessRuleException`（400）、`ConflictException`（409）、`ServiceUnavailableException`（503）を使い、ServiceDefaults の例外ハンドラで変換する
+- ほかのサービスのデータベースに触れない。データが要るときは、そのサービスの `/internal/v1` の API を呼ぶ（呼ぶ向きは record → master だけ）
 - `Nullable` を有効にし、警告を誤りとして扱う
 - 外部からの直接アクセスを想定しない（Gateway経由のみ。`X-Service-Key` を検証する）
 - エラーレスポンス形式: `{ "status", "error", "message", "timestamp" }`
@@ -70,25 +77,28 @@ Next.js (3000) → .NET Gateway (8080) → .NET バックエンド (8081) → Po
 ### API Gateway（ASP.NET Core / C#）
 - Minimal API スタイルで記述する
 - ルーティングは `Program.cs` に集約する
-- バックエンドへのプロキシは YARP を使用する
+- 各サービスへのプロキシは YARP を使用し、パスの接頭辞で振り分ける。`/internal/v1` は振り分けない
 
-### データベース（バックエンドのみアクセス）
+### データベース（各サービスが自分のデータベースだけにアクセス）
 - .NET Gateway はDBに触れない（管理者の確かめは `X-Admin-Key` と環境変数 `ADMIN_KEY` の比較のみ）
-- マイグレーションは EF Core Migrations で管理する（直接DDL実行禁止）
+- マイグレーションは EF Core Migrations で、サービスごとに管理する（直接DDL実行禁止）
+- マスタの行は消さず、`hidden_at` で非表示にする（`docs/decisions/0013`）
 - マイグレーション名は英語の PascalCase（例: `AddNightBossToPlayRecord`）。`main` にあるマイグレーションを書き換えない
 - スキーマ: `game`（EF Core の既定のスキーマと、マイグレーションの履歴のテーブルの両方に指定する）
 - カラム名はスネークケース
-- 座標はマップ画像（1024 px 四方）の px で持つ
+- 座標は 1024 四方の座標空間の数で持つ（マップ画像は 1000 px で、引き伸ばして描く）
 
 ## 環境変数
 
 `.env` ファイルで管理する（`.env` はGit管理対象外）。
 
 ```
-JWT_SECRET=        # JWT署名キー
-SERVICE_KEY=       # Gateway↔バックエンド サービス間認証キー
-DB_USER=           # PostgreSQLユーザー
-DB_PASSWORD=       # PostgreSQLパスワード
+SERVICE_KEY=        # Gateway↔各サービス、record→master のサービス間認証キー
+DB_USER=            # PostgreSQLの管理者。db/init とテスト用DBの作り直しに使う
+DB_PASSWORD=        # PostgreSQLの管理者のパスワード
+MASTER_DB_PASSWORD= # nightreign_master の利用者のパスワード
+RECORD_DB_PASSWORD= # nightreign_record の利用者のパスワード
+RELIC_DB_PASSWORD=  # nightreign_relic の利用者のパスワード
 CORS_ORIGINS=      # Gateway が許すオリジン（省略時 http://localhost:3000）
 ADMIN_KEY=         # 管理用の鍵。16文字以上。/api/v1/admin の呼び出しに X-Admin-Key で付ける
 ```
@@ -105,7 +115,7 @@ docker compose up --build
 | http://localhost:8080 | API Gateway |
 | http://localhost:8000 | 仕様書のサイト（`docker compose -f docs-site/compose.yaml up -d`） |
 
-バックエンド（8081）はコンテナの間だけに公開する。
+3 つのサービス（8081〜8083）はコンテナの間だけに公開する。
 
 ビルドとテストはホストではなくコンテナの中で走らせる（`docs/design/common-runtime.md`）。
 

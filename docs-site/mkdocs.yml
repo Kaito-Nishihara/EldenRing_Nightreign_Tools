@@ -104,3 +104,6 @@ nav:
       - 0008 第 2 次収縮を第二収縮地点で記録する: decisions/0008-second-shrink-by-point.md
       - 0009 管理者を Gateway で管理用の鍵により確かめる: decisions/0009-admin-key.md
       - 0010 記録に夜ボスを持たせ、拠点の種類を持たせない: decisions/0010-night-boss-in-record.md
+      - 0011 サービスの中をクリーンアーキテクチャで分ける: decisions/0011-clean-architecture.md
+      - 0012 バックエンドを機能ごとに 3 つのサービスに分ける: decisions/0012-split-services-by-feature.md
+      - 0013 マスタを消さずに非表示にする: decisions/0013-hide-masters-instead-of-delete.md

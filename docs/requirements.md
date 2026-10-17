@@ -54,14 +54,14 @@
 | 利用者 | できること |
 |---|---|
 | プレイヤー | マップとパターンを見る。記録を足す。ビルドシミュレーターを使う |
-| 管理者 | プレイヤーのできることに加えて、マスタの座標を登録、修正、削除する |
+| 管理者 | プレイヤーのできることに加えて、マスタの座標を登録、修正し、要らない行を非表示にする |
 
 プレイヤーはログインしない。
 管理者の操作は、Gateway が管理用の鍵(`X-Admin-Key`)を確かめた要求だけを受け付ける(決定の記録 [0009](decisions/0009-admin-key.md))。
 鍵は環境変数 `ADMIN_KEY` に置き、管理者だけが知る。
 
 管理者の判定は Gateway で行う。
-バックエンドは、サービス間キーで Gateway を通ったことを確かめる。
+各サービスは、サービス間キーで Gateway を通ったことを確かめる。
 画面で管理の入口を隠すことは、権限の判定にならない。
 
 ## 4. ゲームの前提
@@ -135,8 +135,8 @@
 ### 5.4 マスタの管理
 
 - 管理の画面で、マップを押した場所の座標を取り、名前を付けて登録する。
-- 登録した点を押すと、修正と削除ができる。
-- 記録から参照されている開始地点、収縮候補地、第二収縮地点は削除できない。
+- 登録した点を押すと、修正と非表示ができる。
+- マスタの行は消さない。非表示にした行は、プレイヤーの画面と新しい記録の入力から外れ、過去の記録には残る(決定の記録 [0013](decisions/0013-hide-masters-instead-of-delete.md))。
 
 ### 5.5 ビルドシミュレーター
 
@@ -152,7 +152,7 @@
 - **色覚**: パターンの色分けは、色覚の多様性に配慮した色の組を使い、番号でも見分けられるようにする。
 - **応答の速さ**: 条件を選んでからパターンが出るまでを 1 秒以内にする(見込み。記録が 1 万件までの想定で、測っていない)。
 - **データの扱い**: 記録は消さない(決定の記録 [0005](decisions/0005-keep-play-records.md))。
-- **セキュリティ**: バックエンドは Gateway の外から呼べない。入力はバックエンドで検証する。秘密の値をリポジトリに置かない。手元の外に公開するときは HTTPS で配る。管理用の鍵が見出しに平文で載るためである。
+- **セキュリティ**: バックエンドのサービスは Gateway の外から呼べない。入力は各サービスで検証する。秘密の値をリポジトリに置かない。手元の外に公開するときは HTTPS で配る。管理用の鍵が見出しに平文で載るためである。
 - **言語**: 画面は日本語だけとする。
 
 ## 7. 技術構成
@@ -160,36 +160,43 @@
 | 役割 | 採用 |
 |---|---|
 | 画面 | Next.js 15(App Router)+ React 19 + TypeScript + Tailwind CSS 4。マップは react-konva |
-| 入口 | ASP.NET Core 10(Minimal API)+ YARP。CORS、管理用の鍵の確認、バックエンドへの振り分け |
-| バックエンド | ASP.NET Core 10(Minimal API)+ C#。業務ロジックとデータの出し入れ |
+| 入口 | ASP.NET Core 10(Minimal API)+ YARP。CORS、管理用の鍵の確認、3 つのサービスへの振り分け |
+| バックエンド | ASP.NET Core 10(Minimal API)+ C# の 3 つのサービス。どれもクリーンアーキテクチャ(Domain、Application、Infrastructure、Api) |
 | データアクセス | EF Core(Npgsql) |
 | テーブルの変更管理 | EF Core Migrations |
-| データベース | PostgreSQL 16。スキーマ `game` |
+| データベース | PostgreSQL 16 の 1 台に、サービスごとのデータベース。スキーマ `game` |
 | テスト | バックエンドは xUnit、画面は Vitest |
 | 実行環境 | Docker Compose |
 
-バックエンドを .NET で作り直した理由は、決定の記録 [0001](decisions/0001-dotnet-backend.md) に書く。
+バックエンドを .NET で作り直した理由は決定の記録 [0001](decisions/0001-dotnet-backend.md)、サービスを分けた理由は [0012](decisions/0012-split-services-by-feature.md)、クリーンアーキテクチャにした理由は [0011](decisions/0011-clean-architecture.md) に書く。
 
 ### 構成とデータの持ち主
 
 ```
-Next.js (3000) → .NET Gateway (8080) → .NET バックエンド (8081) → PostgreSQL (5432)
+                                   ┌→ master-service (8081) ─┐
+Next.js (3000) → .NET Gateway (8080) ┼→ record-service (8082) ─┼→ PostgreSQL (5432)
+                                   └→ relic-service  (8083) ─┘
+                 record-service → master-service(参照の確かめ)
 ```
 
 | サービス | 受け持つもの | 持つデータ |
 |---|---|---|
 | `frontend` | 画面。ビルドシミュレーターの計算 | なし。入力中の記録をブラウザに持つ |
-| `gateway` | 入口。CORS、管理用の鍵の確認、バックエンドへの振り分け、サービス間キーの付与 | なし |
-| `backend` | マスタ、パターン検索、プレイ記録、マスタの管理 | すべてのテーブル |
-| `db` | データの保存 | |
+| `gateway` | 入口。CORS、管理用の鍵の確認、パスによる振り分け、サービス間キーの付与 | なし |
+| `master-service` | マスタの取得、マスタの管理 | `nightreign_master`: 夜の王、地変、開始地点、収縮候補地、第二収縮地点、拠点候補地、夜ボス |
+| `record-service` | プレイ記録、パターン検索 | `nightreign_record`: 記録、収縮先 |
+| `relic-service` | ビルドシミュレーターの効果のマスタ | `nightreign_relic`: 遺物の効果 |
+| `db` | データの保存 | サービスごとのデータベース |
 
 決まりは次のとおりとする。
 
-- 画面は Gateway だけを呼ぶ。バックエンドのポートはコンテナの外に出さない。
-- Gateway はバックエンドへの要求に `X-Service-Key` を付ける。バックエンドはこの値が合わない要求を 401 で拒む。
+- 画面は Gateway だけを呼ぶ。3 つのサービスのポートはコンテナの外に出さない。
+- Gateway は各サービスへの要求に `X-Service-Key` を付ける。各サービスはこの値が合わない要求を 401 で拒む。
+- 各サービスは自分のデータベースだけに触れる。ほかのサービスのデータが要るときは、そのサービスの API を呼ぶ。
+- サービスの間の呼び出しは、`record-service` から `master-service` への一方向だけにする。
 - Gateway は `/api/v1/admin` の下への要求に `X-Admin-Key` を求め、合わない要求を 401 で拒む。
 - Gateway はデータベースに触れない。
-- Gateway とバックエンドを 1 つにまとめない理由は、決定の記録 [0002](decisions/0002-keep-gateway-separate.md) に書く。
+- Gateway とサービスを 1 つにまとめない理由は、決定の記録 [0002](decisions/0002-keep-gateway-separate.md) に書く。
 
 ### ディレクトリ構成
 
@@ -202,8 +209,11 @@ frontend/                        # Next.js
 └── src/types/                   # 型
 gateway/                         # ASP.NET Core + YARP
 backend/
-├── NightreignTools.Backend/     # ASP.NET Core
-└── NightreignTools.Backend.Tests/
+├── shared/                      # サービスに共通の部品
+├── master/                      # master-service(Domain、Application、Infrastructure、Api、Tests)
+├── record/                      # record-service
+└── relic/                       # relic-service
+db/init/                         # サービスごとのデータベースと利用者を作る手順
 docs/
 docs-site/                       # 仕様書のサイト
 docker-compose.yml
@@ -224,6 +234,8 @@ docker-compose.yml
 | `play_records` | 1 回のプレイの記録。ボス、地変、開始地点、1 日目と 2 日目の夜ボス、備考 | 記録 |
 | `shrink_entries` | 記録ごとの収縮先。日と段階の組ごとに 1 行。第 1 次は収縮候補地、第 2 次は第二収縮地点を参照する | 記録 |
 
+持ち主のサービスとデータベースは、7 章の表のとおりとする。
+記録は、マスタの行を識別子で持ち、外部キーは持たない。
 列と制約は [データベースの共通仕様](design/common-database.md) と各機能の仕様書に書く。
 
 ## 9. API
@@ -243,7 +255,10 @@ docker-compose.yml
 | `GET /api/v1/relic-effects` | 遺物の効果の一覧 | なし |
 | `GET /api/v1/patterns` | パターン検索 | なし |
 | `POST /api/v1/play-records` | 記録を保存する | なし |
-| `GET`、`POST`、`PUT`、`DELETE /api/v1/admin/...` | マスタの座標の管理 | 管理者(`X-Admin-Key`) |
+| `GET`、`POST`、`PUT /api/v1/admin/...` | マスタの座標の管理と非表示 | 管理者(`X-Admin-Key`) |
+
+`/api/v1/patterns` と `/api/v1/play-records` は `record-service`、`/api/v1/relic-effects` は `relic-service`、そのほかは `master-service` が受け持つ。
+サービスの間だけで使う API(`/internal/v1`)は、[API の共通仕様](design/common-api.md) 4.8 に書く。
 
 入出力とエラーは、[API の共通仕様](design/common-api.md) と各機能の仕様書に書く。
 
@@ -262,14 +277,14 @@ docker-compose.yml
 
 | 段階 | 内容 | 終わりの条件 |
 |---|---|---|
-| 0 | .NET バックエンドの土台 | 骨組み、共通のエラー、サービス間キーの検証、EF Core の初期マイグレーションとマスタの投入ができ、マスタの API が Gateway から返る |
-| 1 | パターン検索とプレイ記録 | パターン検索とプレイ記録の受け入れ条件のうち API の条件が通る |
+| 0 | 共通の部品と `master-service` の土台 | 共通の部品、`master-service` の骨組み、マイグレーションと初期データ、プレイヤー向けのマスタの API ができ、Gateway の振り分けを通して返る |
+| 1 | `record-service`(パターン検索とプレイ記録) | `master-service` の内部の API と `record-service` ができ、パターン検索とプレイ記録の受け入れ条件のうち API の条件が通る |
 | 2 | マスタの管理と権限 | Gateway が管理用の鍵を確かめ、マスタの管理の受け入れ条件が通る |
 | 3 | 画面の見た目の作り直し | 画面の共通仕様の受け入れ条件が通る。4 つの画面が新しい見た目になる |
-| 4 | ビルドシミュレーターの API | ビルドシミュレーターの受け入れ条件が通る |
+| 4 | `relic-service`(ビルドシミュレーターの API) | ビルドシミュレーターの受け入れ条件が通る |
 | 5 | P1 の機能 | 収縮のタイムライン、オフラインでの利用 |
 
-段階 0 から 2 の間、画面は今の作りのまま、新しいバックエンドにつなぐ。
+段階 0 から 2 の間、画面は今の作りのまま、新しいサービスにつなぐ。
 段階ごとに、受け入れ条件のテストが通ってから次へ進む。
 
 ## 12. 未決事項
@@ -288,3 +303,6 @@ docker-compose.yml
 | 第 2 次収縮の記録の形(第二収縮地点で記録する) | [0008](decisions/0008-second-shrink-by-point.md) |
 | 管理者の確かめ方(Gateway で管理用の鍵を確かめる) | [0009](decisions/0009-admin-key.md) |
 | 夜ボスと拠点の種類の記録(夜ボスだけを持つ) | [0010](decisions/0010-night-boss-in-record.md) |
+| サービスの中の分け方(クリーンアーキテクチャ) | [0011](decisions/0011-clean-architecture.md) |
+| サービスの分け方(機能ごとに 3 つ) | [0012](decisions/0012-split-services-by-feature.md) |
+| 要らなくなったマスタの扱い(非表示にする) | [0013](decisions/0013-hide-masters-instead-of-delete.md) |

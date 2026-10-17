@@ -90,7 +90,7 @@ P1 までは、この区画を出さない。
 
 ### `POST /api/v1/play-records`
 
-受け持ち: バックエンド
+受け持ち: `record-service`
 必要な役割: なし
 
 **入力**
@@ -140,7 +140,12 @@ P1 までは、この区画を出さない。
 | 400 | `day` と `phase` の組が重複する | `day=1, phase=1 が重複しています` |
 | 400 | 段階と収縮先の種類が合わない | `day=1, phase=2 は secondShrinkPointId で指定してください` |
 | 400 | 夜ボスの日が合わない | `day1NightBossId には 1 日目の夜ボスを指定してください` |
+| 400 | 参照する行が非表示 | `zoneId '4' は非表示のため、記録に使えません` |
 | 404 | 参照する行がない | `zoneId '99' は存在しません` |
+| 503 | `master-service` が応答しない | `マスタのサービスに接続できません。時間をおいてやり直してください` |
+
+参照する行の確かめは、`master-service` の内部の API([マスタの管理](master-admin.md) 4.4)を 1 回呼んで行う。
+夜の王、地変、開始地点、収縮候補地、第二収縮地点、夜ボスの識別子をまとめて送り、返らなかったものを 404、非表示のものを 400 にする。
 
 検証に失敗したときは、何も保存しない。
 記録と収縮先は、1 つのトランザクションで保存する。
@@ -157,18 +162,21 @@ P1 までは、この区画を出さない。
 
 ## 5. データ
 
-持ち主: バックエンド
+持ち主: `record-service`(データベース `nightreign_record`)
+
+マスタの識別子の列は、`nightreign_master` の行の識別子を持つだけで、外部キーはない(決定の記録 [0012](../decisions/0012-split-services-by-feature.md))。
+あるかどうかは、保存のときに `master-service` に問い合わせて確かめる。
 
 **`play_records`**
 
 | 列 | 型 | 制約 |
 |---|---|---|
 | `id` | integer | 主キー |
-| `boss_id` | varchar(50) | `NOT NULL`。`bosses` を参照 |
-| `jihen_id` | varchar(50) | `jihen` を参照。`NULL` は地変なし |
-| `spawn_point_id` | integer | `NOT NULL`。`spawn_points` を参照 |
-| `day1_night_boss_id` | integer | `night_bosses` を参照。`NULL` は選ばなかった |
-| `day2_night_boss_id` | integer | `night_bosses` を参照。`NULL` は選ばなかった |
+| `boss_id` | varchar(50) | `NOT NULL`。夜の王の識別子 |
+| `jihen_id` | varchar(50) | 地変の識別子。`NULL` は地変なし |
+| `spawn_point_id` | integer | `NOT NULL`。開始地点の識別子 |
+| `day1_night_boss_id` | integer | 夜ボスの識別子。`NULL` は選ばなかった |
+| `day2_night_boss_id` | integer | 夜ボスの識別子。`NULL` は選ばなかった |
 | `note` | varchar(500) | |
 | `created_at` | timestamptz | `NOT NULL` |
 
@@ -183,18 +191,42 @@ P1 までは、この区画を出さない。
 | `play_record_id` | integer | `NOT NULL`。`play_records` を参照。`ON DELETE CASCADE` |
 | `day` | integer | `NOT NULL`。1 か 2 |
 | `phase` | integer | `NOT NULL`。1 か 2 |
-| `zone_id` | integer | `shrink_zones` を参照 |
-| `second_shrink_point_id` | integer | `second_shrink_points` を参照 |
+| `zone_id` | integer | 収縮候補地の識別子 |
+| `second_shrink_point_id` | integer | 第二収縮地点の識別子 |
 
 `(play_record_id, day, phase)` に一意の制約を付ける。
 `phase` が 1 なら `zone_id` だけ、2 なら `second_shrink_point_id` だけを持つ検査の制約を付ける。
 
-夜ボスの日が合っているかは、データベースの制約にせず、サービスで確かめる。
-`night_bosses` の `day` を見る制約は、別のテーブルを参照する検査になるためである。
+日と段階の組の重複、段階と収縮先の種類の対応は、エンティティ(Domain の層)でも確かめる。
+データベースの制約は、規則を破った行が入らないための最後の守りである。
+夜ボスの日が合っているかは、`master-service` から返った `day` を見て、アプリケーションサービスで確かめる。
 
 ## 6. サービスの間のやり取り
 
-画面 → Gateway → バックエンドの順に呼ぶ。
+画面 → Gateway → `record-service` → `master-service` の順に呼ぶ。
+
+参照の確かめの流れを次に示す。
+`master-service` の答えを待ってから保存し、答えがなければ何も保存しないことを読み取ってほしい。
+
+```mermaid
+sequenceDiagram
+    participant 画面
+    participant Gateway
+    participant Record as record-service
+    participant Master as master-service
+    画面->>Gateway: POST /api/v1/play-records
+    Gateway->>Record: X-Service-Key を付け直して渡す
+    Record->>Record: 入力の形と、日と段階の規則を確かめる
+    Record->>Master: POST /internal/v1/references/resolve
+    alt 応答がない(期限切れ、5xx)
+        Record-->>画面: 503。何も保存しない
+    else 応答がある
+        Master-->>Record: 見つかった行と、非表示かどうか
+        Record->>Record: ない行は 404、非表示は 400
+        Record-->>画面: 201 { id, createdAt }
+    end
+```
+
 保存の要求が期限切れか通信の失敗で終わったときは、下書きを残したまま「保存できませんでした。入力は残っています。時間をおいてもう一度保存してください」と出す。
 応答が届かなかったが実際には保存されていた場合、もう一度保存すると記録が 2 件になる。
 これを防ぐ仕組みは、今は持たない(8 章)。
@@ -216,7 +248,7 @@ P1 までは、この区画を出さない。
 | `AC-REC-11` | スロットを 1 つ入れて再読み込みすると、入れた内容が戻り、「前回の入力を戻しました」と出る |
 | `AC-REC-12` | スロットを 1 つも入れていないとき、「記録を保存する」が使えず、「収縮先を 1 つ以上入れてください」と出る |
 | `AC-REC-13` | 保存に成功すると、スロットと備考が空になり、条件は残り、下書きが消える |
-| `AC-REC-14` | バックエンドを止めて保存すると、「保存できませんでした。入力は残っています。時間をおいてもう一度保存してください」と出て、スロットの内容が残る |
+| `AC-REC-14` | `record-service` を止めて保存すると、「保存できませんでした。入力は残っています。時間をおいてもう一度保存してください」と出て、スロットの内容が残る |
 | `AC-REC-15` | 一覧から選ぶ欄を使い、キーボードだけで 4 つのスロットを入れて保存できる |
 | `AC-REC-16` | `phase=2` の収縮先を `zoneId` で送ると 400 が返り、`message` が「day=1, phase=2 は secondShrinkPointId で指定してください」の形である |
 | `AC-REC-17` | `phase=1` の収縮先を `secondShrinkPointId` で送ると 400 が返る |
@@ -225,8 +257,10 @@ P1 までは、この区画を出さない。
 | `AC-REC-20` | `day1NightBossId` を指定し、`day2NightBossId` を省いて保存すると、`day1_night_boss_id` に値が、`day2_night_boss_id` に `NULL` が入る |
 | `AC-REC-21` | 画面で `1-2` を選んでいる状態で収縮候補地の印を押しても入らず、第二収縮地点を押すとその名前が入る |
 | `AC-REC-22` | `version: 1` の下書きが残っている状態で画面を開くと、下書きが消え、「前回の入力を戻しました」が出ない |
+| `AC-REC-23` | `master-service` が応答しない状態で保存すると 503 が返り、`play_records` に行が増えない |
+| `AC-REC-24` | 非表示の収縮候補地を `zoneId` に含めて保存すると 400 が返り、`message` が「zoneId '4' は非表示のため、記録に使えません」の形である |
 
 ## 8. 未決事項
 
 - **第 1 次と第 2 次の対応**: 第二収縮地点がどの収縮候補地の中にあるかを、マスタに持つか。持てば、第 1 次の円の外の地点を拒める。座標が正しくなってから(要件定義の 12 章)、利用者が決める。
-- **同じ記録の二重の保存**: 応答が届かなかったときの保存のやり直しで、記録が 2 件になる(6 章)。画面で作った識別子を送り、バックエンドで重複を拒む形にするか。
+- **同じ記録の二重の保存**: 応答が届かなかったときの保存のやり直しで、記録が 2 件になる(6 章)。画面で作った識別子を送り、`record-service` で重複を拒む形にするか。

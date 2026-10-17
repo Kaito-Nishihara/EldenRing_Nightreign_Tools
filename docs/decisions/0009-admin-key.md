@@ -31,5 +31,5 @@ Gateway が、`/api/v1/admin` の下への要求に `X-Admin-Key` の見出し�
 - Gateway は `X-Admin-Key` を消してからバックエンドへ渡す。バックエンドは管理者を確かめず、サービス間キーで Gateway を通ったことだけを確かめる。
 - 鍵は見出しに平文で載るので、手元の外に公開するときは HTTPS で配る。
 - 管理の画面は、鍵を `sessionStorage` に持つ。タブを閉じると消える。
-- `JWT_SECRET` と `/auth/token` は、まだ使い道がない([API の共通仕様](../design/common-api.md) の未決事項)。
+- `JWT_SECRET` と `/auth/token` は使い道がなくなるので、段階 0 で外す(#50)。
 - 管理者を複数の人に分けて、誰が直したかを残したくなったら、JWT の案で見直す。

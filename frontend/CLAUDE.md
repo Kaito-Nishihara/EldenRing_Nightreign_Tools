@@ -8,7 +8,7 @@ Next.js 15(App Router)、React 19、TypeScript、Tailwind CSS 4、react-konva。
 ```
 src/
 ├── app/          # ページ(/、/record、/build、/admin)。データの取得と部品の組み立てだけを書く
-├── components/   # 部品。機能ごと(map、record、build、admin、sidebar)に分ける。共通の部品は ui/
+├── components/   # 部品。機能ごと(map、pattern、record、build、admin)に分ける。共通の部品は ui/
 ├── hooks/        # 画面の状態と、API の取得をまとめる処理
 ├── lib/          # API のクライアント(api.ts)、計算(buildCalc.ts)、対応表(mapImage.ts)
 ├── types/        # API の応答の型

@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NightreignTools.Record.Application.Masters;
+using NightreignTools.Record.Application.Patterns;
 using NightreignTools.Record.Application.PlayRecords;
 using NightreignTools.Record.Infrastructure.Masters;
 using NightreignTools.Record.Infrastructure.Persistence;
@@ -21,6 +22,7 @@ public static class DependencyInjection
         // nightreign_record への接続と、起動のときのマイグレーション(データベースの共通仕様 5.5)
         services.AddServiceDatabase<RecordDbContext>();
         services.AddScoped<IPlayRecordRepository, PlayRecordRepository>();
+        services.AddScoped<IPatternRecordReader, PatternRecordReader>();
 
         services.AddMasterDirectory();
         return services;

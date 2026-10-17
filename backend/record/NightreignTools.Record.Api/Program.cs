@@ -21,6 +21,7 @@ app.UseServiceDefaults();
 // 機能のエンドポイントは /api/v1 のグループに、機能ごとの Map<機能>Endpoints で足す(サービスの共通構成 5.4)
 var api = app.MapGroup("/api/v1");
 api.MapPlayRecordEndpoints();
+api.MapPatternEndpoints();
 
 return await app.RunServiceAsync();
 

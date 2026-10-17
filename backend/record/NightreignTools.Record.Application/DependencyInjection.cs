@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using NightreignTools.Record.Application.Patterns;
 using NightreignTools.Record.Application.PlayRecords;
 
 namespace NightreignTools.Record.Application;
@@ -9,6 +10,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddScoped<IPlayRecordService, PlayRecordService>();
+        services.AddScoped<IPatternSearchService, PatternSearchService>();
         return services;
     }
 }

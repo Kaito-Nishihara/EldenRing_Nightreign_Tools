@@ -112,7 +112,8 @@ flowchart LR
 決まりは次のとおりとする。
 
 - 業務の規則はエンティティに書き、エンティティを作るときと変えるときに確かめる。規則に反したら `BusinessRuleException` を投げる。
-- アプリケーションサービスはインターフェースと実装に分け、各層の `DependencyInjection.cs` の `Add<層>` で登録する。`Program.cs` は `AddApplication`、`AddInfrastructure`、`AddServiceDefaults` を呼ぶだけにする。
+- アプリケーションサービスはインターフェースと実装に分け、各層の `DependencyInjection.cs` の `Add<層>` で登録する。`Program.cs` は `AddServiceDefaults`、`AddValidation`、`AddApplication`、`AddInfrastructure` を呼ぶだけにする。
+- `AddValidation` は ServiceDefaults ではなく、各サービスの `Program.cs` で呼ぶ。検証の情報はソースジェネレーターがこの呼び出しに差し込むので、エンドポイントを持つ Api のプロジェクトで呼ばないと、検証が働かない。入力の検証の誤りは、ServiceDefaults が ProblemDetails から 4.3 の形に書き替える。
 - エンティティを API の応答に返さない。DTO に詰め替える。
 - すべての非同期のメソッドは `CancellationToken` を受け取り、下の層へ渡す。
 - 読み取りだけのクエリには `AsNoTracking()` を付ける。
@@ -123,6 +124,7 @@ flowchart LR
 ```csharp
 // Api/Program.cs の一部
 builder.AddServiceDefaults();             // エラーの形、例外の変換、サービス間キー、/health
+builder.Services.AddValidation();         // DTO の注釈による入力の検証
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();     // DbContext と、起動のときのマイグレーション
 

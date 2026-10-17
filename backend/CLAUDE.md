@@ -38,7 +38,8 @@ backend/
 - **業務の規則はエンティティ(Domain)に書く。** エンティティの setter は private にし、作るときと変えるときに規則を確かめる。
 - **アプリケーションサービスとポート(リポジトリ、ほかのサービスの呼び出し)は Application に書く。** インターフェースと実装に分ける。
 - **EF Core、マイグレーション、初期データ、ほかのサービスを呼ぶ `HttpClient` は Infrastructure に置く。**
-- **Api は登録の組み立てとエンドポイントだけを書く。** `Program.cs` は `AddServiceDefaults`、`AddApplication`、`AddInfrastructure` を呼ぶだけにする。
+- **Api は登録の組み立てとエンドポイントだけを書く。** `Program.cs` は `AddServiceDefaults`、`AddValidation`、`AddApplication`、`AddInfrastructure` を呼ぶだけにする。
+- **`AddValidation` は各サービスの `Program.cs` で呼ぶ。** ソースジェネレーターがこの呼び出しに検証の情報を差し込むので、ServiceDefaults の中で呼ぶと検証が働かない(呼んでも誤りにならず、黙って素通りする)。
 - **エンティティを応答に返さない。** Application の DTO(record)に詰め替える。
 - 登録は各層の `DependencyInjection.cs` に足す。
 - エラーの形、例外の変換、サービス間キーは `shared/` に置く。サービスの中に写しを作らない。`shared/` に業務の規則を置かない。

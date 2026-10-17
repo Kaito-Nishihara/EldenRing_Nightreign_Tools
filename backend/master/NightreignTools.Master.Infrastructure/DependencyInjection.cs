@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using NightreignTools.Master.Application.Masters;
+using NightreignTools.Master.Application.References;
 using NightreignTools.Master.Infrastructure.Persistence;
 using NightreignTools.Master.Infrastructure.Repositories;
 using NightreignTools.ServiceDefaults.Persistence;
@@ -15,6 +16,7 @@ public static class DependencyInjection
         services.AddServiceDatabase<MasterDbContext>();
 
         services.AddScoped<IMasterReadRepository, MasterReadRepository>();
+        services.AddScoped<IReferenceRepository, ReferenceRepository>();
         return services;
     }
 }

@@ -27,6 +27,19 @@ public class StartupTests
         Assert.Contains("ConnectionStrings__Default", exception.ToString());
     }
 
+    [Theory]
+    [InlineData("")]
+    [InlineData("master-service:8081")]
+    public void AC_SVC_10_MASTER_SERVICE_URLを渡さずに起動すると起動が失敗し文言にMASTER_SERVICE_URLが出る(string url)
+    {
+        using var factory = new FactoryWithMasterServiceUrl(url);
+
+        var exception = Xunit.Record.Exception(() => factory.CreateClient());
+
+        Assert.NotNull(exception);
+        Assert.Contains("MASTER_SERVICE_URL", exception.ToString());
+    }
+
     [Fact]
     public async Task AC_API_09_healthはキーなしで200を返す()
     {
@@ -45,5 +58,10 @@ public class StartupTests
     private sealed class FactoryWithoutConnectionString : RecordServiceFactory
     {
         protected override string ConfiguredConnectionString => "";
+    }
+
+    private sealed class FactoryWithMasterServiceUrl(string url) : RecordServiceFactory
+    {
+        protected override string ConfiguredMasterServiceUrl => url;
     }
 }

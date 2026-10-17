@@ -1,4 +1,4 @@
-namespace NightreignTools.Backend.Common;
+namespace NightreignTools.ServiceDefaults.ErrorHandling;
 
 /// <summary>
 /// すべてのエラーの応答の形(API の共通仕様 4.3)。

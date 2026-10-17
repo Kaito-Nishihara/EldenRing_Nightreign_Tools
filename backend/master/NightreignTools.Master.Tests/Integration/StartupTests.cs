@@ -1,7 +1,7 @@
-namespace NightreignTools.Backend.Tests;
+namespace NightreignTools.Master.Tests.Integration;
 
 /// <summary>
-/// 起動の時点で、必要な設定がないことに気付いて止まる(サービスの共通構成 5.5)。
+/// 起動の時点で、必要な設定がないことに気付いて止まる(サービスの共通構成 5.7)。
 /// </summary>
 public class StartupTests
 {
@@ -16,7 +16,7 @@ public class StartupTests
         Assert.Contains("SERVICE_KEY", exception.ToString());
     }
 
-    private sealed class FactoryWithoutServiceKey : BackendFactory
+    private sealed class FactoryWithoutServiceKey : MasterServiceFactory
     {
         protected override string ConfiguredServiceKey => "";
     }

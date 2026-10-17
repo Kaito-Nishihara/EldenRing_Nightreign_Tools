@@ -1,4 +1,14 @@
 <Solution>
-  <Project Path="NightreignTools.Backend/NightreignTools.Backend.csproj" />
-  <Project Path="NightreignTools.Backend.Tests/NightreignTools.Backend.Tests.csproj" />
+  <Folder Name="/shared/">
+    <Project Path="shared/NightreignTools.SharedKernel/NightreignTools.SharedKernel.csproj" />
+    <Project Path="shared/NightreignTools.ServiceDefaults/NightreignTools.ServiceDefaults.csproj" />
+    <Project Path="shared/NightreignTools.Shared.Tests/NightreignTools.Shared.Tests.csproj" />
+  </Folder>
+  <Folder Name="/master/">
+    <Project Path="master/NightreignTools.Master.Domain/NightreignTools.Master.Domain.csproj" />
+    <Project Path="master/NightreignTools.Master.Application/NightreignTools.Master.Application.csproj" />
+    <Project Path="master/NightreignTools.Master.Infrastructure/NightreignTools.Master.Infrastructure.csproj" />
+    <Project Path="master/NightreignTools.Master.Api/NightreignTools.Master.Api.csproj" />
+    <Project Path="master/NightreignTools.Master.Tests/NightreignTools.Master.Tests.csproj" />
+  </Folder>
 </Solution>

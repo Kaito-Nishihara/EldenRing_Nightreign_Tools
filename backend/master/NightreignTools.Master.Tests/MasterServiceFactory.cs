@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using NightreignTools.Backend.Common;
+using NightreignTools.ServiceDefaults;
+using NightreignTools.ServiceDefaults.Security;
 
-namespace NightreignTools.Backend.Tests;
+namespace NightreignTools.Master.Tests;
 
 /// <summary>
-/// テストのためにバックエンドを起動する。サービス間キーは決まった値にする。
+/// テストのために master-service を起動する。サービス間キーは決まった値にする。
 /// </summary>
-public class BackendFactory : WebApplicationFactory<Program>
+public class MasterServiceFactory : WebApplicationFactory<Program>
 {
     public const string ServiceKey = "test-service-key";
 
@@ -16,7 +17,7 @@ public class BackendFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Testing");
+        builder.UseEnvironment(ServiceDefaultsExtensions.TestingEnvironment);
         builder.UseSetting(ServiceKeyOptions.ConfigKey, ConfiguredServiceKey);
     }
 

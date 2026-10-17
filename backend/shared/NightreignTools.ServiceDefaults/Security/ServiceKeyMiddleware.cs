@@ -1,12 +1,14 @@
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using NightreignTools.ServiceDefaults.ErrorHandling;
 
-namespace NightreignTools.Backend.Common;
+namespace NightreignTools.ServiceDefaults.Security;
 
 /// <summary>
-/// Gateway を通った要求だけを通す(API の共通仕様 4.6)。
+/// Gateway か、ほかのサービスを通った要求だけを通す(API の共通仕様 4.6、4.8)。
 /// <c>/health</c> を除くすべてのパスで、ルートの有無にかかわらず確かめる。キーのない要求への 404 と 401 の違いで、どのパスがあるかを知られないためである。
 /// </summary>
 public sealed class ServiceKeyMiddleware

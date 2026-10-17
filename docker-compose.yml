@@ -13,21 +13,22 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      backend:
+      master-service:
         condition: service_healthy
     environment:
-      - BACKEND_URL=http://backend:8081
+      - BACKEND_URL=http://master-service:8081
       - JWT_SECRET=${JWT_SECRET}
       - SERVICE_KEY=${SERVICE_KEY}
 
-  backend:
-    build: ./backend
+  # master-service: マスタの取得と管理(サービスの共通構成 5.1)
+  master-service:
+    # 共通の部品(backend/shared)を使うので、ビルドの文脈は backend/ にする
+    build:
+      context: ./backend
+      dockerfile: master/Dockerfile
     # 8081 はコンテナの間だけに公開する(実行環境 5.1)
     expose:
       - "8081"
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
       - SERVICE_KEY=${SERVICE_KEY}
     healthcheck:

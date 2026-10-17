@@ -1,13 +1,13 @@
 using System.Net;
 using System.Text.Json;
-using NightreignTools.Backend.Common;
+using NightreignTools.ServiceDefaults.Security;
 
-namespace NightreignTools.Backend.Tests.Common;
+namespace NightreignTools.Master.Tests.Integration;
 
 /// <summary>
 /// サービス間キーの検証(API の共通仕様 4.6)。
 /// </summary>
-public class ServiceKeyTests(BackendFactory factory) : IClassFixture<BackendFactory>
+public class ServiceKeyTests(MasterServiceFactory factory) : IClassFixture<MasterServiceFactory>
 {
     [Fact]
     public async Task AC_API_03_キーなしで呼ぶと401が返る()
@@ -45,6 +45,7 @@ public class ServiceKeyTests(BackendFactory factory) : IClassFixture<BackendFact
 
     [Theory]
     [InlineData("/api/v1/no-such-path")]
+    [InlineData("/internal/v1/no-such-path")]
     [InlineData("/no-such-path")]
     [InlineData("/openapi/v1.json")]
     public async Task AC_SVC_07_キーなしの要求はルートの有無にかかわらず401を返す(string path)

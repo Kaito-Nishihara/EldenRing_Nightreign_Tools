@@ -1,3 +1,3 @@
 **/bin/
 **/obj/
-NightreignTools.Backend.Tests/
+**/*.Tests/

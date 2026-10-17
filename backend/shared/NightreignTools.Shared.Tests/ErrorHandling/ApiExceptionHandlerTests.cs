@@ -2,12 +2,13 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using NightreignTools.Backend.Common;
+using NightreignTools.ServiceDefaults.ErrorHandling;
+using NightreignTools.SharedKernel;
 
-namespace NightreignTools.Backend.Tests.Common;
+namespace NightreignTools.Shared.Tests.ErrorHandling;
 
 /// <summary>
-/// 例外から応答への変換(サービスの共通構成 5.4、API の共通仕様 4.3)。
+/// 例外から応答への変換(サービスの共通構成 5.6、API の共通仕様 4.3)。
 /// </summary>
 public class ApiExceptionHandlerTests
 {
@@ -35,9 +36,19 @@ public class ApiExceptionHandlerTests
     [Fact]
     public async Task AC_SVC_05_ConflictExceptionは409になる()
     {
-        var (status, _) = await HandleAsync(new ConflictException("この収縮候補地は 12 件の記録から参照されているため、削除できません"));
+        var (status, _) = await HandleAsync(new ConflictException("今の状態と食い違います"));
 
         Assert.Equal(409, status);
+    }
+
+    [Fact]
+    public async Task AC_SVC_09_ServiceUnavailableExceptionは503になり文言がそのまま出る()
+    {
+        var (status, body) = await HandleAsync(new ServiceUnavailableException("マスタのサービスに接続できません。時間をおいてやり直してください"));
+
+        Assert.Equal(503, status);
+        Assert.Equal("Service Unavailable", body.GetProperty("error").GetString());
+        Assert.Equal("マスタのサービスに接続できません。時間をおいてやり直してください", body.GetProperty("message").GetString());
     }
 
     [Fact]
@@ -55,8 +66,7 @@ public class ApiExceptionHandlerTests
     {
         var (_, body) = await HandleAsync(new NotFoundException("x"));
 
-        var timestamp = body.GetProperty("timestamp").GetString();
-        Assert.Equal("2026-10-17T12:34:56Z", timestamp);
+        Assert.Equal("2026-10-17T12:34:56Z", body.GetProperty("timestamp").GetString());
     }
 
     [Fact]
@@ -75,8 +85,7 @@ public class ApiExceptionHandlerTests
         var (status, body) = await HandleAsync(thrown);
 
         Assert.Equal(500, status);
-        var message = body.GetProperty("message").GetString();
-        Assert.Equal("内部サーバーエラーが発生しました", message);
+        Assert.Equal("内部サーバーエラーが発生しました", body.GetProperty("message").GetString());
         Assert.DoesNotContain("SELECT", body.GetRawText());
         Assert.DoesNotContain(nameof(AC_API_06_想定していない例外は500になりmessageにSQLとスタックトレースが入らない), body.GetRawText());
     }

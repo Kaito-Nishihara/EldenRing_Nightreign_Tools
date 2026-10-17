@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace NightreignTools.Backend.Common;
+namespace NightreignTools.ServiceDefaults.ErrorHandling;
 
 /// <summary>
 /// エラーの応答を <see cref="ErrorResponse"/> の形で書く。

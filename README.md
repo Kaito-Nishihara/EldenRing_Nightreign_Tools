@@ -12,18 +12,23 @@
 ## システム構成
 
 ```
-Next.js (3000) → .NET Gateway (8080) → .NET バックエンド (8081) → PostgreSQL (5432)
+                                     ┌→ master-service (8081) ─┐
+Next.js (3000) → .NET Gateway (8080) ┼→ record-service (8082) ─┼→ PostgreSQL (5432)
+                                     └→ relic-service  (8083) ─┘
 ```
 
 | サービス | 技術 | 責務 |
 |---------|------|------|
 | frontend | Next.js 15 + TypeScript | UI・マップ描画 |
 | gateway | ASP.NET Core 10 + YARP | API Gateway・管理用の鍵の確認・サービス間キーの付与 |
-| backend | ASP.NET Core 10 + EF Core | マスタ管理・パターン検索・記録保存 |
+| master-service | ASP.NET Core 10 + EF Core | マスタの取得と管理 |
+| record-service | ASP.NET Core 10 + EF Core | プレイ記録とパターン検索 |
+| relic-service | ASP.NET Core 10 + EF Core | ビルドシミュレーターの遺物の効果 |
 | db | PostgreSQL 16 | データ永続化 |
 
 バックエンドは NestJS から .NET へ作り直している途中である。
-`backend/` の NestJS のコードは、段階 0(#50)で .NET のコードに置き換える。
+`backend/` の NestJS のコードは、段階 0(#50)で .NET の 3 つのサービスに置き換える。
+どのサービスも、中はクリーンアーキテクチャ(Domain、Application、Infrastructure、Api)で書く。
 作り直しの理由は [`docs/decisions/0001-dotnet-backend.md`](docs/decisions/0001-dotnet-backend.md) にある。
 
 ## 起動方法
@@ -80,9 +85,9 @@ docker compose -f docs-site/compose.yaml up -d
 
 | 段階 | 内容 | 状態 |
 |---------|------|------|
-| 0 | .NET バックエンドの土台(#50) | 未着手 |
-| 1 | パターン検索とプレイ記録(#51) | 未着手 |
+| 0 | 共通の部品と master-service の土台(#50) | 着手 |
+| 1 | record-service: パターン検索とプレイ記録(#51) | 未着手 |
 | 2 | マスタの管理と権限(#52) | 未着手 |
 | 3 | 画面の見た目の作り直し(#53) | 試作まで |
-| 4 | ビルドシミュレーターの API(#54) | 未着手 |
+| 4 | relic-service: ビルドシミュレーターの API(#54) | 未着手 |
 | 5 | 収縮のタイムライン、オフラインでの利用 | 未着手 |

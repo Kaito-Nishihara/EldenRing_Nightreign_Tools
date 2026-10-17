@@ -33,11 +33,21 @@
 
 ### 5.1 持ち主
 
-データベースに触れるのはバックエンドだけである。
+データベースに触れるのはバックエンドの 3 つのサービスだけである。
 Gateway と画面はデータベースを知らない。
 
-データベースは 1 つ(`nightreign`)、スキーマは `game` の 1 つとする。
-EF Core の既定のスキーマと、マイグレーションの履歴のテーブル(`game.__ef_migrations_history`)も `game` に置く。
+PostgreSQL のコンテナは 1 つとし、サービスごとにデータベースと利用者を分ける(決定の記録 [0012](../decisions/0012-split-services-by-feature.md))。
+各サービスの利用者は、自分のデータベースだけを持ち、ほかのデータベースにつなげない。
+
+| サービス | データベース | 利用者 | テーブル |
+|---|---|---|---|
+| `master-service` | `nightreign_master` | `nightreign_master` | `bosses`、`boss_weaknesses`、`jihen`、`spawn_points`、`shrink_zones`、`second_shrink_points`、`base_points`、`night_bosses` |
+| `record-service` | `nightreign_record` | `nightreign_record` | `play_records`、`shrink_entries` |
+| `relic-service` | `nightreign_relic` | `nightreign_relic` | `relic_effect_categories`、`relic_effects`、`relic_effect_ranks` |
+
+- データベースと利用者は、`db` のコンテナが初めて起動したときに、`db/init/` の手順で作る。合言葉は環境変数で渡す(実行環境 5.2)。
+- どのデータベースも、スキーマは `game` の 1 つとする。EF Core の既定のスキーマと、マイグレーションの履歴のテーブル(`game.__ef_migrations_history`)も `game` に置く。
+- データベースをまたぐ外部キーは持てない。記録からマスタへの参照は、`record-service` が保存のときに `master-service` に問い合わせて確かめる。
 
 ### 5.2 名前
 
@@ -65,23 +75,24 @@ EF Core の既定のスキーマと、マイグレーションの履歴のテー
 ### 5.4 行の消し方
 
 - 記録(`play_records`、`shrink_entries`)は消さない(決定の記録 [0005](../decisions/0005-keep-play-records.md))。
-- マスタは、記録から参照されていなければ実際に消す。参照されていれば消さずに 409 を返す。外部キーは `ON DELETE RESTRICT` にする。
-- 記録から参照されるマスタは、夜の王、地変、開始地点、収縮候補地、第二収縮地点、夜ボスである。
-- 親を消すと子が要らなくなるもの(`boss_weaknesses`、`relic_effect_ranks`、`shrink_entries`)は `ON DELETE CASCADE` にする。
+- マスタも消さない。管理の画面で要らなくなった行は、`hidden_at` に日時を入れて非表示にする(決定の記録 [0013](../decisions/0013-hide-masters-instead-of-delete.md))。非表示にできるのは、開始地点、収縮候補地、第二収縮地点、拠点候補地である。
+- 同じデータベースの中の外部キーは `ON DELETE RESTRICT` にする。ただし、親を消すと子が要らなくなるもの(`boss_weaknesses`、`relic_effect_ranks`、`shrink_entries`)は `ON DELETE CASCADE` にする。
 
 ### 5.5 マイグレーション
 
 - テーブルの変更は EF Core Migrations で行う(決定の記録 [0003](../decisions/0003-ef-core-migrations.md))。`psql` で DDL を流さない。
 - マイグレーションの名前は英語の PascalCase で、何を変えるかを書く。例: `AddNightBossToPlayRecord`
 - `main` にあるマイグレーションを書き換えない。直すときは新しいマイグレーションを足す。
-- バックエンドは起動のときに、未適用のマイグレーションを適用する。適用に失敗したら、起動を止める。
-- 動かすバックエンドは 1 つだけである。複数を同時に起動すると適用が競合するので、増やすときは適用の仕方を見直す。
+- マイグレーションはサービスごとに持ち、各サービスの Infrastructure の `Persistence/Migrations/` に置く。
+- 各サービスは起動のときに、自分のデータベースへ未適用のマイグレーションを適用する。適用に失敗したら、起動を止める。
+- 各サービスは 1 つずつ動かす。同じサービスを複数同時に起動すると適用が競合するので、増やすときは適用の仕方を見直す。
 
-最初のマイグレーションは、NestJS 版の V1 から V11 の最終の形を 1 つにまとめたものとする。
+各サービスの最初のマイグレーションは、NestJS 版の V1 から V11 の最終の形のうち、そのサービスの持つテーブルを 1 つにまとめたものとする。
 V1 から V11 の SQL は、コミット `6529442` の `backend/migrations/` にある。
 
 NestJS 版のデータベースの記録は、新しいスキーマへ移さずに捨てる(決定の記録 [0003](../decisions/0003-ef-core-migrations.md))。
-旧版のデータベースが残った手元では、次の手順でボリュームを消してから起動する。
+旧版のボリュームが残った手元では、`db/init/` の手順が走らず、サービスごとのデータベースと利用者ができない。
+次の手順でボリュームを消してから起動する。
 
 ```bash
 docker compose down
@@ -89,21 +100,23 @@ docker volume rm eldenring_nightreign_tools_postgres_data
 docker compose up --build
 ```
 
-バックエンドは起動のとき、`game.flyway_schema_history` があれば、マイグレーションを適用せずに起動を止める。
-ログには、旧版のデータベースであることと、上の手順を出す。
-旧版のテーブルに重ねてマイグレーションを適用し、分かりにくい誤りで止まることを防ぐためである。
+各サービスは起動のとき、自分のデータベースか利用者がないためにつなげなければ、マイグレーションを適用せずに起動を止める。
+ログには、データベースと利用者は空のボリュームでだけ作られることと、上の手順を出す。
+接続の誤りの文言だけでは、旧版のボリュームが残っていることに気付きにくいためである。
 
 ### 5.6 マスタの初期データ
 
-初期データは `Data/Seed/` のクラスに持ち、EF Core の `HasData` でマイグレーションに含める。
+初期データは各サービスの Infrastructure の `Persistence/Seed/` のクラスに持ち、EF Core の `HasData` でマイグレーションに含める。
 識別子は固定の値で書く。
+整数の識別子は 1000 以下とし、自動の採番は 1001 から始める。
+初期データを決まった識別子で入れても、管理の画面から足した行の識別子とぶつからないようにするためである。
 
 | テーブル | 件数 | 移す元 | 備考 |
 |---|---|---|---|
 | `bosses` | 10 | V3 | |
 | `boss_weaknesses` | 15 | V3 | |
 | `jihen` | 5 | V3 | 中心の座標を px に直す(0 から 1 の値に 1024 を掛ける) |
-| `shrink_zones` | 12 | V3、V9 | ダミーの座標である(要件定義の 12 章)。半径は 12 か所とも 256(マップの幅の半分を直径とする円)にする。実際の半径は座標と合わせて取り直す |
+| `shrink_zones` | 12 | V10 | ダミーの座標である(要件定義の 12 章)。V3 の 12 か所(収縮地点A〜L)は格子に並べただけだったので、V10 の第二収縮地点と同じ名前と中心に置き直す。半径は 12 か所とも 255 にする。旧版のデータベースで、利用者が実際のゲームを見て登録した円の半径である |
 | `second_shrink_points` | 12 | V10 | |
 | `spawn_points` | 9 | V8 | |
 | `base_points` | 15 | V7 | `map_id` は `normal` |
@@ -142,42 +155,59 @@ docker compose up --build
 
 ### 5.7 全体の関係
 
-記録がマスタを参照し、マスタ同士はほとんど参照しないことを読み取ってほしい。
+テーブルの関係は、サービスのデータベースの中で閉じていて、記録からマスタへは識別子だけを持つことを読み取ってほしい。
+
+`master-service`(`nightreign_master`):
 
 ```mermaid
 erDiagram
     bosses ||--o{ boss_weaknesses : "弱点"
-    bosses ||--o{ play_records : "夜の王"
-    jihen |o--o{ play_records : "地変"
-    spawn_points ||--o{ play_records : "開始地点"
-    night_bosses |o--o{ play_records : "1 日目と 2 日目の夜ボス"
-    play_records ||--|{ shrink_entries : "収縮先"
-    shrink_zones |o--o{ shrink_entries : "第 1 次の収縮先"
-    second_shrink_points |o--o{ shrink_entries : "第 2 次の収縮先"
-    relic_effect_categories ||--o{ relic_effects : "分類"
-    relic_effects ||--|{ relic_effect_ranks : "ランクの値"
+    spawn_points
+    shrink_zones
+    second_shrink_points
     base_points
+    jihen
+    night_bosses
 ```
 
-`shrink_entries` の 1 行は、第 1 次なら収縮候補地を、第 2 次なら第二収縮地点を参照する(決定の記録 [0008](../decisions/0008-second-shrink-by-point.md))。
-`base_points` は、どのテーブルからも参照されない(決定の記録 [0010](../decisions/0010-night-boss-in-record.md))。
+`record-service`(`nightreign_record`):
+
+```mermaid
+erDiagram
+    play_records ||--|{ shrink_entries : "収縮先"
+```
+
+`relic-service`(`nightreign_relic`):
+
+```mermaid
+erDiagram
+    relic_effect_categories ||--o{ relic_effects : "分類"
+    relic_effects ||--|{ relic_effect_ranks : "ランクの値"
+```
+
+`play_records` は、夜の王、地変、開始地点、1 日目と 2 日目の夜ボスを、`shrink_entries` は収縮候補地か第二収縮地点を、識別子で持つ。
+どれも `nightreign_master` の行の識別子で、外部キーはない。
+`shrink_entries` の 1 行は、第 1 次なら収縮候補地を、第 2 次なら第二収縮地点を持つ(決定の記録 [0008](../decisions/0008-second-shrink-by-point.md))。
+`base_points` は、どこからも参照されない(決定の記録 [0010](../decisions/0010-night-boss-in-record.md))。
 
 ## 6. サービスの間のやり取り
 
-なし。
+データベースどうしのやり取りはない。
+サービスの間の呼び出しは、[サービスの共通構成](common-service.md) の 5.5 に書く。
 
 ## 7. 受け入れ条件
 
 | 識別子 | 条件 |
 |---|---|
-| `AC-DB-01` | 空のデータベースでバックエンドを起動すると、`game` スキーマにすべてのテーブルができ、`game.__ef_migrations_history` に最初のマイグレーションが 1 行入る |
-| `AC-DB-02` | 同じデータベースでバックエンドを 2 回起動しても、2 回目はマイグレーションを適用せず、起動が成功する |
+| `AC-DB-01` | 空のデータベースで各サービスを起動すると、`game` スキーマに 5.1 の表のそのサービスのテーブルがすべてでき、`game.__ef_migrations_history` に最初のマイグレーションが 1 行入る |
+| `AC-DB-02` | 同じデータベースで同じサービスを 2 回起動しても、2 回目はマイグレーションを適用せず、起動が成功する |
 | `AC-DB-03` | 起動の後に `GET /api/v1/bosses` を呼ぶと 10 件が返り、`gladius` の弱点が `holy` の 1 件である |
 | `AC-DB-04` | 起動の後に `GET /api/v1/night-bosses` を呼ぶと 35 件が返り、`day` が 1 のものが 14 件である |
 | `AC-DB-05` | `GET /api/v1/jihen` の `crater` の中心の座標が、0 から 1024 の px の値(512、204.8)である |
-| `AC-DB-06` | 記録から参照されている収縮候補地を管理の API で消すと 409 が返り、行が残る |
+| `AC-DB-06` | 収縮候補地を管理の API で非表示にすると、行が残り、`hidden_at` に日時が入る |
 | `AC-DB-07` | 記録を保存すると、`created_at` に UTC の今の時刻が入る |
-| `AC-DB-08` | `game.flyway_schema_history` のあるデータベースでバックエンドを起動すると、起動が止まり、ログに旧版のデータベースであることとボリュームを消す手順が出て、テーブルが変わらない |
+| `AC-DB-08` | 自分のデータベースがないサーバーにサービスをつなぐと、起動が止まり、ログに、データベースと利用者は空のボリュームでだけ作られることと、ボリュームを消す手順が出る |
+| `AC-DB-09` | `nightreign_record` の利用者で `nightreign_master` につなごうとすると、拒まれる |
 
 ## 8. 未決事項
 

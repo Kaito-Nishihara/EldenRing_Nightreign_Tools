@@ -44,15 +44,12 @@
           <label class="field" style="flex:1"><span class="field__label">Y</span><input class="input num" value="297.00" inputmode="decimal"></label>
         </div>
         <label class="field">
-          <span class="field__label">半径 <span class="gold">256</span> px</span>
-          <input class="range" type="range" min="100" max="500" value="256">
+          <span class="field__label">半径 <span class="gold">255</span> px</span>
+          <input class="range" type="range" min="100" max="500" value="255">
         </label>
-        <div class="notice notice--error">
-          <span class="notice__icon">!</span>
-          <span>この収縮候補地は 12 件の記録から参照されているため、削除できません。</span>
-        </div>
+        <p class="t-xs soft" style="margin:0">非表示にすると、プレイヤーの画面と新しい記録の入力から外れます。過去の記録には残ります。</p>
         <div class="row">
-          <button class="btn btn--danger" type="button" disabled>削除</button>
+          <button class="btn btn--danger" type="button">非表示にする</button>
           <button class="btn btn--secondary" type="button">取り消す</button>
           <button class="btn btn--primary" type="button" style="flex:1">保存する</button>
         </div>
@@ -64,11 +61,11 @@
       <table class="table">
         <thead><tr><th>名前</th><th class="num">X</th><th class="num">Y</th><th class="num">半径</th></tr></thead>
         <tbody>
-          <tr><td>最北西</td><td class="num">219</td><td class="num">233</td><td class="num">256</td></tr>
-          <tr><td>中央西</td><td class="num">342</td><td class="num">488</td><td class="num">256</td></tr>
-          <tr><td>最北東</td><td class="num">789</td><td class="num">248</td><td class="num">256</td></tr>
-          <tr aria-selected="true"><td>最北</td><td class="num">583</td><td class="num">297</td><td class="num">256</td></tr>
-          <tr><td>最東</td><td class="num">739</td><td class="num">518</td><td class="num">256</td></tr>
+          <tr><td>最北西</td><td class="num">219</td><td class="num">233</td><td class="num">255</td></tr>
+          <tr><td>中央西</td><td class="num">342</td><td class="num">488</td><td class="num">255</td></tr>
+          <tr><td>最北東</td><td class="num">789</td><td class="num">248</td><td class="num">255</td></tr>
+          <tr aria-selected="true"><td>最北</td><td class="num">583</td><td class="num">297</td><td class="num">255</td></tr>
+          <tr><td>最東 <span class="badge">非表示</span></td><td class="num">739</td><td class="num">518</td><td class="num">255</td></tr>
         </tbody>
       </table>
     </section>
@@ -81,7 +78,7 @@
         <span class="t-sm soft">マップを押すと、その場所の座標を入れます</span>
       </div>
       <div class="map-frame">
-        <div class="mock-map" style="height:100%" data-label="マップ。登録済みの収縮候補地と、直している円" data-layers="zones" data-selected-zones="[3]" data-preview="583,297,256"></div>
+        <div class="mock-map" style="height:100%" data-label="マップ。登録済みの収縮候補地と、直している円" data-layers="zones" data-selected-zones="[3]" data-preview="583,297,255"></div>
         <div class="map-coord">X 583.00 ／ Y 297.00</div>
         <div class="map-zoom">
           <button class="btn btn--secondary btn--icon" type="button" aria-label="拡大">＋</button>

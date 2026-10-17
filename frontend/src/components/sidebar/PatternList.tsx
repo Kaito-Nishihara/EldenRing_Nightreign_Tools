@@ -40,7 +40,7 @@ export default function PatternList({
     const firstEntry = top.entries.find((e) => e.day === 1 && e.phase === 1);
     if (!firstEntry) return null;
 
-    return `${data.totalRecords}回中${top.recordCount}回(${ratio}%)は${firstEntry.zone.nameJa}付近`;
+    return `${data.totalRecords}回中${top.recordCount}回(${ratio}%)は${(firstEntry.zone ?? firstEntry.secondShrinkPoint)?.nameJa ?? "未記録"}付近`;
   }, [data]);
 
   if (error) {
@@ -138,7 +138,7 @@ export default function PatternList({
                       <span className="bg-gray-600 px-1.5 py-0.5 rounded text-gray-200">
                         Day{entry.day}-P{entry.phase}
                       </span>
-                      <span>{entry.zone.nameJa}</span>
+                      <span>{(entry.zone ?? entry.secondShrinkPoint)?.nameJa}</span>
                     </div>
                   ))}
                 </div>

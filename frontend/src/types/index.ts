@@ -78,11 +78,15 @@ export interface Pattern {
   entries: PatternEntry[];
 }
 
-/** パターンエントリ（日・フェーズごとの収縮情報） */
+/**
+ * パターンの収縮先(日と段階ごと)。パターン検索 4 章。
+ * 第 1 次は zone(収縮候補地)だけ、第 2 次は secondShrinkPoint(第二収縮地点)だけを持つ(決定の記録 0008)。
+ */
 export interface PatternEntry {
   day: 1 | 2;
   phase: 1 | 2;
-  zone: ShrinkZone;
+  zone: ShrinkZone | null;
+  secondShrinkPoint: SecondShrinkPoint | null;
 }
 
 /** パターン検索レスポンス */

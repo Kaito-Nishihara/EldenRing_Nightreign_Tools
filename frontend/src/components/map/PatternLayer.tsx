@@ -52,9 +52,9 @@ export default function PatternLayer({
         const opacity = isOther ? 0.15 : 1;
 
         /** エントリをday-phaseの昇順でソート */
-        const sortedEntries = [...pattern.entries].sort((a, b) =>
-          a.day !== b.day ? a.day - b.day : a.phase - b.phase
-        );
+        const sortedEntries = [...pattern.entries]
+          .filter((entry): entry is typeof entry & { zone: NonNullable<typeof entry.zone> } => entry.zone !== null)
+          .sort((a, b) => (a.day !== b.day ? a.day - b.day : a.phase - b.phase));
 
         /** 接続線の座標配列を生成 */
         const linePoints = sortedEntries.flatMap((entry) => [

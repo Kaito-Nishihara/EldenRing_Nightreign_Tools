@@ -67,7 +67,7 @@ export default function HomePage() {
     );
     if (!pattern || pattern.entries.length === 0) return null;
     // Day1-Phase1を優先表示
-    const sorted = [...pattern.entries].sort((a, b) =>
+    const sorted = [...pattern.entries].filter((e) => e.zone !== null).sort((a, b) =>
       a.day !== b.day ? a.day - b.day : a.phase - b.phase
     );
     return sorted[0];
@@ -114,7 +114,7 @@ export default function HomePage() {
             mapImagePath={mapImagePath}
             shrinkOverlay={
               <ShrinkOverlay
-                circles={selectedEntry ? [{ x: selectedEntry.zone.centerX, y: selectedEntry.zone.centerY, radius: selectedEntry.zone.radius }] : []}
+                circles={selectedEntry?.zone ? [{ x: selectedEntry.zone.centerX, y: selectedEntry.zone.centerY, radius: selectedEntry.zone.radius }] : []}
               />
             }
           >

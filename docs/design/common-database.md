@@ -124,6 +124,9 @@ docker compose up --build
 | `relic_effect_categories` | 8 | V11 | |
 | `relic_effects`、`relic_effect_ranks` | V11 のすべて | V11 | |
 
+夜の王と地変は、次の表の順を並び順(`sort_order`、1 から)として持つ。
+画面の選択の欄に、この順で並べるためである。
+
 夜の王:
 
 | 識別子 | 名前 | 弱点 | DLC |

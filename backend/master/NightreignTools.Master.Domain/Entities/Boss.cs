@@ -11,6 +11,10 @@ public sealed class Boss
     public string? ImagePath { get; private set; }
     public bool IsDlc { get; private set; }
     public string? UnlockCondition { get; private set; }
+
+    /// <summary>画面の選択の欄での並び順。1 から(データベースの共通仕様 5.6)。</summary>
+    public int SortOrder { get; private set; }
+
     public DateTime CreatedAt { get; private set; }
 
     public IReadOnlyList<BossWeakness> Weaknesses => _weaknesses;

@@ -4,7 +4,7 @@ namespace NightreignTools.Master.Application.Masters;
 
 /// <summary>
 /// マスタを読むためのポート。実装は Infrastructure に置く(サービスの共通構成 5.3)。
-/// 並びはどれも識別子の順とする(マスタの管理 4.1)。
+/// 夜の王と地変は並び順、そのほかは識別子の順に返す(マスタの管理 4.1)。
 /// </summary>
 public interface IMasterReadRepository
 {

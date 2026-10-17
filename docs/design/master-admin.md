@@ -81,7 +81,8 @@
 | `GET /api/v1/jihen` | `[{ id, nameJa, imagePath, area, centerX, centerY, isDlc, unlockCondition }]` |
 | `GET /api/v1/night-bosses` | `[{ id, nameJa, day }]` |
 
-並びは識別子の順とする。
+夜の王と地変は、初期データの並び順(`sort_order`)、識別子の順に並べる。
+そのほかは識別子の順とする。
 受け持ちはすべて `master-service` である。
 開始地点、収縮候補地、第二収縮地点、拠点候補地の一覧には、非表示の行を入れない。
 
@@ -211,6 +212,7 @@ Gateway は振り分けない。
 | `AC-ADM-06` | `GET /api/v1/base-points?mapId=crater` は、`map_id` が `crater` の行だけを返す |
 | `AC-ADM-21` | `GET /api/v1/base-points?mapId=unknown` は 404 を返す |
 | `AC-ADM-22` | 非表示の開始地点は、`GET /api/v1/spawn-points` に入らない |
+| `AC-ADM-23` | `GET /api/v1/bosses` の先頭が `gladius`、`GET /api/v1/jihen` の先頭が `crater` で、どちらも DLC のものが最後に来る |
 | `AC-ADM-07` | 画面でマップを押すと、X と Y にその場所の座標が小数 2 桁で入る |
 | `AC-ADM-08` | 画面で「非表示にする」を押すと確かめの枠が出て、確かめると一覧の行に「非表示」の印が付く |
 | `AC-ADM-09` | Gateway に `X-Admin-Key` なしで `POST /api/v1/admin/spawn-points` を送ると 401 が返り、行が増えない |

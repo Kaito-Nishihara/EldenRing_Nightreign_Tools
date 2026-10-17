@@ -5,16 +5,16 @@ internal static class BossSeed
 {
     public static readonly object[] Bosses =
     [
-        Boss("gladius", "三つ首の獣", "Gladius"),
-        Boss("edere", "喰らいつく顎", "Edere"),
-        Boss("gnostor", "知性の蟲", "Gnostor"),
-        Boss("maris", "兆し", "Maris"),
-        Boss("libra", "調律の魔物", "Libra"),
-        Boss("fulgor", "闇駆ける狩人", "Fulgor"),
-        Boss("caligo", "霧の裂け目", "Caligo"),
-        Boss("nameless", "夜を象る者", "Nameless", unlockCondition: "4体撃破後"),
-        Boss("harmonia", "英雄武器の娘たち", "Harmonia", isDlc: true),
-        Boss("strages", "反逆のストラゲス", "Strages", isDlc: true),
+        Boss(1, "gladius", "三つ首の獣", "Gladius"),
+        Boss(2, "edere", "喰らいつく顎", "Edere"),
+        Boss(3, "gnostor", "知性の蟲", "Gnostor"),
+        Boss(4, "maris", "兆し", "Maris"),
+        Boss(5, "libra", "調律の魔物", "Libra"),
+        Boss(6, "fulgor", "闇駆ける狩人", "Fulgor"),
+        Boss(7, "caligo", "霧の裂け目", "Caligo"),
+        Boss(8, "nameless", "夜を象る者", "Nameless", unlockCondition: "4体撃破後"),
+        Boss(9, "harmonia", "英雄武器の娘たち", "Harmonia", isDlc: true),
+        Boss(10, "strages", "反逆のストラゲス", "Strages", isDlc: true),
     ];
 
     public static readonly object[] Weaknesses =
@@ -36,8 +36,9 @@ internal static class BossSeed
         Weakness(15, "strages", "fire"),
     ];
 
-    private static object Boss(string id, string nameJa, string nameEn, bool isDlc = false, string? unlockCondition = null) =>
-        new { Id = id, NameJa = nameJa, NameEn = nameEn, IsDlc = isDlc, UnlockCondition = unlockCondition, CreatedAt = SeedData.CreatedAt };
+    /// <summary><paramref name="sortOrder"/> は画面での並び順。旧版の V3 の並びのとおり</summary>
+    private static object Boss(int sortOrder, string id, string nameJa, string nameEn, bool isDlc = false, string? unlockCondition = null) =>
+        new { Id = id, NameJa = nameJa, NameEn = nameEn, IsDlc = isDlc, UnlockCondition = unlockCondition, SortOrder = sortOrder, CreatedAt = SeedData.CreatedAt };
 
     private static object Weakness(int id, string bossId, string attribute) =>
         new { Id = id, BossId = bossId, Attribute = attribute, CreatedAt = SeedData.CreatedAt };

@@ -237,6 +237,10 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("name_ja");
 
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
                     b.Property<string>("UnlockCondition")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
@@ -254,7 +258,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDlc = false,
                             NameEn = "Gladius",
-                            NameJa = "三つ首の獣"
+                            NameJa = "三つ首の獣",
+                            SortOrder = 1
                         },
                         new
                         {
@@ -262,7 +267,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDlc = false,
                             NameEn = "Edere",
-                            NameJa = "喰らいつく顎"
+                            NameJa = "喰らいつく顎",
+                            SortOrder = 2
                         },
                         new
                         {
@@ -270,7 +276,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDlc = false,
                             NameEn = "Gnostor",
-                            NameJa = "知性の蟲"
+                            NameJa = "知性の蟲",
+                            SortOrder = 3
                         },
                         new
                         {
@@ -278,7 +285,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDlc = false,
                             NameEn = "Maris",
-                            NameJa = "兆し"
+                            NameJa = "兆し",
+                            SortOrder = 4
                         },
                         new
                         {
@@ -286,7 +294,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDlc = false,
                             NameEn = "Libra",
-                            NameJa = "調律の魔物"
+                            NameJa = "調律の魔物",
+                            SortOrder = 5
                         },
                         new
                         {
@@ -294,7 +303,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDlc = false,
                             NameEn = "Fulgor",
-                            NameJa = "闇駆ける狩人"
+                            NameJa = "闇駆ける狩人",
+                            SortOrder = 6
                         },
                         new
                         {
@@ -302,7 +312,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDlc = false,
                             NameEn = "Caligo",
-                            NameJa = "霧の裂け目"
+                            NameJa = "霧の裂け目",
+                            SortOrder = 7
                         },
                         new
                         {
@@ -311,6 +322,7 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             IsDlc = false,
                             NameEn = "Nameless",
                             NameJa = "夜を象る者",
+                            SortOrder = 8,
                             UnlockCondition = "4体撃破後"
                         },
                         new
@@ -319,7 +331,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDlc = true,
                             NameEn = "Harmonia",
-                            NameJa = "英雄武器の娘たち"
+                            NameJa = "英雄武器の娘たち",
+                            SortOrder = 9
                         },
                         new
                         {
@@ -327,7 +340,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDlc = true,
                             NameEn = "Strages",
-                            NameJa = "反逆のストラゲス"
+                            NameJa = "反逆のストラゲス",
+                            SortOrder = 10
                         });
                 });
 
@@ -520,6 +534,10 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("name_ja");
 
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
                     b.Property<string>("UnlockCondition")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
@@ -544,7 +562,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             CenterY = 204.8m,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDlc = false,
-                            NameJa = "火口"
+                            NameJa = "火口",
+                            SortOrder = 1
                         },
                         new
                         {
@@ -554,7 +573,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             CenterY = 256m,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDlc = false,
-                            NameJa = "山嶺"
+                            NameJa = "山嶺",
+                            SortOrder = 2
                         },
                         new
                         {
@@ -564,7 +584,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             CenterY = 768m,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDlc = false,
-                            NameJa = "腐れ森"
+                            NameJa = "腐れ森",
+                            SortOrder = 3
                         },
                         new
                         {
@@ -574,7 +595,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             CenterY = 512m,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDlc = false,
-                            NameJa = "隠れ都ノクラテオ"
+                            NameJa = "隠れ都ノクラテオ",
+                            SortOrder = 4
                         },
                         new
                         {
@@ -584,7 +606,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                             CenterY = 512m,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDlc = true,
-                            NameJa = "大空洞"
+                            NameJa = "大空洞",
+                            SortOrder = 5
                         });
                 });
 

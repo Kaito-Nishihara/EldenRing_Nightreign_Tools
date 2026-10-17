@@ -7,13 +7,14 @@ internal static class JihenSeed
 {
     public static readonly object[] Rows =
     [
-        Jihen("crater", "火口", "north", 512m, 204.8m),
-        Jihen("mountain", "山嶺", "northwest", 256m, 256m),
-        Jihen("rotted_forest", "腐れ森", "southwest", 256m, 768m),
-        Jihen("noklateo", "隠れ都ノクラテオ", "center", 512m, 512m),
-        Jihen("great_cavern", "大空洞", "all", 512m, 512m, isDlc: true),
+        Jihen(1, "crater", "火口", "north", 512m, 204.8m),
+        Jihen(2, "mountain", "山嶺", "northwest", 256m, 256m),
+        Jihen(3, "rotted_forest", "腐れ森", "southwest", 256m, 768m),
+        Jihen(4, "noklateo", "隠れ都ノクラテオ", "center", 512m, 512m),
+        Jihen(5, "great_cavern", "大空洞", "all", 512m, 512m, isDlc: true),
     ];
 
-    private static object Jihen(string id, string nameJa, string area, decimal centerX, decimal centerY, bool isDlc = false) =>
-        new { Id = id, NameJa = nameJa, Area = area, CenterX = centerX, CenterY = centerY, IsDlc = isDlc, CreatedAt = SeedData.CreatedAt };
+    /// <summary><paramref name="sortOrder"/> は画面での並び順。旧版の V3 の並びのとおり</summary>
+    private static object Jihen(int sortOrder, string id, string nameJa, string area, decimal centerX, decimal centerY, bool isDlc = false) =>
+        new { Id = id, NameJa = nameJa, Area = area, CenterX = centerX, CenterY = centerY, IsDlc = isDlc, SortOrder = sortOrder, CreatedAt = SeedData.CreatedAt };
 }

@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using NightreignTools.Master.Infrastructure.Persistence;
 using Npgsql;
 
 namespace NightreignTools.Master.Tests.Integration;
@@ -21,7 +24,7 @@ public class DatabaseMigrationTests
     ];
 
     [Fact]
-    public async Task AC_DB_01_空のデータベースで起動するとgameスキーマにmasterのテーブルがすべてでき履歴に1行入る()
+    public async Task AC_DB_01_空のデータベースで起動するとgameスキーマにmasterのテーブルがすべてでき履歴にすべてのマイグレーションが入る()
     {
         TestDatabase.Drop(TestDatabase.Name);
         using var factory = new MasterServiceFactory();
@@ -31,8 +34,8 @@ public class DatabaseMigrationTests
             "SELECT table_name FROM information_schema.tables WHERE table_schema = 'game' ORDER BY table_name");
         Assert.Equal(ExpectedTables, tables);
 
-        var history = await TestDatabase.QueryAsync("SELECT migration_id FROM game.__ef_migrations_history");
-        Assert.Single(history);
+        var history = await TestDatabase.QueryAsync("SELECT migration_id FROM game.__ef_migrations_history ORDER BY migration_id");
+        Assert.Equal(AllMigrations(factory), history);
         Assert.EndsWith("_InitialCreate", history[0]);
     }
 
@@ -43,13 +46,21 @@ public class DatabaseMigrationTests
         {
             first.CreateClient();
         }
+        var before = await TestDatabase.QueryAsync("SELECT migration_id FROM game.__ef_migrations_history ORDER BY migration_id");
 
         using var second = new MasterServiceFactory();
         var response = await second.CreateClient().GetAsync("/health");
 
         Assert.True(response.IsSuccessStatusCode);
-        var history = await TestDatabase.QueryAsync("SELECT migration_id FROM game.__ef_migrations_history");
-        Assert.Single(history);
+        var after = await TestDatabase.QueryAsync("SELECT migration_id FROM game.__ef_migrations_history ORDER BY migration_id");
+        Assert.Equal(before, after);
+    }
+
+    /// <summary>このサービスの持つマイグレーションの一覧(古い順)。</summary>
+    private static List<string> AllMigrations(MasterServiceFactory factory)
+    {
+        using var scope = factory.Services.CreateScope();
+        return scope.ServiceProvider.GetRequiredService<MasterDbContext>().Database.GetMigrations().Order().ToList();
     }
 
     [Fact]

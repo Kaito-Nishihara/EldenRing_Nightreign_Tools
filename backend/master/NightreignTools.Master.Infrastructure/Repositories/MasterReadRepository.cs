@@ -9,10 +9,12 @@ namespace NightreignTools.Master.Infrastructure.Repositories;
 internal sealed class MasterReadRepository(MasterDbContext db) : IMasterReadRepository
 {
     public async Task<IReadOnlyList<Boss>> GetBossesAsync(CancellationToken cancellationToken) =>
-        await db.Bosses.AsNoTracking().Include(b => b.Weaknesses).OrderBy(b => b.Id).ToListAsync(cancellationToken);
+        await db.Bosses.AsNoTracking().Include(b => b.Weaknesses)
+            .OrderBy(b => b.SortOrder).ThenBy(b => b.Id)
+            .ToListAsync(cancellationToken);
 
     public async Task<IReadOnlyList<Jihen>> GetJihenAsync(CancellationToken cancellationToken) =>
-        await db.Jihen.AsNoTracking().OrderBy(j => j.Id).ToListAsync(cancellationToken);
+        await db.Jihen.AsNoTracking().OrderBy(j => j.SortOrder).ThenBy(j => j.Id).ToListAsync(cancellationToken);
 
     public Task<bool> JihenExistsAsync(string jihenId, CancellationToken cancellationToken) =>
         db.Jihen.AnyAsync(j => j.Id == jihenId, cancellationToken);

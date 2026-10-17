@@ -42,6 +42,31 @@ services:
       retries: 10
       start_period: 10s
 
+  # record-service: プレイ記録とパターン検索(サービスの共通構成 5.1)
+  record-service:
+    build:
+      context: ./backend
+      dockerfile: record/Dockerfile
+    # 8082 はコンテナの間だけに公開する(実行環境 5.1)
+    expose:
+      - "8082"
+    # 記録の参照は master-service に問い合わせて確かめるので、master-service の稼働も待つ(実行環境 5.1)
+    depends_on:
+      db:
+        condition: service_healthy
+      master-service:
+        condition: service_healthy
+    environment:
+      - SERVICE_KEY=${SERVICE_KEY}
+      - MASTER_SERVICE_URL=http://master-service:8081
+      - ConnectionStrings__Default=Host=db;Port=5432;Database=nightreign_record;Username=nightreign_record;Password=${RECORD_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8082/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
   db:
     image: postgres:16
     ports:

@@ -6,7 +6,7 @@ import { join } from "node:path";
  * AC-UI-01: 部品のファイルに、# で始まる色の値と bg-[ の任意の値を書かない(画面の共通仕様 3.2)。
  * 作り直しを終えたディレクトリから対象にし、画面ごとの PR で広げる(#53)。
  */
-const CHECKED_DIRS = ["components/ui", "components/layout", "components/map"];
+const CHECKED_DIRS = ["components/ui", "components/layout", "components/map", "components/pattern"];
 
 /** ディレクトリの下の .tsx を集める */
 function listTsx(dir: string): string[] {

@@ -3,9 +3,21 @@
   <!-- master-service の Infrastructure。データベースとの出し入れを受け持つ(サービスの共通構成 5.3) -->
 
   <ItemGroup>
+    <!-- dotnet ef でマイグレーションを作るときだけ使う。公開する成果物には入れない -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\NightreignTools.Master.Application\NightreignTools.Master.Application.csproj" />
     <ProjectReference Include="..\NightreignTools.Master.Domain\NightreignTools.Master.Domain.csproj" />
     <ProjectReference Include="..\..\shared\NightreignTools.ServiceDefaults\NightreignTools.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="NightreignTools.Master.Tests" />
   </ItemGroup>
 
 </Project>

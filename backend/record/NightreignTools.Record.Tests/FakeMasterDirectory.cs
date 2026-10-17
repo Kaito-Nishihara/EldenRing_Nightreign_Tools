@@ -15,6 +15,9 @@ internal sealed class FakeMasterDirectory : IMasterDirectory
     /// <summary>非表示にした収縮候補地。</summary>
     public HashSet<int> HiddenZoneIds { get; } = [];
 
+    /// <summary>4 のほかに持たせる第二収縮地点。</summary>
+    public HashSet<int> ExtraPointIds { get; } = [];
+
     /// <summary>true にすると、master-service が応答しないときと同じ例外を投げる。</summary>
     public bool Unavailable { get; set; }
 
@@ -31,7 +34,8 @@ internal sealed class FakeMasterDirectory : IMasterDirectory
             query.JihenIds.Where(id => id == "crater").Select(id => new MasterJihen(id, "山嶺")).ToList(),
             query.SpawnPointIds.Where(id => id is 1 or 2).Select(id => new MasterPoint(id, $"教会{id}", 351, 387, false)).ToList(),
             query.ZoneIds.Where(id => id is 4 or 7).Select(id => new MasterZone(id, $"候補{id}", 500, 500, 255, HiddenZoneIds.Contains(id))).ToList(),
-            query.SecondShrinkPointIds.Where(id => id == 4).Select(id => new MasterPoint(id, "最北", 583, 297, false)).ToList(),
+            query.SecondShrinkPointIds.Where(id => id == 4 || ExtraPointIds.Contains(id))
+                .Select(id => new MasterPoint(id, id == 4 ? "最北" : $"地点{id}", 583, 297, false)).ToList(),
             query.NightBossIds.Where(id => id is 3 or 5).Select(id => new MasterNightBoss(id, $"夜ボス{id}", id == 3 ? 1 : 2)).ToList()));
     }
 }

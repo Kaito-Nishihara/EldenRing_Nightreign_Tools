@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>共通の部品と状態 | 収縮パターン帳(見た目の試作)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;700&family=Shippori+Mincho+B1:wght@600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+</head>
+<body data-current="" style="overflow-y:auto">
+<main class="states">
+  <div class="heading heading--page">
+    <span class="eyebrow">Components</span>
+    <h1>共通の部品と状態</h1>
+  </div>
+
+  <section class="panel panel--ornate" aria-labelledby="s-btn">
+    <span class="corners"></span>
+    <div class="heading"><span class="eyebrow">Buttons</span><h2 id="s-btn">ボタン</h2></div>
+    <div class="stack-sm">
+      <div class="row wrap">
+        <button class="btn btn--primary" type="button">主のボタン</button>
+        <button class="btn btn--secondary" type="button">副のボタン</button>
+        <button class="btn btn--danger" type="button">削除</button>
+        <button class="btn btn--ghost" type="button">文字だけ</button>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn--primary" type="button" disabled>保存しています</button>
+        <button class="btn btn--secondary" type="button" disabled>使えない</button>
+      </div>
+      <div class="divider" aria-hidden="true">◆</div>
+      <div class="segmented" data-toggle-group>
+        <button type="button" aria-pressed="true"><span class="display">DAY I</span></button>
+        <button type="button" aria-pressed="false"><span class="display">DAY II</span></button>
+      </div>
+      <div class="row wrap">
+        <span class="badge badge--gold">3 回</span>
+        <span class="badge badge--tide">夜の雨</span>
+        <span class="badge badge--grace">保存済み</span>
+        <span class="badge">DLC</span>
+        <span class="chip" style="background:#4477AA">1</span>
+        <span class="chip" style="background:#EE6677">2</span>
+        <span class="chip" style="background:#228833">3</span>
+        <span class="chip" style="background:#CCBB44">4</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel panel--ornate" aria-labelledby="s-field">
+    <span class="corners"></span>
+    <div class="heading"><span class="eyebrow">Fields</span><h2 id="s-field">入力欄</h2></div>
+    <div class="stack">
+      <label class="field">
+        <span class="field__label">名前</span>
+        <input class="input" value="最北">
+      </label>
+      <label class="field">
+        <span class="field__label">X</span>
+        <input class="input" value="1200" style="border-color:var(--ember)" aria-invalid="true" aria-describedby="x-err">
+        <span class="field__error" id="x-err">0 から 1024 の数を入れてください</span>
+      </label>
+    </div>
+  </section>
+
+  <section class="panel panel--ornate" aria-labelledby="s-load">
+    <span class="corners"></span>
+    <div class="heading"><span class="eyebrow">Loading</span><h2 id="s-load">読み込み中</h2></div>
+    <div class="stack-sm" aria-busy="true">
+      <div class="skeleton" style="height:22px;width:60%"></div>
+      <div class="skeleton" style="height:96px"></div>
+      <div class="skeleton" style="height:96px"></div>
+    </div>
+  </section>
+
+  <section class="panel panel--ornate" aria-labelledby="s-empty">
+    <span class="corners"></span>
+    <div class="heading"><span class="eyebrow">Empty</span><h2 id="s-empty">記録がない</h2></div>
+    <div class="empty">
+      <div class="empty__mark" aria-hidden="true">◆ ◆ ◆</div>
+      <p class="serif" style="font-size:18px;color:var(--gold-bright);margin:8px 0 4px">この条件の記録はまだありません</p>
+      <p class="t-sm soft" style="margin:0 0 16px">今回のプレイで収縮先を記録しましょう。</p>
+      <a class="btn btn--primary" href="record.html">この条件で記録する</a>
+    </div>
+  </section>
+
+  <section class="panel panel--ornate" aria-labelledby="s-err">
+    <span class="corners"></span>
+    <div class="heading"><span class="eyebrow">Error</span><h2 id="s-err">エラー</h2></div>
+    <div class="stack-sm">
+      <div class="notice notice--error" role="alert">
+        <span class="notice__icon">!</span>
+        <span>サーバーに接続できません。時間をおいてやり直してください。</span>
+      </div>
+      <button class="btn btn--secondary" type="button">もう一度読み込む</button>
+    </div>
+  </section>
+
+  <section class="panel panel--ornate" aria-labelledby="s-key">
+    <span class="corners"></span>
+    <div class="heading"><span class="eyebrow">Admin Key</span><h2 id="s-key">管理用の鍵</h2></div>
+    <form class="stack-sm" onsubmit="return false">
+      <p class="t-sm soft" style="margin:0">マスタの管理の画面を開いたとき、鍵がなければこれだけを出す。</p>
+      <label class="field">
+        <span class="field__label">管理用の鍵</span>
+        <input class="input" type="password" value="wrong-key-000000" autocomplete="current-password">
+      </label>
+      <div class="notice notice--error" role="alert">
+        <span class="notice__icon">!</span>
+        <span>管理用の鍵が違います。</span>
+      </div>
+      <button class="btn btn--primary" type="submit">入る</button>
+    </form>
+  </section>
+
+  <section class="panel panel--ornate" aria-labelledby="s-toast">
+    <span class="corners"></span>
+    <div class="heading"><span class="eyebrow">Toast</span><h2 id="s-toast">保存できた知らせ</h2></div>
+    <div class="toast toast--static" role="status">
+      <span class="grace" aria-hidden="true">✓</span>
+      <span>記録を保存しました</span>
+      <a href="pattern.html" class="t-sm">パターンを見る</a>
+    </div>
+  </section>
+</main>
+<script src="mock.js"></script>
+</body>
+</html>

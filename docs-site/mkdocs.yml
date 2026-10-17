@@ -1,0 +1,106 @@
+# 仕様書をブラウザで読むサイトの設定。アプリ本体とは別のもので、アプリの起動やビルドに関わらない
+# 文書の中身は ../docs/ にあり、このディレクトリには表示の仕組みだけを置く
+# 起動: docker compose -f docs-site/compose.yaml up -d  →  http://localhost:8000
+site_name: 収縮パターン帳 仕様書
+site_description: エルデンリング ナイトレインの収縮パターン帳の要件定義、設計、画面の試作
+docs_dir: ../docs
+site_dir: /tmp/site
+use_directory_urls: true
+
+theme:
+  name: material
+  language: ja
+  # 見た目の上書き。overrides/assets/docs.css がサイトの assets/docs.css として配られる
+  custom_dir: overrides
+  # 書体は docs.css で指定する
+  font: false
+  # アプリと同じく暗い配色だけを使う
+  palette:
+    scheme: slate
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.highlight
+    - content.code.copy
+
+extra_css:
+  - assets/docs.css
+
+# 画面一覧のページで、試作の枠を、ページの幅に合わせて縮める
+extra_javascript:
+  - assets/screen-frame.js
+
+# 一文ごとに改行して書いた日本語を、表示のときだけ 1 つの段落に詰める
+hooks:
+  - hooks/join_japanese_lines.py
+  - hooks/copy_frontend_public.py
+
+# 文書のほかに、見た目と変換の処理を変えたときも表示を更新する
+watch:
+  - overrides
+  - hooks
+
+markdown_extensions:
+  - tables
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - toc:
+      permalink: true
+      toc_depth: 3
+      # 日本語の見出しでも、見出しへのリンクが作られるようにする
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.details
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  # ```mermaid のコードブロックを図として描く
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+# 文書を足したら、ここに 1 行足す。足さなくても表示されるが、並び順が名前順になる
+nav:
+  - はじめに: index.md
+  - 要件定義: requirements.md
+  - アーキテクチャ図: architecture.html
+  - 共通の設計:
+      - API の共通仕様: design/common-api.md
+      - データベースの共通仕様: design/common-database.md
+      - サービスの共通構成: design/common-service.md
+      - 画面の共通仕様: design/common-frontend.md
+      - 実行環境: design/common-runtime.md
+  - 画面の設計:
+      - 画面の一覧と遷移: design/screens.md
+  - 画面一覧:
+      - 一覧: screens/index.md
+      - パターン検索: screens/pattern.md
+      - プレイ記録: screens/record.md
+      - ビルドシミュレーター: screens/build.md
+      - マスタの管理: screens/admin.md
+      - 共通の部品と状態: screens/common.md
+  - 機能の設計:
+      - パターン検索: design/pattern-search.md
+      - プレイ記録: design/play-record.md
+      - マスタの管理: design/master-admin.md
+      - ビルドシミュレーター: design/build-simulator.md
+  - 決定の記録:
+      - 0001 バックエンドを ASP.NET Core と C# で作り直す: decisions/0001-dotnet-backend.md
+      - 0002 Gateway とバックエンドを 1 つにまとめない: decisions/0002-keep-gateway-separate.md
+      - 0003 テーブルの変更を EF Core Migrations で管理する: decisions/0003-ef-core-migrations.md
+      - 0004 マップの座標をマップ画像の px で持つ: decisions/0004-pixel-coordinates.md
+      - 0005 プレイの記録を消さない: decisions/0005-keep-play-records.md
+      - 0006 ビルドシミュレーターの計算をブラウザで行う: decisions/0006-build-calc-in-browser.md
+      - 0007 データベースのアクセスに EF Core を使う: decisions/0007-ef-core.md
+      - 0008 第 2 次収縮を第二収縮地点で記録する: decisions/0008-second-shrink-by-point.md
+      - 0009 管理者を Gateway で管理用の鍵により確かめる: decisions/0009-admin-key.md
+      - 0010 記録に夜ボスを持たせ、拠点の種類を持たせない: decisions/0010-night-boss-in-record.md

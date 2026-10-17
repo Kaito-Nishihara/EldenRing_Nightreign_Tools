@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>プレイ記録 | 収縮パターン帳(見た目の試作)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;700&family=Shippori+Mincho+B1:wght@600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+</head>
+<body data-current="record">
+<main class="layout">
+  <h1 class="sr-only">プレイ記録</h1>
+  <aside class="layout__side is-collapsed" aria-label="記録の入力">
+    <button class="sheet-handle" type="button" aria-expanded="false">DAY I 第 2 次を入力中 ／ 開く</button>
+
+    <section class="panel panel--ornate" aria-labelledby="slot-title">
+      <span class="corners"></span>
+      <div class="row row--between" style="align-items:flex-start">
+        <div class="heading" style="margin-bottom:12px"><span class="eyebrow">Night Rain</span><h2 id="slot-title">収縮先</h2></div>
+        <span class="badge badge--gold"><span data-filled-count>1</span> / 4</span>
+      </div>
+
+      <div class="notice notice--tide t-sm" style="margin-bottom:12px">
+        <div style="flex:1">
+          <div class="row row--between">
+            <span>次の収縮まで</span>
+            <span class="countdown">2:48</span>
+          </div>
+          <div class="timeline" aria-hidden="true">
+            <div class="timeline__track"></div>
+            <div class="timeline__rain" style="left:28%;width:20%"></div>
+            <div class="timeline__rain" style="left:69%;width:19%"></div>
+            <div class="timeline__now" style="left:52%"></div>
+            <span class="timeline__tick" style="left:28%">4:30</span>
+            <span class="timeline__tick" style="left:48%">7:40</span>
+            <span class="timeline__tick" style="left:69%">11:10</span>
+            <span class="timeline__tick" style="left:88%">14:10</span>
+          </div>
+          <div class="row row--between" style="margin-top:6px">
+            <span class="t-xs soft">プレイの経過 8:22(P1 の機能)</span>
+            <button class="btn btn--ghost t-sm" type="button" style="min-height:32px">一時停止</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack-sm">
+        <span class="eyebrow">Day I</span>
+        <div class="slots">
+          <button class="slot" type="button" aria-pressed="false" data-day="1" data-phase="1" data-zone="3">
+            <span class="slot__phase">第 1 次</span>
+            <span class="slot__value">最北</span>
+            <span class="slot__state grace" aria-label="入力済み">✓</span>
+          </button>
+          <button class="slot" type="button" aria-pressed="true" data-day="1" data-phase="2">
+            <span class="slot__phase">第 2 次</span>
+            <span class="slot__value slot__value--empty">マップで第二収縮地点を押す</span>
+            <span class="slot__state"></span>
+          </button>
+        </div>
+        <label class="field">
+          <span class="field__label">DAY I の夜ボス(任意)</span>
+          <select class="select">
+            <option>選ばない</option><option selected>鈴玉狩り</option><option>貪食ドラゴン</option><option>英雄のガーゴイル</option><option>百足のデーモン</option><option>戦場の宿将</option>
+          </select>
+        </label>
+        <span class="eyebrow" style="margin-top:8px">Day II</span>
+        <div class="slots">
+          <button class="slot" type="button" aria-pressed="false" data-day="2" data-phase="1">
+            <span class="slot__phase">第 1 次</span>
+            <span class="slot__value slot__value--empty">未入力</span>
+            <span class="slot__state"></span>
+          </button>
+          <button class="slot" type="button" aria-pressed="false" data-day="2" data-phase="2">
+            <span class="slot__phase">第 2 次</span>
+            <span class="slot__value slot__value--empty">未入力</span>
+            <span class="slot__state"></span>
+          </button>
+        </div>
+        <label class="field">
+          <span class="field__label">DAY II の夜ボス(任意)</span>
+          <select class="select">
+            <option selected>選ばない</option><option>古竜</option><option>忌み鬼</option><option>大土竜</option><option>死儀礼の鳥</option><option>騎士アルトリウス</option>
+          </select>
+        </label>
+        <details class="t-sm" style="margin-top:4px">
+          <summary class="soft" style="cursor:pointer">一覧から選ぶ(キーボードで操作するとき)</summary>
+          <select class="select" style="margin-top:8px" aria-label="DAY I 第 2 次の第二収縮地点">
+            <option>最北西</option><option>中央西</option><option>最北東</option><option selected>最北</option><option>最東</option><option>中央東</option>
+          </select>
+        </details>
+      </div>
+    </section>
+
+    <section class="panel panel--ornate" aria-labelledby="cond-title">
+      <span class="corners"></span>
+      <div class="heading"><span class="eyebrow">This Expedition</span><h2 id="cond-title">今回の条件</h2></div>
+      <div class="stack">
+        <div class="row">
+          <span class="sigil">獣</span>
+          <div>
+            <div class="serif" style="font-weight:800;color:var(--gold-bright)">三つ首の獣</div>
+            <div class="t-sm soft">地変なし ／ 北東の教会</div>
+          </div>
+          <button class="btn btn--ghost t-sm" type="button" style="margin-left:auto">変える</button>
+        </div>
+        <label class="field">
+          <span class="field__label">備考(任意、500 文字まで)</span>
+          <textarea class="textarea" placeholder="例: 2 日目は地変の方へ寄った"></textarea>
+        </label>
+        <p class="t-xs soft" style="margin:0">入力中の内容はこの端末に残ります。最後に残した時刻 21:42</p>
+        <div class="row">
+          <button class="btn btn--secondary" type="button">やり直す</button>
+          <button class="btn btn--primary" type="button" style="flex:1">記録を保存する</button>
+        </div>
+      </div>
+    </section>
+  </aside>
+
+  <section class="layout__main" aria-label="マップ">
+    <div class="panel panel--ornate panel--fill">
+      <span class="corners"></span>
+      <div class="map-toolbar">
+        <div class="segmented" data-toggle-group data-day-toggle style="width:200px">
+          <button type="button" aria-pressed="true"><span class="display">DAY I</span></button>
+          <button type="button" aria-pressed="false"><span class="display">DAY II</span></button>
+        </div>
+        <div class="segmented" data-toggle-group>
+          <button type="button" aria-pressed="true">収縮を表示</button>
+          <button type="button" aria-pressed="false">隠す</button>
+        </div>
+      </div>
+      <div class="map-frame">
+        <div class="mock-map" style="height:100%" data-label="マップ。第 1 次は収縮候補地、第 2 次は第二収縮地点を押して収縮先を選ぶ" data-layers="zones,points,spawn" data-spawn="0" data-selected-zones="[3]" data-rain="3" data-pickable="1" data-mode="points"></div>
+        <div class="map-zoom">
+          <button class="btn btn--secondary btn--icon" type="button" aria-label="拡大">＋</button>
+          <button class="btn btn--secondary btn--icon" type="button" aria-label="縮小">－</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="mock.js"></script>
+</body>
+</html>

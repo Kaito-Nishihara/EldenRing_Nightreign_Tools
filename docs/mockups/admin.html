@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>マスタの管理 | 収縮パターン帳(見た目の試作)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;700&family=Shippori+Mincho+B1:wght@600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+</head>
+<body data-current="admin">
+<main class="layout">
+  <h1 class="sr-only">マスタの管理</h1>
+  <aside class="layout__side is-collapsed" aria-label="登録と修正">
+    <button class="sheet-handle" type="button" aria-expanded="false">入力を開く</button>
+
+    <section class="panel panel--ornate" aria-labelledby="mode-title">
+      <span class="corners"></span>
+      <div class="heading"><span class="eyebrow">Cartography</span><h2 id="mode-title">登録するもの</h2></div>
+      <div class="mode-tabs" data-toggle-group>
+        <button type="button" aria-pressed="false"><span class="mode-dot" style="background:var(--gold-bright)"></span>開始地点</button>
+        <button type="button" aria-pressed="true"><span class="mode-dot" style="border:1.5px solid var(--tide)"></span>収縮候補地</button>
+        <button type="button" aria-pressed="false"><span class="mode-dot" style="background:var(--tide);transform:rotate(45deg)"></span>第二収縮地点</button>
+        <button type="button" aria-pressed="false"><span class="mode-dot" style="border:2px solid var(--line-strong);border-radius:50%"></span>拠点候補地</button>
+      </div>
+      <label class="field" style="margin-top:12px">
+        <span class="field__label">マップ</span>
+        <select class="select"><option>通常</option><option>火口</option><option>山嶺</option></select>
+      </label>
+    </section>
+
+    <section class="panel panel--ornate" aria-labelledby="form-title">
+      <span class="corners"></span>
+      <div class="heading"><span class="eyebrow">Edit</span><h2 id="form-title">収縮候補地「最北」を直す</h2></div>
+      <div class="stack">
+        <label class="field">
+          <span class="field__label">名前</span>
+          <input class="input" value="最北">
+        </label>
+        <div class="row">
+          <label class="field" style="flex:1"><span class="field__label">X</span><input class="input num" value="583.00" inputmode="decimal"></label>
+          <label class="field" style="flex:1"><span class="field__label">Y</span><input class="input num" value="297.00" inputmode="decimal"></label>
+        </div>
+        <label class="field">
+          <span class="field__label">半径 <span class="gold">256</span> px</span>
+          <input class="range" type="range" min="100" max="500" value="256">
+        </label>
+        <div class="notice notice--error">
+          <span class="notice__icon">!</span>
+          <span>この収縮候補地は 12 件の記録から参照されているため、削除できません。</span>
+        </div>
+        <div class="row">
+          <button class="btn btn--danger" type="button" disabled>削除</button>
+          <button class="btn btn--secondary" type="button">取り消す</button>
+          <button class="btn btn--primary" type="button" style="flex:1">保存する</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="list-title">
+      <div class="heading" style="margin-bottom:8px"><h2 id="list-title" style="font-size:16px">登録済み 12 件</h2></div>
+      <table class="table">
+        <thead><tr><th>名前</th><th class="num">X</th><th class="num">Y</th><th class="num">半径</th></tr></thead>
+        <tbody>
+          <tr><td>最北西</td><td class="num">219</td><td class="num">233</td><td class="num">256</td></tr>
+          <tr><td>中央西</td><td class="num">342</td><td class="num">488</td><td class="num">256</td></tr>
+          <tr><td>最北東</td><td class="num">789</td><td class="num">248</td><td class="num">256</td></tr>
+          <tr aria-selected="true"><td>最北</td><td class="num">583</td><td class="num">297</td><td class="num">256</td></tr>
+          <tr><td>最東</td><td class="num">739</td><td class="num">518</td><td class="num">256</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </aside>
+
+  <section class="layout__main" aria-label="マップ">
+    <div class="panel panel--ornate panel--fill">
+      <span class="corners"></span>
+      <div class="map-toolbar">
+        <span class="t-sm soft">マップを押すと、その場所の座標を入れます</span>
+      </div>
+      <div class="map-frame">
+        <div class="mock-map" style="height:100%" data-label="マップ。登録済みの収縮候補地と、直している円" data-layers="zones" data-selected-zones="[3]" data-preview="583,297,256"></div>
+        <div class="map-coord">X 583.00 ／ Y 297.00</div>
+        <div class="map-zoom">
+          <button class="btn btn--secondary btn--icon" type="button" aria-label="拡大">＋</button>
+          <button class="btn btn--secondary btn--icon" type="button" aria-label="縮小">－</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="mock.js"></script>
+</body>
+</html>

@@ -65,9 +65,11 @@
 ```
 backend/
 ├── NightreignTools.slnx
+├── Directory.Build.props                   # 全プロジェクトの共通の設定(net10.0、Nullable、警告を誤りに)
+├── Directory.Packages.props                # パッケージの版を 1 か所で決める
 ├── shared/
 │   ├── NightreignTools.SharedKernel/       # 業務の例外。どこにも頼らない
-│   └── NightreignTools.ServiceDefaults/    # Api の共通の部品: エラーの形、例外の変換、サービス間キー、/health、起動のときのマイグレーション
+│   └── NightreignTools.ServiceDefaults/    # 共通の部品: エラーの形、例外の変換、サービス間キー、/health、接続文字列の検証、起動のときのマイグレーション
 ├── master/
 │   ├── NightreignTools.Master.Domain/
 │   ├── NightreignTools.Master.Application/
@@ -92,6 +94,7 @@ flowchart LR
     Api --> Application
     Api --> Infrastructure
     Api --> SD[ServiceDefaults]
+    Infrastructure --> SD
     Infrastructure --> Application
     Infrastructure --> Domain
     Application --> Domain
@@ -103,7 +106,7 @@ flowchart LR
 |---|---|---|---|
 | Domain | エンティティと値オブジェクト、業務の規則(例: 日と段階の組が重複しない、座標が 0 以上 1024 以下) | 保存、HTTP、DTO | SharedKernel |
 | Application | アプリケーションサービス、ポート(`I<対象>Repository`、`IMasterDirectory`)、DTO、エンティティと DTO の詰め替え、存在の確認 | EF Core、HTTP の型(`IResult`、`HttpContext`)、`HttpClient` | Domain、SharedKernel |
-| Infrastructure | DbContext、構成、マイグレーション、初期データ、リポジトリの実装、ほかのサービスを呼ぶクライアント | 業務の規則 | Application、Domain、EF Core |
+| Infrastructure | DbContext、構成、マイグレーション、初期データ、リポジトリの実装、ほかのサービスを呼ぶクライアント | 業務の規則 | Application、Domain、EF Core、ServiceDefaults の永続化の部品 |
 | Api | `Program.cs`(登録の組み立て)、エンドポイント、状態の決定(200、201、204) | 業務の規則、EF Core の直接の利用 | Application、Infrastructure、ServiceDefaults |
 
 決まりは次のとおりとする。

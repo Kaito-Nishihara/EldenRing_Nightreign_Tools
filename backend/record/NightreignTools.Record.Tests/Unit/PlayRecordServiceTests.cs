@@ -132,34 +132,6 @@ public class PlayRecordServiceTests
         Assert.Empty(_repository.Saved);
     }
 
-    /// <summary>
-    /// master-service の偽物。夜の王 gladius、地変 crater、開始地点 1、収縮候補地 4 と 7、第二収縮地点 4、
-    /// 1 日目の夜ボス 3、2 日目の夜ボス 5 を持つ。問い合わせられた識別子のうち、持つものだけを返す。
-    /// </summary>
-    private sealed class FakeMasterDirectory : IMasterDirectory
-    {
-        public List<MasterReferenceQuery> Queries { get; } = [];
-        public HashSet<int> HiddenZoneIds { get; } = [];
-        public bool Unavailable { get; set; }
-
-        public Task<MasterReferences> ResolveAsync(MasterReferenceQuery query, CancellationToken ct)
-        {
-            Queries.Add(query);
-            if (Unavailable)
-            {
-                throw new ServiceUnavailableException("マスタのサービスに接続できません。時間をおいてやり直してください");
-            }
-
-            return Task.FromResult(new MasterReferences(
-                query.BossIds.Where(id => id == "gladius").Select(id => new MasterBoss(id, "三つ首の獣")).ToList(),
-                query.JihenIds.Where(id => id == "crater").Select(id => new MasterJihen(id, "山嶺")).ToList(),
-                query.SpawnPointIds.Where(id => id == 1).Select(id => new MasterPoint(id, "北東の教会", 351, 387, false)).ToList(),
-                query.ZoneIds.Where(id => id is 4 or 7).Select(id => new MasterZone(id, $"候補{id}", 500, 500, 255, HiddenZoneIds.Contains(id))).ToList(),
-                query.SecondShrinkPointIds.Where(id => id == 4).Select(id => new MasterPoint(id, "最北", 583, 297, false)).ToList(),
-                query.NightBossIds.Where(id => id is 3 or 5).Select(id => new MasterNightBoss(id, $"夜ボス{id}", id == 3 ? 1 : 2)).ToList()));
-        }
-    }
-
     private sealed class FakeRepository : IPlayRecordRepository
     {
         public const int SavedId = 0;

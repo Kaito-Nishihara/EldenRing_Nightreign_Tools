@@ -1,3 +1,4 @@
+using NightreignTools.Record.Api.Endpoints;
 using NightreignTools.Record.Application;
 using NightreignTools.Record.Infrastructure;
 using NightreignTools.ServiceDefaults;
@@ -17,8 +18,9 @@ var app = builder.Build();
 
 app.UseServiceDefaults();
 
-// 機能のエンドポイントは /api/v1 のグループに、機能ごとの Map<機能>Endpoints で足す(サービスの共通構成 5.4)。
-// 記録の保存とパターン検索は、それぞれの機能の PR で、var api = app.MapGroup("/api/v1") に足す
+// 機能のエンドポイントは /api/v1 のグループに、機能ごとの Map<機能>Endpoints で足す(サービスの共通構成 5.4)
+var api = app.MapGroup("/api/v1");
+api.MapPlayRecordEndpoints();
 
 return await app.RunServiceAsync();
 

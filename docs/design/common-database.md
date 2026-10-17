@@ -149,9 +149,7 @@ docker compose up --build
 | `noklateo` | 隠れ都ノクラテオ | 中央 | `jihen-nokurateou.webp` |
 | `great_cavern` | 大空洞 | 全体 | なし。通常のマップを使う |
 
-マップ画像の列は、画面側の対応表(`frontend/src/lib/mapImage.ts`)が持つ。
-今の対応表は `kakou` などの別の識別子を鍵にしていて、上の識別子と合っていない。
-段階 3 で、上の識別子に合わせて直す。
+マップ画像の列は、画面側の対応表(`frontend/src/lib/mapImage.ts`)が持ち、上の識別子を鍵にする。
 
 ### 5.7 全体の関係
 

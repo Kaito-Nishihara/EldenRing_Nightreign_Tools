@@ -3,12 +3,15 @@
  * 地変未選択時はデフォルトマップを返す
  */
 
-/** 地変ID→マップ画像ファイル名のマッピング */
+/**
+ * 地変ID→マップ画像ファイル名のマッピング。
+ * 鍵は API が返す地変の識別子(データベースの共通仕様 5.6)。大空洞(great_cavern)は通常のマップを使う
+ */
 const JIHEN_MAP: Record<string, string> = {
-  kakou: "jihen-kakou.webp",
-  sankan: "jihen-sankan.webp",
-  fuhai: "jihen-fuhai.webp",
-  nokurateou: "jihen-nokurateou.webp",
+  crater: "jihen-kakou.webp",
+  mountain: "jihen-sankan.webp",
+  rotted_forest: "jihen-fuhai.webp",
+  noklateo: "jihen-nokurateou.webp",
 };
 
 /**

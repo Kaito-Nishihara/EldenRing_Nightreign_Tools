@@ -1,12 +1,16 @@
 # ビルドステージ
-FROM gradle:8-jdk21 AS build
+FROM node:20-alpine AS build
 WORKDIR /app
+COPY package*.json ./
+RUN npm ci
 COPY . .
-RUN gradle bootJar --no-daemon
+RUN npm run build
 
 # 実行ステージ
-FROM eclipse-temurin:21-jre
+FROM node:20-alpine
 WORKDIR /app
-COPY --from=build /app/build/libs/*.jar app.jar
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY migrations ./migrations
 EXPOSE 8081
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["node", "dist/main"]

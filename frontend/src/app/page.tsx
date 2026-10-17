@@ -89,12 +89,20 @@ export default function HomePage() {
             マップ収縮パターン検索
           </span>
         </h1>
-        <Link
-          href="/record"
-          className="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-md transition-colors font-medium"
-        >
-          記録入力
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/build"
+            className="bg-amber-700 hover:bg-amber-600 text-white text-sm px-4 py-2 rounded-md transition-colors font-medium"
+          >
+            ビルドシミュレーター
+          </Link>
+          <Link
+            href="/record"
+            className="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-md transition-colors font-medium"
+          >
+            記録入力
+          </Link>
+        </div>
       </header>
 
       {/* メインコンテンツ */}

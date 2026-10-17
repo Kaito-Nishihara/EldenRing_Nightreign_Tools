@@ -71,48 +71,66 @@ export default function AdminOverlay({
 
   return (
     <>
-      {/* 収縮候補地は選択中または新規作成プレビューのみ表示 */}
-      {(() => {
-        const selectedZone = shrinkZones.find((sz) => sz.id === editingShrinkZoneId) ?? null;
-        const previewPosition =
-          clickedPosition ??
-          (selectedZone
-            ? { x: selectedZone.centerX, y: selectedZone.centerY }
-            : null);
-
-        if (editMode !== "shrink-zone" || !previewPosition) {
-          return null;
-        }
-
+      {/* 収縮候補地モード時のみ表示 */}
+      {editMode === "shrink-zone" && shrinkZones.map((sz) => {
+        const isEditing = sz.id === editingShrinkZoneId;
+        const displayRadius = isEditing ? shrinkZoneRadius : sz.radius;
+        const displayX = isEditing && clickedPosition ? clickedPosition.x : sz.centerX;
+        const displayY = isEditing && clickedPosition ? clickedPosition.y : sz.centerY;
         return (
           <Group
-            key={selectedZone ? `sz-${selectedZone.id}` : "shrink-zone-preview"}
-            onClick={selectedZone ? () => onShrinkZoneClick(selectedZone) : undefined}
-            onTap={selectedZone ? () => onShrinkZoneClick(selectedZone) : undefined}
+            key={`sz-${sz.id}`}
+            onClick={() => onShrinkZoneClick(sz)}
+            onTap={() => onShrinkZoneClick(sz)}
           >
             <Circle
-              x={previewPosition.x}
-              y={previewPosition.y}
-              radius={shrinkZoneRadius}
-              fill={selectedZone ? "rgba(34, 197, 94, 0.3)" : "rgba(34, 197, 94, 0.22)"}
-              stroke={selectedZone ? "#22c55e" : "#4ade80"}
-              strokeWidth={selectedZone ? 3 : 2}
+              x={displayX}
+              y={displayY}
+              radius={displayRadius}
+              fill={isEditing ? "rgba(34, 197, 94, 0.3)" : "rgba(34, 197, 94, 0.15)"}
+              stroke={isEditing ? "#22c55e" : "#4ade80"}
+              strokeWidth={isEditing ? 3 : 1.5}
             />
             <Text
-              x={previewPosition.x - 60}
-              y={previewPosition.y - 6}
-              text={selectedZone ? `${selectedZone.nameJa} r=${shrinkZoneRadius}` : `新規候補 r=${shrinkZoneRadius}`}
+              x={displayX - 60}
+              y={displayY - 6}
+              text={isEditing ? `${sz.nameJa} r=${displayRadius}` : sz.nameJa}
               fontSize={11}
-              fill="#86efac"
+              fill={isEditing ? "#86efac" : "#4ade80"}
               align="center"
               width={120}
+              listening={false}
             />
           </Group>
         );
-      })()}
+      })}
 
-      {/* 開始地点をアイコンで表示 */}
-      {spawnPoints.map((sp) => {
+      {/* 新規作成プレビュー（編集中ゾーンなし＆クリック位置あり） */}
+      {editMode === "shrink-zone" && clickedPosition && !editingShrinkZoneId && (
+        <Group key="shrink-zone-preview">
+          <Circle
+            x={clickedPosition.x}
+            y={clickedPosition.y}
+            radius={shrinkZoneRadius}
+            fill="rgba(34, 197, 94, 0.22)"
+            stroke="#4ade80"
+            strokeWidth={2}
+          />
+          <Text
+            x={clickedPosition.x - 60}
+            y={clickedPosition.y - 6}
+            text={`新規候補 r=${shrinkZoneRadius}`}
+            fontSize={11}
+            fill="#86efac"
+            align="center"
+            width={120}
+            listening={false}
+          />
+        </Group>
+      )}
+
+      {/* 開始地点モード時のみ表示 */}
+      {editMode === "spawn-point" && spawnPoints.map((sp) => {
         const isEditing = editingSpawnPointId === sp.id;
         return (
           <Group
@@ -163,8 +181,8 @@ export default function AdminOverlay({
         );
       })}
 
-      {/* 第二収縮地点候補をマーカーで表示 */}
-      {secondShrinkPoints.map((point) => {
+      {/* 第二収縮地点モード時のみ表示 */}
+      {editMode === "second-shrink-point" && secondShrinkPoints.map((point) => {
         const isEditing = editingSecondShrinkPointId === point.id;
         return (
           <Group

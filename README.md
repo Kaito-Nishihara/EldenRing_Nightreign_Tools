@@ -12,15 +12,22 @@
 ## システム構成
 
 ```
-Next.js (3000) → .NET Gateway (8080) → Spring Boot (8081) → PostgreSQL (5432)
+Next.js (3000) → .NET Gateway (8080) → 3 つのサービス(master、record、relic) → PostgreSQL (5432)
 ```
 
 | サービス | 技術 | 責務 |
 |---------|------|------|
-| frontend | Next.js 15 + TypeScript | UI・マップ描画・PWA |
-| gateway | ASP.NET Core 10 + YARP | API Gateway・JWT認証 |
-| backend | Spring Boot 3.5.x (Java 25) + Flyway | マスタ管理・パターン検索・記録集計 |
+| frontend | Next.js 15 + TypeScript | UI・マップ描画 |
+| gateway | ASP.NET Core 10 + YARP | API Gateway・管理用の鍵の確認・サービス間キーの付与 |
+| master-service (8081) | ASP.NET Core 10 + EF Core | マスタの取得と管理 |
+| record-service (8082) | ASP.NET Core 10 + EF Core | プレイ記録とパターン検索 |
+| relic-service (8083) | ASP.NET Core 10 + EF Core | ビルドシミュレーターの遺物の効果 |
 | db | PostgreSQL 16 | データ永続化 |
+
+バックエンドは NestJS から .NET へ作り直している途中である。
+`backend/` の NestJS のコードは、段階 0(#50)で .NET の 3 つのサービスに置き換える。
+どのサービスも、中はクリーンアーキテクチャ(Domain、Application、Infrastructure、Api)で書く。
+作り直しの理由は [`docs/decisions/0001-dotnet-backend.md`](docs/decisions/0001-dotnet-backend.md) にある。
 
 ## 起動方法
 
@@ -39,23 +46,29 @@ cp .env.example .env
 ### 起動
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 | URL | 用途 |
 |-----|------|
 | http://localhost:3000 | フロントエンド |
 | http://localhost:8080 | API Gateway |
-| http://localhost:8081/swagger-ui.html | Spring Boot Swagger UI（開発用） |
 
 ## ドキュメント
 
+仕様書は `docs/` にある。
+次のコマンドで、ブラウザで読めるサイトを起動できる。
+
+```bash
+docker compose -f docs-site/compose.yaml up -d
+# http://localhost:8000
+```
+
 | ドキュメント | 場所 |
 |------------|------|
+| 文書の一覧 | [`docs/index.md`](docs/index.md) |
 | 要件定義書 | [`docs/requirements.md`](docs/requirements.md) |
-| アーキテクチャ設計書 | [`docs/design/architecture.md`](docs/design/architecture.md) |
-| データベース設計書 | [`docs/design/database.md`](docs/design/database.md) |
-| API設計書 | [`docs/design/api.md`](docs/design/api.md) |
+| 画面の試作 | [`docs/screens/index.md`](docs/screens/index.md) |
 
 ## 主な機能
 
@@ -66,11 +79,13 @@ docker-compose up --build
 
 ## 開発状況
 
-| フェーズ | 内容 | 状態 |
+段階と終わりの条件は、[要件定義の 11 章](docs/requirements.md) にある。
+
+| 段階 | 内容 | 状態 |
 |---------|------|------|
-| Phase 1 | Docker環境構築・DBマイグレーション | 未着手 |
-| Phase 2 | Spring Boot API実装 | 未着手 |
-| Phase 3 | .NET API Gateway実装 | 未着手 |
-| Phase 4 | Next.jsフロントエンド実装 | 未着手 |
-| Phase 5 | 記録入力UI・タイムライン | 未着手 |
-| Phase 6 | PWA対応・モバイル最適化 | 未着手 |
+| 0 | 共通の部品と master-service の土台(#50) | 着手 |
+| 1 | record-service: パターン検索とプレイ記録(#51) | 未着手 |
+| 2 | マスタの管理と権限(#52) | 未着手 |
+| 3 | 画面の見た目の作り直し(#53) | 試作まで |
+| 4 | relic-service: ビルドシミュレーターの API(#54) | 未着手 |
+| 5 | 収縮のタイムライン、オフラインでの利用 | 未着手 |

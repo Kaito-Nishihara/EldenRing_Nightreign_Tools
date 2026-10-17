@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>パターン検索 | 収縮パターン帳(見た目の試作)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;700&family=Shippori+Mincho+B1:wght@600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+</head>
+<body data-current="pattern">
+<main class="layout">
+  <h1 class="sr-only">パターン検索</h1>
+  <aside class="layout__side is-collapsed" aria-label="条件とパターン">
+    <button class="sheet-handle" type="button" aria-expanded="false">条件とパターンを開く</button>
+
+    <section class="panel panel--ornate" aria-labelledby="cond-title">
+      <span class="corners"></span>
+      <div class="heading"><span class="eyebrow">Conditions</span><h2 id="cond-title">条件</h2></div>
+      <div class="stack">
+        <div class="field">
+          <span class="field__label">夜の王</span>
+          <div class="boss-list" data-toggle-group>
+            <button class="boss-option" type="button" aria-pressed="true"><span class="sigil">獣</span>三つ首の獣</button>
+            <button class="boss-option" type="button" aria-pressed="false"><span class="sigil">顎</span>喰らいつく顎</button>
+            <button class="boss-option" type="button" aria-pressed="false"><span class="sigil">蟲</span>知性の蟲</button>
+            <button class="boss-option" type="button" aria-pressed="false"><span class="sigil">兆</span>兆し</button>
+            <button class="boss-option" type="button" aria-pressed="false"><span class="sigil">律</span>調律の魔物</button>
+            <button class="boss-option" type="button" aria-pressed="false"><span class="sigil">狩</span>闇駆ける狩人</button>
+          </div>
+          <button class="btn btn--ghost t-sm" type="button">ほかの 4 体を表示</button>
+        </div>
+        <label class="field">
+          <span class="field__label">地変</span>
+          <select class="select">
+            <option>なし</option><option>火口</option><option>山嶺</option><option>腐れ森</option><option>隠れ都ノクラテオ</option><option>大空洞</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field__label">開始地点</span>
+          <select class="select">
+            <option>北東の教会</option><option>西の教会</option><option>南西の教会</option><option>南の教会</option>
+          </select>
+          <span class="field__hint">マップの開始地点のアイコンを押しても選べます</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="panel panel--ornate" aria-labelledby="pat-title">
+      <span class="corners"></span>
+      <div class="heading"><span class="eyebrow">Patterns</span><h2 id="pat-title">過去のパターン</h2></div>
+      <p class="t-sm soft" role="status" style="margin:0 0 12px">この条件の記録 6 件、3 パターン</p>
+      <ul class="patterns" data-toggle-group>
+        <li>
+          <button class="pattern" type="button" data-pattern="0" aria-pressed="true">
+            <span class="pattern__head">
+              <span class="chip" style="background:#4477AA">1</span>
+              <span class="pattern__title">最北 → 最南東</span>
+              <span class="badge badge--gold" style="margin-left:auto">3 回</span>
+            </span>
+            <dl class="pattern__route">
+              <dt>DAY I</dt><dd>第 1 次 最北 <span class="soft">／</span> 第 2 次 最北</dd>
+              <dt>DAY II</dt><dd>第 1 次 最南東 <span class="soft">／</span> 第 2 次 最南東</dd>
+            </dl>
+            <div class="meter" aria-hidden="true"><span style="width:50%"></span></div>
+            <span class="t-xs soft">6 回中 3 回、最後の記録 2026-10-12</span>
+          </button>
+        </li>
+        <li>
+          <button class="pattern" type="button" data-pattern="1" aria-pressed="false">
+            <span class="pattern__head">
+              <span class="chip" style="background:#EE6677">2</span>
+              <span class="pattern__title">中央西 → 最東</span>
+              <span class="badge" style="margin-left:auto">2 回</span>
+            </span>
+            <dl class="pattern__route">
+              <dt>DAY I</dt><dd>第 1 次 中央西 <span class="soft">／</span> 第 2 次 中央西</dd>
+              <dt>DAY II</dt><dd>第 1 次 最東</dd>
+            </dl>
+            <div class="meter" aria-hidden="true"><span style="width:33%"></span></div>
+            <span class="t-xs soft">6 回中 2 回、最後の記録 2026-10-03</span>
+          </button>
+        </li>
+        <li>
+          <button class="pattern" type="button" data-pattern="2" aria-pressed="false">
+            <span class="pattern__head">
+              <span class="chip" style="background:#228833">3</span>
+              <span class="pattern__title">最西 → 中央東</span>
+              <span class="badge" style="margin-left:auto">1 回</span>
+            </span>
+            <dl class="pattern__route">
+              <dt>DAY I</dt><dd>第 1 次 最西</dd>
+              <dt>DAY II</dt><dd>第 1 次 中央東</dd>
+            </dl>
+            <div class="meter" aria-hidden="true"><span style="width:17%"></span></div>
+            <span class="t-xs soft">6 回中 1 回、最後の記録 2026-09-21</span>
+          </button>
+        </li>
+      </ul>
+      <div class="divider" aria-hidden="true">◆</div>
+      <a class="btn btn--primary btn--block" href="record.html">この条件で記録する</a>
+    </section>
+  </aside>
+
+  <section class="layout__main" aria-label="マップ">
+    <div class="panel panel--ornate panel--fill">
+      <span class="corners"></span>
+      <div class="map-toolbar">
+        <div class="row">
+          <span class="eyebrow">Limveld</span>
+          <span class="serif" style="color:var(--gold-bright)">三つ首の獣 ／ 地変なし ／ 北東の教会</span>
+        </div>
+        <div class="segmented" data-toggle-group data-day-filter style="width:220px">
+          <button type="button" aria-pressed="true" data-day="all">すべて</button>
+          <button type="button" aria-pressed="false" data-day="1"><span class="display">DAY I</span></button>
+          <button type="button" aria-pressed="false" data-day="2"><span class="display">DAY II</span></button>
+        </div>
+      </div>
+      <div class="map-frame">
+        <div class="mock-map" style="height:100%" data-label="マップ。選んだパターンの実際の収縮先" data-layers="pattern,spawn" data-day="all" data-spawn="0" data-patterns="[[3,6],[1,4],[10,5]]" data-seconds="[[3,6],[1,null],[null,null]]" data-active="0"></div>
+        <div class="map-legend" aria-hidden="true">
+          <span><i style="border:1.5px solid var(--gold-bright);border-radius:50%"></i>開始地点</span>
+          <span><i style="border:2px solid #4477AA;border-radius:50%"></i>第 1 次の収縮</span>
+          <span><i style="background:#4477AA;transform:rotate(45deg) scale(0.8)"></i>第 2 次の収縮</span>
+          <span>I ／ II は日</span>
+        </div>
+        <div class="map-zoom">
+          <button class="btn btn--secondary btn--icon" type="button" aria-label="拡大">＋</button>
+          <button class="btn btn--secondary btn--icon" type="button" aria-label="縮小">－</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="mock.js"></script>
+</body>
+</html>

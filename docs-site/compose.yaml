@@ -1,0 +1,18 @@
+# 仕様書のサイトだけを起動する。アプリ本体の docker-compose.yml(リポジトリの直下)とは別に管理する
+# 起動: docker compose -f docs-site/compose.yaml up -d  →  http://localhost:8000
+# 停止: docker compose -f docs-site/compose.yaml down
+name: nightreign-docs
+
+services:
+  docs:
+    image: squidfunk/mkdocs-material:9
+    ports:
+      - "8000:8000"
+    volumes:
+      # 文書の中身は読み取り専用で渡す。サイトから文書を書き換えない
+      - ../docs:/work/docs:ro
+      - .:/work/docs-site:ro
+      # 画面の試作が使う画像。hooks/copy_frontend_public.py がサイトに写す
+      - ../frontend/public:/work/frontend/public:ro
+    working_dir: /work/docs-site
+    command: serve --dev-addr=0.0.0.0:8000

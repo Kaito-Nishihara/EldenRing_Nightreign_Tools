@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="NightreignTools.Backend/NightreignTools.Backend.csproj" />
+  <Project Path="NightreignTools.Backend.Tests/NightreignTools.Backend.Tests.csproj" />
+</Solution>

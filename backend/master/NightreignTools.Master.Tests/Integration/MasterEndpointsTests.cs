@@ -22,6 +22,22 @@ public class MasterEndpointsTests(MasterServiceFactory factory) : IClassFixture<
     }
 
     [Fact]
+    public async Task AC_ADM_23_夜の王と地変は初期データの並び順で返りDLCのものが最後に来る()
+    {
+        var bosses = await GetArrayAsync("/api/v1/bosses");
+        var jihen = await GetArrayAsync("/api/v1/jihen");
+
+        Assert.Equal(
+            ["gladius", "edere", "gnostor", "maris", "libra", "fulgor", "caligo", "nameless", "harmonia", "strages"],
+            bosses.Select(b => b.GetProperty("id").GetString() ?? "").ToArray());
+        Assert.Equal(
+            ["crater", "mountain", "rotted_forest", "noklateo", "great_cavern"],
+            jihen.Select(j => j.GetProperty("id").GetString() ?? "").ToArray());
+        Assert.True(bosses[^1].GetProperty("isDlc").GetBoolean());
+        Assert.True(jihen[^1].GetProperty("isDlc").GetBoolean());
+    }
+
+    [Fact]
     public async Task AC_DB_04_night_bossesは35件を返しdayが1のものは14件である()
     {
         var nightBosses = await GetArrayAsync("/api/v1/night-bosses");

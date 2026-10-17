@@ -13,6 +13,9 @@
   </Folder>
   <Folder Name="/record/">
     <Project Path="record/NightreignTools.Record.Domain/NightreignTools.Record.Domain.csproj" />
+    <Project Path="record/NightreignTools.Record.Application/NightreignTools.Record.Application.csproj" />
+    <Project Path="record/NightreignTools.Record.Infrastructure/NightreignTools.Record.Infrastructure.csproj" />
+    <Project Path="record/NightreignTools.Record.Api/NightreignTools.Record.Api.csproj" />
     <Project Path="record/NightreignTools.Record.Tests/NightreignTools.Record.Tests.csproj" />
   </Folder>
 </Solution>

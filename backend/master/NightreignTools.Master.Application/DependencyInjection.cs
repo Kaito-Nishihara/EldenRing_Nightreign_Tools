@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using NightreignTools.Master.Application.Masters;
 
 namespace NightreignTools.Master.Application;
 
@@ -7,6 +8,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        services.AddScoped<IMasterCatalogService, MasterCatalogService>();
         return services;
     }
 }

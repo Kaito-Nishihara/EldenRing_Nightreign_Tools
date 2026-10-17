@@ -48,6 +48,8 @@ function MapCanvasInner({
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [mapImage, setMapImage] = useState<HTMLImageElement | null>(null);
+  /** 利用者が拡大か移動をしたか。するまでは、枠の大きさが変わるたびに全体が収まるよう合わせ直す */
+  const interacted = useRef(false);
 
   /** コンテナサイズの変更を監視してステージサイズを更新する */
   useEffect(() => {
@@ -55,10 +57,17 @@ function MapCanvasInner({
 
     const updateSize = () => {
       if (containerRef.current) {
-        setStageSize({
+        const size = {
           width: containerRef.current.offsetWidth,
           height: containerRef.current.offsetHeight,
-        });
+        };
+        setStageSize(size);
+        // 表示の大きさに合わせて全体を縮め、真ん中に置く(画面の共通仕様 3.8)
+        if (!interacted.current && size.width > 0 && size.height > 0) {
+          const fit = Math.min(Math.max(Math.min(size.width / width, size.height / height), MIN_SCALE), MAX_SCALE);
+          setScale(fit);
+          setPosition({ x: (size.width - width * fit) / 2, y: (size.height - height * fit) / 2 });
+        }
       }
     };
 
@@ -68,7 +77,7 @@ function MapCanvasInner({
     observer.observe(containerRef.current);
 
     return () => observer.disconnect();
-  }, []);
+  }, [width, height]);
 
   /** マップ画像を読み込む */
   useEffect(() => {
@@ -88,6 +97,7 @@ function MapCanvasInner({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (e: any) => {
       e.evt.preventDefault();
+      interacted.current = true;
 
       const stage = e.target.getStage();
       if (!stage) return;
@@ -137,6 +147,7 @@ function MapCanvasInner({
   const handleDragEnd = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (e: any) => {
+      interacted.current = true;
       setPosition({
         x: e.target.x(),
         y: e.target.y(),

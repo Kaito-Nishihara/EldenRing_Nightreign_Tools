@@ -107,8 +107,8 @@ flowchart LR
 
 ```csharp
 // Program.cs の一部
-var api = app.MapGroup("/api/v1")
-    .AddEndpointFilter<ServiceKeyFilter>();
+app.UseMiddleware<ServiceKeyMiddleware>();
+var api = app.MapGroup("/api/v1");
 api.MapMasterEndpoints();
 api.MapPatternEndpoints();
 api.MapPlayRecordEndpoints();
@@ -116,7 +116,7 @@ api.MapGroup("/admin").MapAdminEndpoints();
 ```
 
 - 機能ごとに `Map<機能>Endpoints` の拡張メソッドを 1 つ作る。
-- サービス間キーの検証は、`/api/v1` のグループに 1 回だけ付ける。エンドポイントごとに付けない。付け忘れを防ぐためである。
+- サービス間キーの検証は、ミドルウェアで 1 回だけ行う。`/health` を除くすべてのパスで、ルートを探す前に確かめる。エンドポイントごとに付けると付け忘れが起き、ルートの後で確かめると、キーのない要求に 404 と 401 のどちらを返すかで、どのパスがあるかを知られるためである。
 - Gateway は今のとおり、ルーティングを `Program.cs` に集める。Gateway のエンドポイントは 2 つしかないためである。
 
 ### 5.4 例外と HTTP の応答

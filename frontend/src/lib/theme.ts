@@ -45,6 +45,13 @@ export const MAP_STYLE = {
   spawnDimmedOpacity: 0.45,
   /** 拠点候補地の印の地 */
   baseMarkerFill: "rgba(26, 22, 18, 0.85)",
+  /** パターンの第 1 次の中心に置く、日の丸の半径 */
+  dayChipRadius: 18,
+  /** 第 2 次の菱形の一辺と、第 1 次の中心とつなぐ破線 */
+  secondPointSize: 20,
+  secondPointDash: [6, 5],
+  /** 開始地点から第 1 次の中心へつなぐ線の太さ */
+  routeStrokeWidth: 4,
 } as const;
 
 /**

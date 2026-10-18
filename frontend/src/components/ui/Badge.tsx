@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 
-export type BadgeTone = "neutral" | "gold" | "tide" | "grace";
+export type BadgeTone = "neutral" | "azure" | "tide" | "grace";
 
 const TONE_CLASSES: Record<BadgeTone, string> = {
   neutral: "border-line-strong text-ash-soft",
-  gold: "border-gold text-gold",
+  azure: "border-azure text-azure",
   tide: "border-tide text-tide",
   grace: "border-grace text-grace",
 };

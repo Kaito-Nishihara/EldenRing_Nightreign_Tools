@@ -58,14 +58,14 @@ export default function ConditionPanel({
                 onClick={() => onChange({ bossId: selected ? null : boss.id })}
                 className={`flex min-h-11 items-center gap-2 border px-2 text-left text-sm transition-colors duration-200 ease-out ${
                   selected
-                    ? "border-gold bg-gradient-to-r from-gold/15 to-transparent text-ash shadow-[inset_2px_0_0_var(--color-gold)]"
-                    : "border-line text-ash hover:border-gold-deep"
+                    ? "border-azure bg-gradient-to-r from-azure/15 to-transparent text-ash shadow-[inset_2px_0_0_var(--color-azure)]"
+                    : "border-line text-ash hover:border-azure-deep"
                 }`}
               >
                 <span
                   aria-hidden
                   className={`flex h-7 w-7 flex-none items-center justify-center border font-serif text-sm font-extrabold ${
-                    selected ? "border-gold text-gold-bright" : "border-gold-deep text-gold"
+                    selected ? "border-azure text-azure-bright" : "border-azure-deep text-azure"
                   }`}
                 >
                   {bossSigil(boss)}
@@ -77,7 +77,7 @@ export default function ConditionPanel({
           })}
         </div>
         {hiddenCount > 0 && !expanded && (
-          <button type="button" onClick={() => setShowAll(true)} className="mt-2 min-h-11 w-full text-sm text-gold hover:underline">
+          <button type="button" onClick={() => setShowAll(true)} className="mt-2 min-h-11 w-full text-sm text-azure hover:underline">
             ほかの {hiddenCount} 体を表示
           </button>
         )}
@@ -87,7 +87,7 @@ export default function ConditionPanel({
             {bosses
               .find((boss) => boss.id === bossId)
               ?.weaknesses.map((weakness) => (
-                <Badge key={weakness} tone="gold">
+                <Badge key={weakness} tone="azure">
                   {weakness}
                 </Badge>
               ))}

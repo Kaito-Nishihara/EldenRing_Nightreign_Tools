@@ -120,7 +120,7 @@ function PatternSearchPage() {
               <span aria-hidden className="font-display text-xs uppercase tracking-display text-ash-soft">
                 Limveld
               </span>
-              <span className="truncate font-serif text-sm font-extrabold text-gold-bright">{conditionText}</span>
+              <span className="truncate font-serif text-sm font-extrabold text-azure-bright">{conditionText}</span>
             </p>
             <SegmentedControl
               ariaLabel="マップに出す日"

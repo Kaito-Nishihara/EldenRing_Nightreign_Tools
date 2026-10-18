@@ -26,7 +26,7 @@ export default function BuildPage() {
   return (
     <div className="min-h-full">
       <div className="flex items-center justify-between gap-3 px-4 pt-4">
-        <h1 className="font-serif text-2xl font-extrabold text-gold-bright">ビルドシミュレーター</h1>
+        <h1 className="font-serif text-2xl font-extrabold text-azure-bright">ビルドシミュレーター</h1>
         {/* 保存していないので失うものが少なく、確かめの枠は出さない(ビルドシミュレーター 3.1) */}
         <Button variant="ghost" onClick={resetAll}>
           すべて外す

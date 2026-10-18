@@ -9,7 +9,7 @@ export default function MapLegend({ color }: { color: string }) {
       className="pointer-events-none absolute bottom-2 left-2 flex max-w-[calc(100%-5rem)] flex-wrap gap-x-3 gap-y-1 border border-line bg-night/85 px-2 py-1 text-xs text-ash-soft"
     >
       <span className="flex items-center gap-1">
-        <i className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-gold-bright" />
+        <i className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-azure-bright" />
         開始地点
       </span>
       <span className="flex items-center gap-1">

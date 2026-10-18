@@ -12,7 +12,7 @@ const NAV_ITEMS = [
 
 /**
  * 全画面に共通のヘッダー。高さ 56px。
- * 左に英字の飾りと題、右に 3 つの入口。今いる画面の入口は金の文字と下線にし、aria-current を付ける。
+ * 左に英字の飾りと題、右に 3 つの入口。今いる画面の入口は青の文字と下線にし、aria-current を付ける。
  * 管理の画面では入口を出さず、ADMIN の印だけを出す。
  */
 export default function SiteHeader() {
@@ -22,7 +22,7 @@ export default function SiteHeader() {
   return (
     <header className="flex h-14 flex-none items-center justify-between gap-3 border-b border-line bg-night/90 px-3 md:px-6">
       <Link href="/" className="flex min-w-0 items-baseline gap-2 md:gap-3">
-        <span className="font-display text-sm font-bold tracking-display text-gold-bright md:text-base">
+        <span className="font-display text-sm font-bold tracking-display text-azure-bright md:text-base">
           NIGHTREIGN
         </span>
         <span className="hidden truncate font-serif text-sm text-ash-soft sm:inline">収縮パターン帳</span>
@@ -40,7 +40,7 @@ export default function SiteHeader() {
                 href={item.href}
                 aria-current={current ? "page" : undefined}
                 className={`flex items-center whitespace-nowrap border-b-2 px-2 text-sm transition-colors duration-200 ease-out md:px-4 ${
-                  current ? "border-gold text-gold" : "border-transparent text-ash-soft hover:text-gold-bright"
+                  current ? "border-azure text-azure" : "border-transparent text-ash-soft hover:text-azure-bright"
                 }`}
               >
                 {item.label}

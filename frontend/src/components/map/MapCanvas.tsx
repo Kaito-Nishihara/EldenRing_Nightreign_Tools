@@ -187,7 +187,7 @@ function MapCanvasInner({
       </Stage>
 
       {/* ズーム表示 */}
-      <div className="absolute bottom-2 right-2 border border-line bg-night/85 px-2 font-display text-xs tracking-display text-gold-bright">
+      <div className="absolute bottom-2 right-2 border border-line bg-night/85 px-2 font-display text-xs tracking-display text-azure-bright">
         {Math.round(scale * 100)}%
       </div>
     </div>

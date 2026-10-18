@@ -18,4 +18,14 @@ describe("lib/theme.ts(画面の共通仕様 3.2)", () => {
       expect(match?.[1].toLowerCase()).toBe(value.toLowerCase());
     }
   });
+
+  it("AC-UI-04: ページの地は #070b16、本文の文字は #e4eaf3 である", () => {
+    const css = readFileSync(join(__dirname, "../app/globals.css"), "utf8");
+    const body = css.match(/body\s*\{[^}]*\}/)?.[0] ?? "";
+
+    expect(body).toContain("background-color: var(--color-night);");
+    expect(body).toContain("color: var(--color-ash);");
+    expect(THEME.night).toBe("#070b16");
+    expect(THEME.ash).toBe("#e4eaf3");
+  });
 });

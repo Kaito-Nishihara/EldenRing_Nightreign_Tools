@@ -63,6 +63,37 @@ export interface BasePoint {
   y: number;
 }
 
+/** 管理用の API が受け持つ場所の種類(マスタの管理 4.2)。API のパスの一部になる */
+export type AdminPlaceKind = "spawn-points" | "shrink-zones" | "second-shrink-points" | "base-points";
+
+/** 管理用の開始地点。プレイヤー向けの形に isHidden を足したもの */
+export interface AdminSpawnPoint extends SpawnPoint {
+  isHidden: boolean;
+}
+
+/** 管理用の収縮候補地 */
+export interface AdminShrinkZone extends ShrinkZone {
+  isHidden: boolean;
+}
+
+/** 管理用の第二収縮地点 */
+export interface AdminSecondShrinkPoint extends SecondShrinkPoint {
+  isHidden: boolean;
+}
+
+/** 管理用の拠点候補地 */
+export interface AdminBasePoint extends BasePoint {
+  isHidden: boolean;
+}
+
+/** 種類ごとの、管理用の API の出力の形 */
+export interface AdminPlaceDtoMap {
+  "spawn-points": AdminSpawnPoint;
+  "shrink-zones": AdminShrinkZone;
+  "second-shrink-points": AdminSecondShrinkPoint;
+  "base-points": AdminBasePoint;
+}
+
 /** パターン */
 export interface Pattern {
   patternIndex: number;

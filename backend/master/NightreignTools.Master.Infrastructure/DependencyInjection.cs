@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using NightreignTools.Master.Application.Admin;
 using NightreignTools.Master.Application.Masters;
 using NightreignTools.Master.Application.References;
 using NightreignTools.Master.Infrastructure.Persistence;
@@ -17,6 +18,7 @@ public static class DependencyInjection
 
         services.AddScoped<IMasterReadRepository, MasterReadRepository>();
         services.AddScoped<IReferenceRepository, ReferenceRepository>();
+        services.AddScoped<IMapPlaceAdminRepository, MapPlaceAdminRepository>();
         return services;
     }
 }

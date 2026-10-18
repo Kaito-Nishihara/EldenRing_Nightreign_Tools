@@ -25,6 +25,8 @@ services:
       - RELIC_SERVICE_URL=http://relic-service:8083
       - SERVICE_KEY=${SERVICE_KEY}
       - CORS_ORIGINS=${CORS_ORIGINS:-}
+      # 管理用の鍵。16 文字以上。ないか短いと Gateway が起動しない(マスタの管理 4.3)
+      - ADMIN_KEY=${ADMIN_KEY}
 
   # master-service: マスタの取得と管理(サービスの共通構成 5.1)
   master-service:

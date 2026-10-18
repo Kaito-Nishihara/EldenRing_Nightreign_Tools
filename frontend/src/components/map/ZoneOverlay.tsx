@@ -53,13 +53,13 @@ export default function ZoneOverlay({ zones, selectedEntries = [], activeZoneId,
               />
             )}
 
-            {/* 中心の印。選んだものは tide で塗り、今入力しているスロットの収縮先は gold-bright の線にする */}
+            {/* 中心の印。選んだものは tide で塗り、今入力しているスロットの収縮先は azure-bright の線にする */}
             <Circle
               x={zone.centerX}
               y={zone.centerY}
               radius={markerRadius}
               fill={isSelected ? THEME.tide : MAP_STYLE.zoneMarkerFill}
-              stroke={isActive ? THEME.goldBright : THEME.tide}
+              stroke={isActive ? THEME.azureBright : THEME.tide}
               strokeWidth={MAP_STYLE.zoneStrokeWidth}
               hitStrokeWidth={18}
               onClick={() => onZoneSelect?.(zone)}
@@ -74,7 +74,7 @@ export default function ZoneOverlay({ zones, selectedEntries = [], activeZoneId,
               text={label}
               fontSize={16}
               fontStyle="bold"
-              fill={isActive ? THEME.goldBright : THEME.ash}
+              fill={isActive ? THEME.azureBright : THEME.ash}
               stroke={THEME.night}
               strokeWidth={MAP_STYLE.labelStrokeWidth}
               fillAfterStrokeEnabled

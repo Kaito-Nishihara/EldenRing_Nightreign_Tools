@@ -18,7 +18,7 @@ interface SegmentedControlProps<T extends string> {
 
 /**
  * 2 から 4 の選択肢を横に並べた切り替え(画面の共通仕様 3.7)。1 日目と 2 日目の切り替えなどに使う。
- * 選んだものは金の文字と下の線にし、aria-pressed を付ける。色だけで選んだことを示さない。
+ * 選んだものは青の文字と下の線にし、aria-pressed を付ける。色だけで選んだことを示さない。
  */
 export default function SegmentedControl<T extends string>({
   options,
@@ -39,7 +39,7 @@ export default function SegmentedControl<T extends string>({
             onClick={() => onChange(option.value)}
             className={`min-h-11 flex-1 whitespace-nowrap border-b-2 px-3 text-sm transition-colors duration-200 ease-out ${
               option.display ? "font-display tracking-display" : ""
-            } ${pressed ? "border-gold bg-night-sunk text-gold" : "border-transparent text-ash-soft hover:text-gold-bright"}`}
+            } ${pressed ? "border-azure bg-night-sunk text-azure" : "border-transparent text-ash-soft hover:text-azure-bright"}`}
           >
             {option.label}
           </button>

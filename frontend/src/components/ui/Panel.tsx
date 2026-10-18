@@ -5,7 +5,7 @@ interface PanelProps extends ComponentPropsWithoutRef<"section"> {
   ornate?: boolean;
 }
 
-/** 飾り枠の 1 つの角。長さ 12px の gold-deep の鉤形の線 */
+/** 飾り枠の 1 つの角。長さ 12px の azure-deep の鉤形の線 */
 const CORNERS = [
   "-left-px -top-px border-l border-t",
   "-right-px -top-px border-r border-t",
@@ -24,7 +24,7 @@ export default function Panel({ ornate = false, className = "", children, ...pro
     >
       {ornate &&
         CORNERS.map((position) => (
-          <span key={position} aria-hidden className={`pointer-events-none absolute h-3 w-3 border-gold-deep ${position}`} />
+          <span key={position} aria-hidden className={`pointer-events-none absolute h-3 w-3 border-azure-deep ${position}`} />
         ))}
       {children}
     </section>

@@ -95,7 +95,7 @@ export default function BasePointMarkers({
                   <Circle
                     radius={MARKER_SIZE / 2 + 2}
                     fill={MAP_STYLE.zoneMarkerFill}
-                    stroke={THEME.goldBright}
+                    stroke={THEME.azureBright}
                     strokeWidth={2}
                   />
                   <KonvaImage
@@ -193,7 +193,7 @@ export default function BasePointMarkers({
                                 x={iconSize / 2}
                                 y={iconSize / 2}
                                 radius={iconSize / 2 + 2}
-                                stroke={THEME.goldBright}
+                                stroke={THEME.azureBright}
                                 strokeWidth={2}
                               />
                             )}

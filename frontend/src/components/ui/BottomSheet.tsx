@@ -19,7 +19,7 @@ export default function BottomSheet({ handleLabel, defaultOpen = false, children
   const contentId = useId();
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-20 flex max-h-[75dvh] flex-col border-t border-gold-deep bg-night-raised md:static md:z-auto md:max-h-none md:border-0 md:bg-transparent">
+    <div className="fixed inset-x-0 bottom-0 z-20 flex max-h-[75dvh] flex-col border-t border-azure-deep bg-night-raised md:static md:z-auto md:max-h-none md:border-0 md:bg-transparent">
       <button
         type="button"
         aria-expanded={open}

@@ -20,10 +20,10 @@ interface EmptyStateProps {
 export function EmptyState({ title, description, action }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center gap-3 border border-dashed border-line px-4 py-8 text-center">
-      <span aria-hidden className="text-gold-deep">
+      <span aria-hidden className="text-azure-deep">
         ◆ ◆ ◆
       </span>
-      <p className="font-serif text-base font-extrabold text-gold-bright">{title}</p>
+      <p className="font-serif text-base font-extrabold text-azure-bright">{title}</p>
       {description && <p className="text-sm text-ash-soft">{description}</p>}
       {action}
     </div>

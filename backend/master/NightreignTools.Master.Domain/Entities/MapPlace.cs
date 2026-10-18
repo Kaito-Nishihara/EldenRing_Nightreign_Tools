@@ -6,11 +6,13 @@ namespace NightreignTools.Master.Domain.Entities;
 /// </summary>
 public abstract class MapPlace
 {
+    /// <summary>識別子。初期データは 1000 以下、管理の画面で足した行は 1001 から。</summary>
     public int Id { get; private set; }
 
     /// <summary>非表示にした日時。null は表示中。</summary>
     public DateTime? HiddenAt { get; private set; }
 
+    /// <summary>行を作った日時(UTC)。データベースの既定値で入る。</summary>
     public DateTime CreatedAt { get; private set; }
 
     public bool IsHidden => HiddenAt is not null;

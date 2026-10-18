@@ -37,6 +37,7 @@
 | [決定の記録 0013](decisions/0013-hide-masters-instead-of-delete.md) | マスタを消さずに非表示にする |
 | [決定の記録 0014](decisions/0014-deploy-to-aws-ecs.md) | AWS の ECS on Fargate に配置し、GitHub Actions で配る |
 | [決定の記録 0015](decisions/0015-migrate-before-deploy.md) | ステージングと本番では、配置の前にマイグレーションを適用する |
+| [決定の記録 0016](decisions/0016-publish-game-images.md) | ゲームの画像を公開の場で使う |
 
 仕様に迷ったときは、要件定義を正本とする。
 図や試作と要件定義が食い違っていたら、要件定義が正しい。

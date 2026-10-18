@@ -57,7 +57,9 @@ docker compose up --build
 ## ドキュメント
 
 仕様書は `docs/` にある。
-次のコマンドで、ブラウザで読めるサイトを起動できる。
+公開しているサイトは https://kaito-nishihara.github.io/EldenRing_Nightreign_Tools/ にある。`main` に入った変更が反映される。
+
+手元では、次のコマンドでサイトを起動できる。
 
 ```bash
 docker compose -f docs-site/compose.yaml up -d

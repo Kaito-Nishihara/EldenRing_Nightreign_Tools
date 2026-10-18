@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- record-service の Infrastructure。データベースとの出し入れと、master-service の呼び出しを受け持つ(サービスの共通構成 5.3) -->
+
+  <ItemGroup>
+    <!-- dotnet ef でマイグレーションを作るときだけ使う。公開する成果物には入れない -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <!-- master-service を呼ぶときの期限と再試行 -->
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NightreignTools.Record.Application\NightreignTools.Record.Application.csproj" />
+    <ProjectReference Include="..\NightreignTools.Record.Domain\NightreignTools.Record.Domain.csproj" />
+    <ProjectReference Include="..\..\shared\NightreignTools.ServiceDefaults\NightreignTools.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="NightreignTools.Record.Tests" />
+  </ItemGroup>
+
+</Project>

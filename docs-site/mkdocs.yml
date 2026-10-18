@@ -3,6 +3,9 @@
 # 起動: docker compose -f docs-site/compose.yaml up -d  →  http://localhost:8000
 site_name: 収縮パターン帳 仕様書
 site_description: エルデンリング ナイトレインの収縮パターン帳の要件定義、設計、画面の試作
+# 公開先の URL。GitHub Pages に置くときだけ、ワークフロー(.github/workflows/docs.yml)が渡す。
+# 手元では空にして、http://localhost:8000/ の直下で開けるようにする
+site_url: !ENV [SITE_URL, '']
 docs_dir: ../docs
 site_dir: /tmp/site
 use_directory_urls: true
@@ -111,3 +114,4 @@ nav:
       - 0013 マスタを消さずに非表示にする: decisions/0013-hide-masters-instead-of-delete.md
       - 0014 AWS の ECS on Fargate に配置する: decisions/0014-deploy-to-aws-ecs.md
       - 0015 配置の前にマイグレーションを適用する: decisions/0015-migrate-before-deploy.md
+      - 0016 ゲームの画像を公開の場で使う: decisions/0016-publish-game-images.md

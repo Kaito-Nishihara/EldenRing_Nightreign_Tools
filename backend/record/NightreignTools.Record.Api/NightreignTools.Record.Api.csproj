@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- record-service の入口。登録の組み立てとエンドポイントだけを書く(サービスの共通構成 5.3) -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\NightreignTools.Record.Application\NightreignTools.Record.Application.csproj" />
+    <ProjectReference Include="..\NightreignTools.Record.Infrastructure\NightreignTools.Record.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\shared\NightreignTools.ServiceDefaults\NightreignTools.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>

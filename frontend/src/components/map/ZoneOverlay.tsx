@@ -17,6 +17,8 @@ interface ZoneOverlayProps {
   activeZoneId?: number | null;
   /** 中心の印を押したときの動き */
   onZoneSelect?: (zone: ShrinkZone) => void;
+  /** 印を押せるか。false なら薄い印にし、押しても何も起きない(プレイ記録 3.3) */
+  pickable?: boolean;
 }
 
 /**
@@ -25,7 +27,7 @@ interface ZoneOverlayProps {
  * 円の中は動ける場所なので塗らない(外の暗がりは ShrinkOverlay が塗る)。
  * 親の MapCanvas が dynamic import で SSR から隔離しているので、require で react-konva を取る。
  */
-export default function ZoneOverlay({ zones, selectedEntries = [], activeZoneId, onZoneSelect }: ZoneOverlayProps) {
+export default function ZoneOverlay({ zones, selectedEntries = [], activeZoneId, onZoneSelect, pickable = true }: ZoneOverlayProps) {
   /* eslint-disable @typescript-eslint/no-require-imports */
   const { Circle, Text, Group } = require("react-konva");
   /* eslint-enable @typescript-eslint/no-require-imports */
@@ -55,6 +57,8 @@ export default function ZoneOverlay({ zones, selectedEntries = [], activeZoneId,
 
             {/* 中心の印。選んだものは tide で塗り、今入力しているスロットの収縮先は azure-bright の線にする */}
             <Circle
+              opacity={pickable ? 1 : MAP_STYLE.inactiveZoneOpacity}
+              listening={pickable}
               x={zone.centerX}
               y={zone.centerY}
               radius={markerRadius}

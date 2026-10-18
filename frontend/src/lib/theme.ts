@@ -50,6 +50,10 @@ export const MAP_STYLE = {
   /** 第 2 次の菱形の一辺と、第 1 次の中心とつなぐ破線 */
   secondPointSize: 20,
   secondPointDash: [6, 5],
+  /** 同じ日の第 1 次の円の外にある第二収縮地点の不透明度(プレイ記録 3.3) */
+  dimmedPointOpacity: 0.4,
+  /** 第 2 次のスロットを選んでいる間の、押せない収縮候補地の印の不透明度(プレイ記録 3.3) */
+  inactiveZoneOpacity: 0.35,
   /** 開始地点から第 1 次の中心へつなぐ線の太さ */
   routeStrokeWidth: 4,
 } as const;

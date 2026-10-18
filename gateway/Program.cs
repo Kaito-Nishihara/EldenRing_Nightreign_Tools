@@ -33,6 +33,7 @@ builder.Services.AddHealthChecks();
 // record-service は master-service を呼ぶので(最長 10 秒)、record-cluster の期限は 15 秒にしてある
 OverrideDestination("MASTER_SERVICE_URL", "master-cluster", "master");
 OverrideDestination("RECORD_SERVICE_URL", "record-cluster", "record");
+OverrideDestination("RELIC_SERVICE_URL", "relic-cluster", "relic");
 
 void OverrideDestination(string variable, string cluster, string destination)
 {

@@ -56,6 +56,11 @@ export const MAP_STYLE = {
   inactiveZoneOpacity: 0.35,
   /** 開始地点から第 1 次の中心へつなぐ線の太さ */
   routeStrokeWidth: 4,
+  /** 管理の画面で、直している収縮候補地の円の破線(マスタの管理 3.3) */
+  editingDash: [12, 8],
+  /** 管理の画面で、非表示の行の印の点線と不透明度(マスタの管理 3.3) */
+  hiddenDash: [3, 4],
+  hiddenOpacity: 0.6,
 } as const;
 
 /**

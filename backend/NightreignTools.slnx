@@ -18,6 +18,13 @@
     <Project Path="record/NightreignTools.Record.Api/NightreignTools.Record.Api.csproj" />
     <Project Path="record/NightreignTools.Record.Tests/NightreignTools.Record.Tests.csproj" />
   </Folder>
+  <Folder Name="/relic/">
+    <Project Path="relic/NightreignTools.Relic.Domain/NightreignTools.Relic.Domain.csproj" />
+    <Project Path="relic/NightreignTools.Relic.Application/NightreignTools.Relic.Application.csproj" />
+    <Project Path="relic/NightreignTools.Relic.Infrastructure/NightreignTools.Relic.Infrastructure.csproj" />
+    <Project Path="relic/NightreignTools.Relic.Api/NightreignTools.Relic.Api.csproj" />
+    <Project Path="relic/NightreignTools.Relic.Tests/NightreignTools.Relic.Tests.csproj" />
+  </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/NightreignTools.SchemaDoc/NightreignTools.SchemaDoc.csproj" />
     <Project Path="tools/NightreignTools.SchemaDoc.Tests/NightreignTools.SchemaDoc.Tests.csproj" />

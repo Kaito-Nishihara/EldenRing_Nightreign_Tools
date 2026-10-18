@@ -23,12 +23,24 @@ public static class GatewayErrorResponse
             _ => ReasonPhrases.GetReasonPhrase(status),
         };
 
-        return http.Response.WriteAsJsonAsync(new
+        return WriteBodyAsync(http, status, message);
+    }
+
+    /// <summary>
+    /// Gateway が自分で応答を返すときに、状態と本文を書く。管理用の鍵の誤り(401)と回数の超過(429)に使う
+    /// </summary>
+    public static Task WriteAsync(HttpContext http, int status, string message)
+    {
+        http.Response.StatusCode = status;
+        return WriteBodyAsync(http, status, message);
+    }
+
+    private static Task WriteBodyAsync(HttpContext http, int status, string message) =>
+        http.Response.WriteAsJsonAsync(new
         {
             status,
             error = ReasonPhrases.GetReasonPhrase(status),
             message,
             timestamp = DateTime.UtcNow,
         }, http.RequestAborted);
-    }
 }

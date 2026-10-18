@@ -111,3 +111,4 @@ nav:
       - 0012 バックエンドを機能ごとに 3 つのサービスに分ける: decisions/0012-split-services-by-feature.md
       - 0013 マスタを消さずに非表示にする: decisions/0013-hide-masters-instead-of-delete.md
       - 0016 ゲームの画像を公開の場で使う: decisions/0016-publish-game-images.md
+      - 0017 テーブルの定義書をエンティティから作る: decisions/0017-schema-doc-from-entities.md

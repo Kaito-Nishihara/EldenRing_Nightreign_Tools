@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- relic-service の Infrastructure。データベースとの出し入れと、遺物の効果の初期データを受け持つ(サービスの共通構成 5.3) -->
+
+  <ItemGroup>
+    <!-- dotnet ef でマイグレーションを作るときだけ使う。公開する成果物には入れない -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NightreignTools.Relic.Application\NightreignTools.Relic.Application.csproj" />
+    <ProjectReference Include="..\NightreignTools.Relic.Domain\NightreignTools.Relic.Domain.csproj" />
+    <ProjectReference Include="..\..\shared\NightreignTools.ServiceDefaults\NightreignTools.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="NightreignTools.Relic.Tests" />
+  </ItemGroup>
+
+</Project>

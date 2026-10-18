@@ -70,6 +70,27 @@ services:
       retries: 10
       start_period: 10s
 
+  # relic-service: ビルドシミュレーターの遺物の効果のマスタ(サービスの共通構成 5.1)
+  relic-service:
+    build:
+      context: ./backend
+      dockerfile: relic/Dockerfile
+    # 8083 はコンテナの間だけに公開する(実行環境 5.1)
+    expose:
+      - "8083"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - SERVICE_KEY=${SERVICE_KEY}
+      - ConnectionStrings__Default=Host=db;Port=5432;Database=nightreign_relic;Username=nightreign_relic;Password=${RELIC_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8083/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
   db:
     image: postgres:16
     ports:

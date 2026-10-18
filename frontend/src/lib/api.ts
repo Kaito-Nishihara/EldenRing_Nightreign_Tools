@@ -10,7 +10,8 @@ import type {
   SecondShrinkPoint,
   SpawnPoint,
   PatternResponse,
-  PlayRecordRequest,
+  CreatePlayRecordRequest,
+  CreatePlayRecordResponse,
 } from "@/types";
 
 /**
@@ -96,16 +97,10 @@ export async function getPatterns(
 }
 
 /**
- * プレイ記録を作成する
- * @param request - プレイ記録リクエスト
+ * プレイ記録を保存する(プレイ記録 4 章)。受け持ちは record-service
  */
-export async function createPlayRecord(
-  request: PlayRecordRequest
-): Promise<{ id: number; createdAt: string }> {
-  const response = await apiClient.post<{ id: number; createdAt: string }>(
-    "/api/v1/play-records",
-    request
-  );
+export async function createPlayRecord(request: CreatePlayRecordRequest): Promise<CreatePlayRecordResponse> {
+  const response = await apiClient.post<CreatePlayRecordResponse>("/api/v1/play-records", request);
   return response.data;
 }
 

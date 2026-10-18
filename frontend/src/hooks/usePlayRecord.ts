@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import type { PlayRecordRequest, ShrinkEntryRequest } from "@/types";
+import type { CreatePlayRecordEntry, CreatePlayRecordRequest } from "@/types";
 import { createPlayRecord } from "@/lib/api";
 
 /** localStorage保存キー */
@@ -193,11 +193,12 @@ export function usePlayRecord(): UsePlayRecordReturn {
       return;
     }
 
-    const entries: ShrinkEntryRequest[] = [];
+    const entries: CreatePlayRecordEntry[] = [];
     for (const [key, zoneId] of Object.entries(form.entries)) {
       if (zoneId !== null) {
         const [d, p] = key.split("-").map(Number);
-        entries.push({ day: d as 1 | 2, phase: p as 1 | 2, zoneId });
+        // 第 2 次は第二収縮地点で送る(決定の記録 0008)。この画面は次の PR で作り直す
+        entries.push({ day: d as 1 | 2, phase: p as 1 | 2, zoneId: p === 1 ? zoneId : null, secondShrinkPointId: p === 2 ? zoneId : null });
       }
     }
 
@@ -206,11 +207,13 @@ export function usePlayRecord(): UsePlayRecordReturn {
       return;
     }
 
-    const request: PlayRecordRequest = {
+    const request: CreatePlayRecordRequest = {
       bossId: form.bossId,
       jihenId: form.jihenId,
       spawnPointId: form.spawnPointId,
-      note: form.note || undefined,
+      day1NightBossId: null,
+      day2NightBossId: null,
+      note: form.note || null,
       entries,
     };
 

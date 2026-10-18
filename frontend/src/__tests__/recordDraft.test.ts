@@ -4,6 +4,7 @@ import {
   emptyDraft,
   fillSlot,
   firstEmptySlot,
+  firstEmptySlotOfDay,
   missingRequirements,
   parseDraft,
   toRequest,
@@ -47,6 +48,13 @@ describe("lib/recordDraft のスロット(プレイ記録 3.2)", () => {
     const draft = { ...emptyDraft(), slots: { "1-1": 1, "1-2": null, "2-1": 3, "2-2": null } };
 
     expect(firstEmptySlot(draft)).toEqual({ day: 1, phase: 2 });
+  });
+
+  it("日を替えたときは、その日の最初の空いたスロットを選ぶ。両方入れていれば null", () => {
+    const draft = { ...emptyDraft(), slots: { "1-1": 1, "1-2": 2, "2-1": 3, "2-2": null } };
+
+    expect(firstEmptySlotOfDay(draft, 2)).toEqual({ day: 2, phase: 2 });
+    expect(firstEmptySlotOfDay(draft, 1)).toBeNull();
   });
 });
 

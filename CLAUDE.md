@@ -98,6 +98,9 @@ Docker が起動していないときは、確かめられないことを利用�
 - Python でファイルを直すときは、Windows のパス(`\N` など)を含む文字列を、普通の文字列リテラルに書かない。エスケープとして読まれて壊れる。
 - 日本語を含む応答を `curl` や Python の `print` でそのまま見ると、文字が化ける。化けても中身は正しいことが多いので、比べるときは UTF-8 で読み直すか、識別子と数で確かめる。
 - Git Bash から `docker compose run` に `/src/...` のようなパスを渡すときは、先頭に `MSYS_NO_PATHCONV=1` を付ける。付けないとパスが Windows の形に書き換えられる。
+- ホストの IDE(Visual Studio)が開いていると、新しいプロジェクトの `obj/` に Windows のパスで restore の結果を書く。コンテナの restore と build が止まるか失敗するので、その `obj/` と `bin/` を消してからコンテナで restore し直す。
+- コンテナから外のネットワークにつながらないことがある(ホストからはつながる)。NuGet の restore が止まったら、`dotnet restore NightreignTools.slnx --source /root/.nuget/packages` で手元のキャッシュから restore する。キャッシュにないパッケージが要るときは、Docker Desktop を起動し直してもらう。
+- Playwright のコンテナから画面(3000)を開くときは `--network host` を付ける。画面は `localhost:8080` の Gateway を呼ぶので、`host.docker.internal` で開くと API が届かず、接続のエラーの表示になる。
 
 ## 文章の規約
 

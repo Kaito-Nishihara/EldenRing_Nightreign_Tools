@@ -151,62 +151,6 @@ export async function adminUpdatePlace<K extends AdminPlaceKind>(
   return response.data;
 }
 
-/** 管理用: 開始地点を登録する */
-export async function adminCreateSpawnPoint(
-  data: Omit<SpawnPoint, "id">
-): Promise<SpawnPoint> {
-  const response = await apiClient.post<SpawnPoint>(
-    "/api/v1/admin/spawn-points",
-    data
-  );
-  return response.data;
-}
-
-/** 管理用: 開始地点を更新する */
-export async function adminUpdateSpawnPoint(
-  id: number,
-  data: Omit<SpawnPoint, "id">
-): Promise<SpawnPoint> {
-  const response = await apiClient.put<SpawnPoint>(
-    `/api/v1/admin/spawn-points/${id}`,
-    data
-  );
-  return response.data;
-}
-
-/** 管理用: 開始地点を削除する */
-export async function adminDeleteSpawnPoint(id: number): Promise<void> {
-  await apiClient.delete(`/api/v1/admin/spawn-points/${id}`);
-}
-
-/** 管理用: 収縮候補地を登録する */
-export async function adminCreateShrinkZone(
-  data: Omit<ShrinkZone, "id">
-): Promise<ShrinkZone> {
-  const response = await apiClient.post<ShrinkZone>(
-    "/api/v1/admin/shrink-zones",
-    data
-  );
-  return response.data;
-}
-
-/** 管理用: 収縮候補地を更新する */
-export async function adminUpdateShrinkZone(
-  id: number,
-  data: Omit<ShrinkZone, "id">
-): Promise<ShrinkZone> {
-  const response = await apiClient.put<ShrinkZone>(
-    `/api/v1/admin/shrink-zones/${id}`,
-    data
-  );
-  return response.data;
-}
-
-/** 管理用: 収縮候補地を削除する */
-export async function adminDeleteShrinkZone(id: number): Promise<void> {
-  await apiClient.delete(`/api/v1/admin/shrink-zones/${id}`);
-}
-
 /**
  * 夜ボス一覧を取得する
  */
@@ -223,34 +167,6 @@ export async function getSecondShrinkPoints(): Promise<SecondShrinkPoint[]> {
   return response.data;
 }
 
-/** 管理用: 第二収縮地点候補を登録する */
-export async function adminCreateSecondShrinkPoint(
-  data: Omit<SecondShrinkPoint, "id">
-): Promise<SecondShrinkPoint> {
-  const response = await apiClient.post<SecondShrinkPoint>(
-    "/api/v1/admin/second-shrink-points",
-    data
-  );
-  return response.data;
-}
-
-/** 管理用: 第二収縮地点候補を更新する */
-export async function adminUpdateSecondShrinkPoint(
-  id: number,
-  data: Omit<SecondShrinkPoint, "id">
-): Promise<SecondShrinkPoint> {
-  const response = await apiClient.put<SecondShrinkPoint>(
-    `/api/v1/admin/second-shrink-points/${id}`,
-    data
-  );
-  return response.data;
-}
-
-/** 管理用: 第二収縮地点候補を削除する */
-export async function adminDeleteSecondShrinkPoint(id: number): Promise<void> {
-  await apiClient.delete(`/api/v1/admin/second-shrink-points/${id}`);
-}
-
 /**
  * 拠点候補地一覧を取得する（マップIDで絞り込み）
  * @param mapId - マップ識別子（デフォルト: normal）
@@ -260,34 +176,6 @@ export async function getBasePoints(mapId: string = "normal"): Promise<BasePoint
     params: { mapId },
   });
   return response.data;
-}
-
-/** 管理用: 拠点候補地を登録する */
-export async function adminCreateBasePoint(
-  data: Omit<BasePoint, "id">
-): Promise<BasePoint> {
-  const response = await apiClient.post<BasePoint>(
-    "/api/v1/admin/base-points",
-    data
-  );
-  return response.data;
-}
-
-/** 管理用: 拠点候補地を更新する */
-export async function adminUpdateBasePoint(
-  id: number,
-  data: Omit<BasePoint, "id">
-): Promise<BasePoint> {
-  const response = await apiClient.put<BasePoint>(
-    `/api/v1/admin/base-points/${id}`,
-    data
-  );
-  return response.data;
-}
-
-/** 管理用: 拠点候補地を削除する */
-export async function adminDeleteBasePoint(id: number): Promise<void> {
-  await apiClient.delete(`/api/v1/admin/base-points/${id}`);
 }
 
 /**

@@ -95,20 +95,31 @@ export interface PatternResponse {
   patterns: Pattern[];
 }
 
-/** プレイ記録リクエスト */
-export interface PlayRecordRequest {
+/** プレイ記録の保存の入力(POST /api/v1/play-records、プレイ記録 4 章) */
+export interface CreatePlayRecordRequest {
   bossId: string;
-  jihenId?: string | null;
+  jihenId: string | null;
   spawnPointId: number;
-  note?: string;
-  entries: ShrinkEntryRequest[];
+  day1NightBossId: number | null;
+  day2NightBossId: number | null;
+  note: string | null;
+  entries: CreatePlayRecordEntry[];
 }
 
-/** 収縮エントリリクエスト */
-export interface ShrinkEntryRequest {
+/**
+ * 保存する収縮先。第 1 次は zoneId(収縮候補地)だけ、第 2 次は secondShrinkPointId(第二収縮地点)だけを持つ(決定の記録 0008)。
+ */
+export interface CreatePlayRecordEntry {
   day: 1 | 2;
   phase: 1 | 2;
-  zoneId: number;
+  zoneId: number | null;
+  secondShrinkPointId: number | null;
+}
+
+/** プレイ記録の保存の出力(201) */
+export interface CreatePlayRecordResponse {
+  id: number;
+  createdAt: string;
 }
 
 // ==========================================

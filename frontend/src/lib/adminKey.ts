@@ -5,6 +5,9 @@
 
 export const ADMIN_KEY_STORAGE_KEY = "nightreign_admin_key";
 
+/** 鍵が合わないときの文言。Gateway の 401 の文言と同じにする(マスタの管理 4.2) */
+export const ADMIN_KEY_INVALID_MESSAGE = "管理用の鍵が違います";
+
 const listeners = new Set<() => void>();
 
 function notify(): void {

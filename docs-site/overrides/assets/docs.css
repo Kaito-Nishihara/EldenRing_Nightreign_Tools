@@ -1,4 +1,4 @@
-/* 仕様書サイトの見た目。アプリと同じ夜の地と金の配色、明朝の見出しに合わせる(画面の共通仕様 3.2、3.3) */
+/* 仕様書サイトの見た目。アプリと同じ紺の地と青の配色、明朝の見出しに合わせる(画面の共通仕様 3.2、3.3) */
 @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+JP:wght@400;700&family=Shippori+Mincho+B1:wght@600;800&display=swap");
 
 :root {
@@ -10,32 +10,32 @@
 
 /* 暗い配色だけを使う。Material の slate を土台に、アプリの色へ置き換える */
 [data-md-color-scheme="slate"] {
-  --doc-night: #0e0c0a;
-  --doc-raised: #1a1612;
-  --doc-sunk: #24201a;
-  --doc-ash: #e8dfcc;
-  --doc-ash-soft: #a89c86;
-  --doc-gold: #c9a45c;
-  --doc-gold-bright: #e6c886;
-  --doc-gold-deep: #8a6d32;
-  --doc-tide: #8c7cf0;
-  --doc-ember: #d0654a;
-  --doc-line: #3a3226;
+  --doc-night: #070b16;
+  --doc-raised: #0e1526;
+  --doc-sunk: #172038;
+  --doc-ash: #e4eaf3;
+  --doc-ash-soft: #8f9ab0;
+  --doc-azure: #5b93ff;
+  --doc-azure-bright: #a8c8ff;
+  --doc-azure-deep: #3b63b3;
+  --doc-tide: #b18cff;
+  --doc-ember: #ec6a72;
+  --doc-line: #1f2a44;
 
   --md-hue: 35;
   --md-default-bg-color: var(--doc-night);
   --md-default-fg-color: var(--doc-ash);
   --md-default-fg-color--light: var(--doc-ash-soft);
-  --md-default-fg-color--lighter: #7a6f5e;
+  --md-default-fg-color--lighter: #66718a;
   --md-default-fg-color--lightest: var(--doc-line);
   --md-primary-fg-color: var(--doc-raised);
   --md-primary-fg-color--light: var(--doc-sunk);
   --md-primary-fg-color--dark: var(--doc-night);
-  --md-primary-bg-color: var(--doc-gold-bright);
+  --md-primary-bg-color: var(--doc-azure-bright);
   --md-primary-bg-color--light: var(--doc-ash-soft);
-  --md-accent-fg-color: var(--doc-gold-bright);
+  --md-accent-fg-color: var(--doc-azure-bright);
   --md-typeset-color: var(--doc-ash);
-  --md-typeset-a-color: var(--doc-gold);
+  --md-typeset-a-color: var(--doc-azure);
   --md-code-bg-color: var(--doc-sunk);
   --md-code-fg-color: var(--doc-ash);
   --md-typeset-table-color: var(--doc-line);
@@ -43,11 +43,11 @@
   --md-footer-bg-color--dark: var(--doc-night);
 }
 
-/* 上から差す金の光と、細かい粒の模様 */
+/* 上から差す青の光と、細かい粒の模様 */
 [data-md-color-scheme="slate"] body {
   background-image:
-    radial-gradient(ellipse 70% 40% at 50% -10%, rgba(201, 164, 92, 0.08), transparent 70%),
-    radial-gradient(rgba(232, 223, 204, 0.03) 1px, transparent 1px);
+    radial-gradient(ellipse 70% 40% at 50% -10%, rgba(91, 147, 255, 0.08), transparent 70%),
+    radial-gradient(rgba(228, 234, 243, 0.03) 1px, transparent 1px);
   background-size: 100% 100%, 3px 3px;
   background-attachment: fixed;
 }
@@ -60,29 +60,29 @@
 .md-typeset { font-size: 0.8rem; line-height: 1.95; }
 .md-typeset p { margin: 0.9em 0; }
 
-/* 見出しは明朝体の金にする */
+/* 見出しは明朝体の青にする */
 .md-typeset h1,
 .md-typeset h2,
 .md-typeset h3 {
   font-family: var(--doc-serif);
   letter-spacing: 0.04em;
-  color: var(--doc-gold-bright);
+  color: var(--doc-azure-bright);
 }
 .md-typeset h1 {
   font-weight: 800;
   padding-bottom: 0.5em;
   margin-bottom: 1.2em;
-  /* 両端が透けて消える金の線 */
+  /* 両端が透けて消える青の線 */
   border-bottom: 1px solid transparent;
-  border-image: linear-gradient(to right, transparent, var(--doc-gold-deep) 20%, var(--doc-gold-deep) 80%, transparent) 1;
+  border-image: linear-gradient(to right, transparent, var(--doc-azure-deep) 20%, var(--doc-azure-deep) 80%, transparent) 1;
 }
 .md-typeset h2 {
   font-weight: 800;
   margin-top: 2.4em;
   padding-left: 0.7em;
-  border-left: 2px solid var(--doc-gold);
+  border-left: 2px solid var(--doc-azure);
 }
-.md-typeset h3 { font-weight: 600; margin-top: 2em; color: var(--doc-gold); }
+.md-typeset h3 { font-weight: 600; margin-top: 2em; color: var(--doc-azure); }
 .md-typeset h4 { font-weight: 700; color: var(--doc-ash-soft); }
 
 /* 表は一段持ち上げた地に置き、横にあふれたら表だけを横に送る */
@@ -102,12 +102,12 @@
 /* 1 列目のコード(識別子、パス)は語の途中で折り返さない */
 .md-typeset table:not([class]) td:first-child code { white-space: nowrap; }
 
-/* リンクは金にする。slate の既定は、配色の属性の組み合わせで青を上書きしてくるので、ここで直接指定する */
-.md-typeset a { color: var(--doc-gold); }
-.md-typeset a:hover { color: var(--doc-gold-bright); }
+/* リンクは差し色の青にする。slate の既定の色が、配色の属性の組み合わせで上書きしてくるので、ここで直接指定する */
+.md-typeset a { color: var(--doc-azure); }
+.md-typeset a:hover { color: var(--doc-azure-bright); }
 
-/* 太字は金で引き立てる。文章の規約で、太字は要所にだけ使うことになっている */
-.md-typeset strong { color: var(--doc-gold-bright); }
+/* 太字は青で引き立てる。文章の規約で、太字は要所にだけ使うことになっている */
+.md-typeset strong { color: var(--doc-azure-bright); }
 .md-typeset table strong { color: inherit; }
 
 .md-typeset code { border-radius: 0; padding: 0.1em 0.35em; font-size: 0.86em; }
@@ -122,7 +122,7 @@
 
 .md-nav { font-size: 0.72rem; }
 .md-nav__item .md-nav__link--active,
-.md-nav__item .md-nav__link--active:hover { font-weight: 700; color: var(--doc-gold-bright); }
+.md-nav__item .md-nav__link--active:hover { font-weight: 700; color: var(--doc-azure-bright); }
 
 @media print {
   .md-typeset h2, .md-typeset h3 { break-after: avoid; }
@@ -135,8 +135,8 @@
   width: 100%;
   height: 640px;
   overflow: hidden;
-  border: 1px solid var(--doc-gold-deep, #8a6d32);
-  background: #0e0c0a;
+  border: 1px solid var(--doc-azure-deep, #3b63b3);
+  background: #070b16;
   margin: 0.8em 0;
 }
 .screen-frame--phone { max-width: 390px; }

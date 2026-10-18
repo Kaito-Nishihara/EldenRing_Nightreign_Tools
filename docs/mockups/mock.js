@@ -167,7 +167,7 @@
     });
   }
 
-  /** 開始地点。アプリと同じ spawn.webp を置き、選んだものは大きくして金の輪で囲む */
+  /** 開始地点。アプリと同じ spawn.webp を置き、選んだものは大きくして青の輪で囲む */
   function drawSpawns(svg, selected) {
     DATA.spawns.forEach(function (s, i) {
       var isSelected = selected === i;

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using NightreignTools.Relic.Domain;
+using NightreignTools.Relic.Domain.Entities;
 using NightreignTools.ServiceDefaults.Persistence;
 
 namespace NightreignTools.Relic.Infrastructure.Persistence;
@@ -11,6 +12,10 @@ namespace NightreignTools.Relic.Infrastructure.Persistence;
 /// </summary>
 public sealed class RelicDbContext(DbContextOptions<RelicDbContext> options) : DbContext(options)
 {
+    public DbSet<RelicEffectCategory> RelicEffectCategories => Set<RelicEffectCategory>();
+    public DbSet<RelicEffect> RelicEffects => Set<RelicEffect>();
+    public DbSet<RelicEffectRank> RelicEffectRanks => Set<RelicEffectRank>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema(DatabaseServiceCollectionExtensions.Schema);

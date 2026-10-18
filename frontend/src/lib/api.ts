@@ -12,6 +12,8 @@ import type {
   PatternResponse,
   CreatePlayRecordRequest,
   CreatePlayRecordResponse,
+  AdminPlaceDtoMap,
+  AdminPlaceKind,
 } from "@/types";
 
 /**
@@ -107,6 +109,47 @@ export async function createPlayRecord(request: CreatePlayRecordRequest): Promis
 // ==========================================
 // 管理画面用API
 // ==========================================
+
+/** 管理用の鍵を付ける見出し(マスタの管理 3.1)。プレイヤー向けの API には付けない */
+function adminHeaders(adminKey: string) {
+  return { "X-Admin-Key": adminKey };
+}
+
+/** 管理用: 種類ごとの一覧。非表示の行も入る(マスタの管理 4.2) */
+export async function adminListPlaces<K extends AdminPlaceKind>(
+  kind: K,
+  adminKey: string
+): Promise<AdminPlaceDtoMap[K][]> {
+  const response = await apiClient.get<AdminPlaceDtoMap[K][]>(`/api/v1/admin/${kind}`, {
+    headers: adminHeaders(adminKey),
+  });
+  return response.data;
+}
+
+/** 管理用: 登録する。作った行を返す */
+export async function adminCreatePlace<K extends AdminPlaceKind>(
+  kind: K,
+  request: object,
+  adminKey: string
+): Promise<AdminPlaceDtoMap[K]> {
+  const response = await apiClient.post<AdminPlaceDtoMap[K]>(`/api/v1/admin/${kind}`, request, {
+    headers: adminHeaders(adminKey),
+  });
+  return response.data;
+}
+
+/** 管理用: 修正、非表示、表示に戻す。直した行を返す */
+export async function adminUpdatePlace<K extends AdminPlaceKind>(
+  kind: K,
+  id: number,
+  request: object,
+  adminKey: string
+): Promise<AdminPlaceDtoMap[K]> {
+  const response = await apiClient.put<AdminPlaceDtoMap[K]>(`/api/v1/admin/${kind}/${id}`, request, {
+    headers: adminHeaders(adminKey),
+  });
+  return response.data;
+}
 
 /** 管理用: 開始地点を登録する */
 export async function adminCreateSpawnPoint(

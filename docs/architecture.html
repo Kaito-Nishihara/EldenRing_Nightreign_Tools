@@ -10,20 +10,20 @@
 <style>
   /* 色は「画面の共通仕様」3.2 の値。この図は暗い配色だけで描く */
   :root {
-    --night: #0e0c0a; --raised: #1a1612; --sunk: #24201a;
-    --ash: #e8dfcc; --ash-soft: #a89c86;
-    --gold: #c9a45c; --gold-bright: #e6c886; --gold-deep: #8a6d32;
-    --tide: #8c7cf0; --ember: #d0654a; --grace: #9cc08a; --line: #3a3226;
+    --night: #070b16; --raised: #0e1526; --sunk: #172038;
+    --ash: #e4eaf3; --ash-soft: #8f9ab0;
+    --azure: #5b93ff; --azure-bright: #a8c8ff; --azure-deep: #3b63b3;
+    --tide: #b18cff; --ember: #ec6a72; --grace: #86c9a0; --line: #1f2a44;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0; background: var(--night); color: var(--ash);
-    background-image: radial-gradient(ellipse 70% 40% at 50% -10%, rgba(201,164,92,.08), transparent 70%);
+    background-image: radial-gradient(ellipse 70% 40% at 50% -10%, rgba(91,147,255,.08), transparent 70%);
     font-family: "Noto Sans JP", "Hiragino Sans", sans-serif; line-height: 1.8;
   }
   main { max-width: 1080px; margin: 0 auto; padding: 32px 16px 64px; }
   .eyebrow { font-family: "Cinzel", serif; font-size: 12px; letter-spacing: .18em; color: var(--ash-soft); text-transform: uppercase; }
-  h1, h2 { font-family: "Shippori Mincho B1", serif; font-weight: 800; color: var(--gold-bright); margin: 0 0 8px; letter-spacing: .04em; }
+  h1, h2 { font-family: "Shippori Mincho B1", serif; font-weight: 800; color: var(--azure-bright); margin: 0 0 8px; letter-spacing: .04em; }
   h1 { font-size: 28px; }
   h2 { font-size: 20px; margin-top: 40px; }
   p { margin: 0 0 12px; }
@@ -35,7 +35,7 @@
   th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
   th { color: var(--ash-soft); font-weight: 400; background: var(--sunk); }
   code { font-family: Consolas, monospace; font-size: 13px; background: var(--sunk); padding: 1px 4px; }
-  a { color: var(--gold); }
+  a { color: var(--azure); }
 </style>
 </head>
 <body>
@@ -50,75 +50,75 @@
     <svg viewBox="0 0 1000 470" role="img" aria-label="ブラウザから Next.js、Gateway、3 つのサービス、PostgreSQL への構成図">
       <defs>
         <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-          <path d="M0 0 L10 5 L0 10 Z" fill="#c9a45c"/>
+          <path d="M0 0 L10 5 L0 10 Z" fill="#5b93ff"/>
         </marker>
         <marker id="arrow-tide" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-          <path d="M0 0 L10 5 L0 10 Z" fill="#8c7cf0"/>
+          <path d="M0 0 L10 5 L0 10 Z" fill="#b18cff"/>
         </marker>
       </defs>
       <!-- Docker Compose の枠 -->
-      <rect x="170" y="20" width="810" height="430" fill="none" stroke="#3a3226" stroke-dasharray="6 6"/>
-      <text x="186" y="44" fill="#a89c86" font-size="13">Docker Compose</text>
+      <rect x="170" y="20" width="810" height="430" fill="none" stroke="#1f2a44" stroke-dasharray="6 6"/>
+      <text x="186" y="44" fill="#8f9ab0" font-size="13">Docker Compose</text>
 
       <!-- ブラウザ -->
-      <rect x="20" y="200" width="120" height="80" fill="#24201a" stroke="#7a6a4e"/>
-      <text x="80" y="235" fill="#e8dfcc" font-size="15" text-anchor="middle">ブラウザ</text>
-      <text x="80" y="257" fill="#a89c86" font-size="12" text-anchor="middle">スマホ、PC</text>
+      <rect x="20" y="200" width="120" height="80" fill="#172038" stroke="#5a70a8"/>
+      <text x="80" y="235" fill="#e4eaf3" font-size="15" text-anchor="middle">ブラウザ</text>
+      <text x="80" y="257" fill="#8f9ab0" font-size="12" text-anchor="middle">スマホ、PC</text>
 
       <!-- frontend -->
-      <rect x="200" y="70" width="160" height="100" fill="#1a1612" stroke="#8a6d32"/>
-      <text x="280" y="100" fill="#e6c886" font-size="16" text-anchor="middle" font-weight="700">frontend</text>
-      <text x="280" y="122" fill="#e8dfcc" font-size="13" text-anchor="middle">Next.js 15</text>
-      <text x="280" y="142" fill="#a89c86" font-size="12" text-anchor="middle">画面、ビルドの計算</text>
-      <text x="280" y="160" fill="#a89c86" font-size="12" text-anchor="middle">:3000</text>
+      <rect x="200" y="70" width="160" height="100" fill="#0e1526" stroke="#3b63b3"/>
+      <text x="280" y="100" fill="#a8c8ff" font-size="16" text-anchor="middle" font-weight="700">frontend</text>
+      <text x="280" y="122" fill="#e4eaf3" font-size="13" text-anchor="middle">Next.js 15</text>
+      <text x="280" y="142" fill="#8f9ab0" font-size="12" text-anchor="middle">画面、ビルドの計算</text>
+      <text x="280" y="160" fill="#8f9ab0" font-size="12" text-anchor="middle">:3000</text>
 
       <!-- gateway -->
-      <rect x="385" y="190" width="190" height="110" fill="#1a1612" stroke="#c9a45c" stroke-width="1.5"/>
-      <text x="480" y="218" fill="#e6c886" font-size="16" text-anchor="middle" font-weight="700">gateway</text>
-      <text x="480" y="240" fill="#e8dfcc" font-size="13" text-anchor="middle">ASP.NET Core + YARP</text>
-      <text x="480" y="260" fill="#a89c86" font-size="12" text-anchor="middle">CORS、管理用の鍵、振り分け</text>
-      <text x="480" y="280" fill="#a89c86" font-size="12" text-anchor="middle">:8080(外に出す)</text>
+      <rect x="385" y="190" width="190" height="110" fill="#0e1526" stroke="#5b93ff" stroke-width="1.5"/>
+      <text x="480" y="218" fill="#a8c8ff" font-size="16" text-anchor="middle" font-weight="700">gateway</text>
+      <text x="480" y="240" fill="#e4eaf3" font-size="13" text-anchor="middle">ASP.NET Core + YARP</text>
+      <text x="480" y="260" fill="#8f9ab0" font-size="12" text-anchor="middle">CORS、管理用の鍵、振り分け</text>
+      <text x="480" y="280" fill="#8f9ab0" font-size="12" text-anchor="middle">:8080(外に出す)</text>
 
       <!-- 3 つのサービス -->
-      <rect x="610" y="70" width="190" height="90" fill="#1a1612" stroke="#8a6d32"/>
-      <text x="705" y="98" fill="#e6c886" font-size="15" text-anchor="middle" font-weight="700">master-service :8081</text>
-      <text x="705" y="120" fill="#a89c86" font-size="12" text-anchor="middle">マスタの取得と管理</text>
-      <text x="705" y="140" fill="#a89c86" font-size="12" text-anchor="middle">/api/v1 のそのほか、/admin</text>
+      <rect x="610" y="70" width="190" height="90" fill="#0e1526" stroke="#3b63b3"/>
+      <text x="705" y="98" fill="#a8c8ff" font-size="15" text-anchor="middle" font-weight="700">master-service :8081</text>
+      <text x="705" y="120" fill="#8f9ab0" font-size="12" text-anchor="middle">マスタの取得と管理</text>
+      <text x="705" y="140" fill="#8f9ab0" font-size="12" text-anchor="middle">/api/v1 のそのほか、/admin</text>
 
-      <rect x="610" y="200" width="190" height="90" fill="#1a1612" stroke="#8a6d32"/>
-      <text x="705" y="228" fill="#e6c886" font-size="15" text-anchor="middle" font-weight="700">record-service :8082</text>
-      <text x="705" y="250" fill="#a89c86" font-size="12" text-anchor="middle">プレイ記録、パターン検索</text>
-      <text x="705" y="270" fill="#a89c86" font-size="12" text-anchor="middle">/patterns、/play-records</text>
+      <rect x="610" y="200" width="190" height="90" fill="#0e1526" stroke="#3b63b3"/>
+      <text x="705" y="228" fill="#a8c8ff" font-size="15" text-anchor="middle" font-weight="700">record-service :8082</text>
+      <text x="705" y="250" fill="#8f9ab0" font-size="12" text-anchor="middle">プレイ記録、パターン検索</text>
+      <text x="705" y="270" fill="#8f9ab0" font-size="12" text-anchor="middle">/patterns、/play-records</text>
 
-      <rect x="610" y="330" width="190" height="90" fill="#1a1612" stroke="#8a6d32"/>
-      <text x="705" y="358" fill="#e6c886" font-size="15" text-anchor="middle" font-weight="700">relic-service :8083</text>
-      <text x="705" y="380" fill="#a89c86" font-size="12" text-anchor="middle">遺物の効果のマスタ</text>
-      <text x="705" y="400" fill="#a89c86" font-size="12" text-anchor="middle">/relic-effects</text>
+      <rect x="610" y="330" width="190" height="90" fill="#0e1526" stroke="#3b63b3"/>
+      <text x="705" y="358" fill="#a8c8ff" font-size="15" text-anchor="middle" font-weight="700">relic-service :8083</text>
+      <text x="705" y="380" fill="#8f9ab0" font-size="12" text-anchor="middle">遺物の効果のマスタ</text>
+      <text x="705" y="400" fill="#8f9ab0" font-size="12" text-anchor="middle">/relic-effects</text>
 
       <!-- db -->
-      <rect x="840" y="160" width="125" height="170" fill="#24201a" stroke="#8c7cf0"/>
-      <text x="902" y="190" fill="#e8dfcc" font-size="15" text-anchor="middle" font-weight="700">db</text>
-      <text x="902" y="210" fill="#a89c86" font-size="12" text-anchor="middle">PostgreSQL 16</text>
-      <text x="902" y="240" fill="#e8dfcc" font-size="11" text-anchor="middle">nightreign_master</text>
-      <text x="902" y="262" fill="#e8dfcc" font-size="11" text-anchor="middle">nightreign_record</text>
-      <text x="902" y="284" fill="#e8dfcc" font-size="11" text-anchor="middle">nightreign_relic</text>
-      <text x="902" y="312" fill="#a89c86" font-size="11" text-anchor="middle">サービスごとに分ける</text>
+      <rect x="840" y="160" width="125" height="170" fill="#172038" stroke="#b18cff"/>
+      <text x="902" y="190" fill="#e4eaf3" font-size="15" text-anchor="middle" font-weight="700">db</text>
+      <text x="902" y="210" fill="#8f9ab0" font-size="12" text-anchor="middle">PostgreSQL 16</text>
+      <text x="902" y="240" fill="#e4eaf3" font-size="11" text-anchor="middle">nightreign_master</text>
+      <text x="902" y="262" fill="#e4eaf3" font-size="11" text-anchor="middle">nightreign_record</text>
+      <text x="902" y="284" fill="#e4eaf3" font-size="11" text-anchor="middle">nightreign_relic</text>
+      <text x="902" y="312" fill="#8f9ab0" font-size="11" text-anchor="middle">サービスごとに分ける</text>
 
       <!-- 矢印 -->
-      <path d="M140 220 L198 150" stroke="#c9a45c" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-      <text x="96" y="170" fill="#a89c86" font-size="12">画面を取る</text>
-      <path d="M140 250 L383 250" stroke="#c9a45c" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-      <text x="200" y="270" fill="#a89c86" font-size="12">/api/v1 を呼ぶ</text>
-      <path d="M575 225 L608 125" stroke="#c9a45c" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-      <path d="M575 245 L608 245" stroke="#c9a45c" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-      <path d="M575 265 L608 365" stroke="#c9a45c" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-      <text x="400" y="330" fill="#e6c886" font-size="12">X-Service-Key を付けて渡す</text>
+      <path d="M140 220 L198 150" stroke="#5b93ff" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <text x="96" y="170" fill="#8f9ab0" font-size="12">画面を取る</text>
+      <path d="M140 250 L383 250" stroke="#5b93ff" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <text x="200" y="270" fill="#8f9ab0" font-size="12">/api/v1 を呼ぶ</text>
+      <path d="M575 225 L608 125" stroke="#5b93ff" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <path d="M575 245 L608 245" stroke="#5b93ff" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <path d="M575 265 L608 365" stroke="#5b93ff" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <text x="400" y="330" fill="#a8c8ff" font-size="12">X-Service-Key を付けて渡す</text>
       <!-- record から master への一方向 -->
-      <path d="M760 200 L760 162" stroke="#8c7cf0" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#arrow-tide)"/>
-      <text x="752" y="186" fill="#8c7cf0" font-size="11" text-anchor="end">参照の確かめ</text>
-      <path d="M800 115 L838 200" stroke="#c9a45c" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-      <path d="M800 245 L838 255" stroke="#c9a45c" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-      <path d="M800 375 L838 300" stroke="#c9a45c" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <path d="M760 200 L760 162" stroke="#b18cff" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#arrow-tide)"/>
+      <text x="752" y="186" fill="#b18cff" font-size="11" text-anchor="end">参照の確かめ</text>
+      <path d="M800 115 L838 200" stroke="#5b93ff" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <path d="M800 245 L838 255" stroke="#5b93ff" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <path d="M800 375 L838 300" stroke="#5b93ff" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
     </svg>
   </div>
 
@@ -128,22 +128,22 @@
     <svg viewBox="0 0 1000 360" role="img" aria-label="記録の保存の流れ">
       <defs>
         <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-          <path d="M0 0 L10 5 L0 10 Z" fill="#c9a45c"/>
+          <path d="M0 0 L10 5 L0 10 Z" fill="#5b93ff"/>
         </marker>
       </defs>
       <g font-size="14" text-anchor="middle">
-        <text x="80" y="30" fill="#e6c886">画面</text>
-        <text x="300" y="30" fill="#e6c886">gateway</text>
-        <text x="520" y="30" fill="#e6c886">record-service</text>
-        <text x="740" y="30" fill="#e6c886">master-service</text>
-        <text x="920" y="30" fill="#e6c886">db</text>
+        <text x="80" y="30" fill="#a8c8ff">画面</text>
+        <text x="300" y="30" fill="#a8c8ff">gateway</text>
+        <text x="520" y="30" fill="#a8c8ff">record-service</text>
+        <text x="740" y="30" fill="#a8c8ff">master-service</text>
+        <text x="920" y="30" fill="#a8c8ff">db</text>
       </g>
-      <g stroke="#3a3226">
+      <g stroke="#1f2a44">
         <line x1="80" y1="42" x2="80" y2="350"/><line x1="300" y1="42" x2="300" y2="350"/>
         <line x1="520" y1="42" x2="520" y2="350"/><line x1="740" y1="42" x2="740" y2="350"/>
         <line x1="920" y1="42" x2="920" y2="350"/>
       </g>
-      <g stroke="#c9a45c" stroke-width="1.5" fill="none">
+      <g stroke="#5b93ff" stroke-width="1.5" fill="none">
         <path d="M80 70 L298 70" marker-end="url(#a2)"/>
         <path d="M300 100 L518 100" marker-end="url(#a2)"/>
         <path d="M520 160 L738 160" marker-end="url(#a2)"/>
@@ -151,13 +151,13 @@
         <path d="M520 260 L918 260" marker-end="url(#a2)"/>
         <path d="M520 310 L82 310" marker-end="url(#a2)"/>
       </g>
-      <g font-size="12" fill="#e8dfcc">
+      <g font-size="12" fill="#e4eaf3">
         <text x="90" y="62">POST /api/v1/play-records</text>
         <text x="310" y="92">X-Service-Key を付け直して渡す</text>
-        <text x="530" y="130" fill="#a89c86">入力の形と、日と段階の規則を確かめる(だめなら 400)</text>
+        <text x="530" y="130" fill="#8f9ab0">入力の形と、日と段階の規則を確かめる(だめなら 400)</text>
         <text x="530" y="152">POST /internal/v1/references/resolve</text>
         <text x="530" y="208">見つかった行と、非表示かどうか(応答がなければ 503)</text>
-        <text x="530" y="235" fill="#a89c86">ない行は 404、非表示は 400。何も保存しない</text>
+        <text x="530" y="235" fill="#8f9ab0">ない行は 404、非表示は 400。何も保存しない</text>
         <text x="530" y="252">nightreign_record に記録と収縮先を 1 つのトランザクションで保存</text>
         <text x="200" y="302">201 { id, createdAt }</text>
       </g>

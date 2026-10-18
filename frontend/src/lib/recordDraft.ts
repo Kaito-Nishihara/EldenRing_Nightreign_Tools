@@ -92,6 +92,11 @@ export function firstEmptySlot(draft: RecordDraft): Slot | null {
   return SLOT_ORDER.find((slot) => draft.slots[slotKey(slot)] === null) ?? null;
 }
 
+/** その日のスロットのうち、最初の空いたスロット。両方入れていれば null。マップの日を替えたときに選ぶ */
+export function firstEmptySlotOfDay(draft: RecordDraft, day: Day): Slot | null {
+  return SLOT_ORDER.find((slot) => slot.day === day && draft.slots[slotKey(slot)] === null) ?? null;
+}
+
 /**
  * スロットに収縮先を入れ、次に選ぶスロットを返す(AC-REC-09、AC-REC-10)。
  * 次は、入れたスロットの後ろから SLOT_ORDER の順に探した、最初の空いたスロットである。空いたスロットがなければ null。

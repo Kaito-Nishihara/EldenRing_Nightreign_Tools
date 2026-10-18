@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import type { ShrinkZone } from "@/types";
 import { MAP_STYLE, THEME } from "@/lib/theme";
 
@@ -40,10 +41,11 @@ export default function ZoneOverlay({ zones, selectedEntries = [], activeZoneId,
         const selectedEntry = selectedEntries.find((entry) => entry.zoneId === zone.id);
         const isSelected = Boolean(selectedEntry);
         const isActive = zone.id === activeZoneId;
-        const label = selectedEntry ? `${selectedEntry.label} ${zone.nameJa}` : zone.nameJa;
+        const label = selectedEntry?.label ? `${selectedEntry.label} ${zone.nameJa}` : zone.nameJa;
 
         return (
-          <Group key={zone.id}>
+          <Fragment key={zone.id}>
+            {/* 選んだ収縮の円は、印を薄くしている間も薄くしない */}
             {isSelected && (
               <Circle
                 x={zone.centerX}
@@ -55,36 +57,36 @@ export default function ZoneOverlay({ zones, selectedEntries = [], activeZoneId,
               />
             )}
 
-            {/* 中心の印。選んだものは tide で塗り、今入力しているスロットの収縮先は azure-bright の線にする */}
-            <Circle
-              opacity={pickable ? 1 : MAP_STYLE.inactiveZoneOpacity}
-              listening={pickable}
-              x={zone.centerX}
-              y={zone.centerY}
-              radius={markerRadius}
-              fill={isSelected ? THEME.tide : MAP_STYLE.zoneMarkerFill}
-              stroke={isActive ? THEME.azureBright : THEME.tide}
-              strokeWidth={MAP_STYLE.zoneStrokeWidth}
-              hitStrokeWidth={18}
-              onClick={() => onZoneSelect?.(zone)}
-              onTap={() => onZoneSelect?.(zone)}
-            />
+            <Group opacity={pickable ? 1 : MAP_STYLE.inactiveZoneOpacity} listening={pickable}>
+              {/* 中心の印。選んだものは tide で塗り、今入力しているスロットの収縮先は azure-bright の線にする */}
+              <Circle
+                x={zone.centerX}
+                y={zone.centerY}
+                radius={markerRadius}
+                fill={isSelected ? THEME.tide : MAP_STYLE.zoneMarkerFill}
+                stroke={isActive ? THEME.azureBright : THEME.tide}
+                strokeWidth={MAP_STYLE.zoneStrokeWidth}
+                hitStrokeWidth={18}
+                onClick={() => onZoneSelect?.(zone)}
+                onTap={() => onZoneSelect?.(zone)}
+              />
 
-            <Text
-              x={zone.centerX - 60}
-              y={zone.centerY - markerRadius - 24}
-              width={120}
-              align="center"
-              text={label}
-              fontSize={16}
-              fontStyle="bold"
-              fill={isActive ? THEME.azureBright : THEME.ash}
-              stroke={THEME.night}
-              strokeWidth={MAP_STYLE.labelStrokeWidth}
-              fillAfterStrokeEnabled
-              listening={false}
-            />
-          </Group>
+              <Text
+                x={zone.centerX - 60}
+                y={zone.centerY - markerRadius - 24}
+                width={120}
+                align="center"
+                text={label}
+                fontSize={16}
+                fontStyle="bold"
+                fill={isActive ? THEME.azureBright : THEME.ash}
+                stroke={THEME.night}
+                strokeWidth={MAP_STYLE.labelStrokeWidth}
+                fillAfterStrokeEnabled
+                listening={false}
+              />
+            </Group>
+          </Fragment>
         );
       })}
     </>

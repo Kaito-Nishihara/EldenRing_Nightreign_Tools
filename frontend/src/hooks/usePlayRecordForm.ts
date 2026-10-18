@@ -134,13 +134,20 @@ export function usePlayRecordForm() {
     }
   }, [draft]);
 
+  // 知らせの部品は閉じる処理が替わると時間を数え直すので、同じ関数を返す
+  const dismissRestored = useCallback(() => setRestored(false), []);
+
+  /** 保存の結果の知らせを閉じる */
+  const dismissSave = useCallback(() => setSave((previous) => (previous.kind === "saving" ? previous : { kind: "idle" })), []);
+
   return {
     draft,
     activeSlot,
     setActiveSlot,
     restored,
-    dismissRestored: () => setRestored(false),
+    dismissRestored,
     save,
+    dismissSave,
     filledCount: filledCount(draft),
     missing: missingRequirements(draft),
     setBossId,

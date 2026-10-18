@@ -1,3 +1,4 @@
+using NightreignTools.Relic.Api.Endpoints;
 using NightreignTools.Relic.Application;
 using NightreignTools.Relic.Infrastructure;
 using NightreignTools.ServiceDefaults;
@@ -18,7 +19,8 @@ var app = builder.Build();
 app.UseServiceDefaults();
 
 // 機能のエンドポイントは /api/v1 のグループに、機能ごとの Map<機能>Endpoints で足す(サービスの共通構成 5.4)
-app.MapGroup("/api/v1");
+var api = app.MapGroup("/api/v1");
+api.MapRelicEffectEndpoints();
 
 return await app.RunServiceAsync();
 

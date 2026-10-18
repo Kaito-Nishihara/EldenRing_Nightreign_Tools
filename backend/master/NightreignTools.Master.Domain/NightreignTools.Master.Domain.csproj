@@ -2,6 +2,13 @@
 
   <!-- master-service の Domain。エンティティと業務の規則だけを持ち、EF Core と ASP.NET Core を知らない(サービスの共通構成 5.3) -->
 
+  <!-- エンティティの <summary> を、テーブルと列の説明にする(データベースの共通仕様 5.8)。
+       説明はテストで漏れを確かめるので、公開のメンバーすべてに説明を求める警告(CS1591)は出さない -->
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\shared\NightreignTools.SharedKernel\NightreignTools.SharedKernel.csproj" />
   </ItemGroup>

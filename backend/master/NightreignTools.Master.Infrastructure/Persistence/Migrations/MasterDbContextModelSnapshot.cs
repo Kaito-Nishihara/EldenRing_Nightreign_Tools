@@ -28,7 +28,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasComment("識別子。初期データは 1000 以下、管理の画面で足した行は 1001 から。");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
                     NpgsqlPropertyBuilderExtensions.HasIdentityOptions(b.Property<int>("Id"), 1001L, null, null, null, null, null);
@@ -37,11 +38,13 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
+                        .HasDefaultValueSql("now()")
+                        .HasComment("行を作った日時(UTC)。データベースの既定値で入る。");
 
                     b.Property<DateTime?>("HiddenAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("hidden_at");
+                        .HasColumnName("hidden_at")
+                        .HasComment("非表示にした日時。null は表示中。");
 
                     b.Property<string>("MapId")
                         .IsRequired()
@@ -49,22 +52,26 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasDefaultValue("normal")
-                        .HasColumnName("map_id");
+                        .HasColumnName("map_id")
+                        .HasComment("どのマップの拠点か。normal は通常のマップ、ほかは地変の識別子。");
 
                     b.Property<string>("NameJa")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("name_ja");
+                        .HasColumnName("name_ja")
+                        .HasComment("日本語の名前。null は名前なし。");
 
                     b.Property<decimal>("X")
                         .HasPrecision(7, 2)
                         .HasColumnType("numeric(7,2)")
-                        .HasColumnName("x");
+                        .HasColumnName("x")
+                        .HasComment("x 座標。1024 四方の座標空間の数。");
 
                     b.Property<decimal>("Y")
                         .HasPrecision(7, 2)
                         .HasColumnType("numeric(7,2)")
-                        .HasColumnName("y");
+                        .HasColumnName("y")
+                        .HasComment("y 座標。1024 四方の座標空間の数。");
 
                     b.HasKey("Id")
                         .HasName("pk_base_points");
@@ -74,6 +81,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
 
                     b.ToTable("base_points", "game", t =>
                         {
+                            t.HasComment("拠点候補地。マップ(通常か地変)ごとに持つ。拠点の種類は持たない(決定の記録 0010)。");
+
                             t.HasCheckConstraint("ck_base_points_x", "x BETWEEN 0 AND 1024");
 
                             t.HasCheckConstraint("ck_base_points_y", "y BETWEEN 0 AND 1024");
@@ -207,49 +216,60 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                     b.Property<string>("Id")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasComment("識別子。英小文字の固定の値。例: gladius。");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
+                        .HasDefaultValueSql("now()")
+                        .HasComment("行を作った日時(UTC)。データベースの既定値で入る。");
 
                     b.Property<string>("ImagePath")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
-                        .HasColumnName("image_path");
+                        .HasColumnName("image_path")
+                        .HasComment("画像のパス。null は画像なし。");
 
                     b.Property<bool>("IsDlc")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(false)
-                        .HasColumnName("is_dlc");
+                        .HasColumnName("is_dlc")
+                        .HasComment("ダウンロードコンテンツで足された夜の王か。");
 
                     b.Property<string>("NameEn")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("name_en");
+                        .HasColumnName("name_en")
+                        .HasComment("英語の名前。");
 
                     b.Property<string>("NameJa")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("name_ja");
+                        .HasColumnName("name_ja")
+                        .HasComment("日本語の名前。");
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("integer")
-                        .HasColumnName("sort_order");
+                        .HasColumnName("sort_order")
+                        .HasComment("画面の選択の欄での並び順。1 から(データベースの共通仕様 5.6)。");
 
                     b.Property<string>("UnlockCondition")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
-                        .HasColumnName("unlock_condition");
+                        .HasColumnName("unlock_condition")
+                        .HasComment("戦えるようになる条件。null は最初から戦える。");
 
                     b.HasKey("Id")
                         .HasName("pk_bosses");
 
-                    b.ToTable("bosses", "game");
+                    b.ToTable("bosses", "game", t =>
+                        {
+                            t.HasComment("夜の王(3 日目に戦う相手)。識別子は英小文字の固定の値。マイグレーションの初期データだけで管理する。");
+                        });
 
                     b.HasData(
                         new
@@ -350,7 +370,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasComment("識別子。");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
                     NpgsqlPropertyBuilderExtensions.HasIdentityOptions(b.Property<int>("Id"), 1001L, null, null, null, null, null);
@@ -359,18 +380,21 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)")
-                        .HasColumnName("attribute");
+                        .HasColumnName("attribute")
+                        .HasComment("弱点の属性。例: holy、fire。");
 
                     b.Property<string>("BossId")
                         .IsRequired()
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("boss_id");
+                        .HasColumnName("boss_id")
+                        .HasComment("夜の王の識別子。");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
+                        .HasDefaultValueSql("now()")
+                        .HasComment("行を作った日時(UTC)。データベースの既定値で入る。");
 
                     b.HasKey("Id")
                         .HasName("pk_boss_weaknesses");
@@ -378,7 +402,10 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                     b.HasIndex("BossId")
                         .HasDatabaseName("ix_boss_weaknesses_boss_id");
 
-                    b.ToTable("boss_weaknesses", "game");
+                    b.ToTable("boss_weaknesses", "game", t =>
+                        {
+                            t.HasComment("夜の王の弱点の属性。例: holy、fire。");
+                        });
 
                     b.HasData(
                         new
@@ -493,61 +520,73 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                     b.Property<string>("Id")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasComment("識別子。英小文字の固定の値。例: crater。");
 
                     b.Property<string>("Area")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("area");
+                        .HasColumnName("area")
+                        .HasComment("地変が起きる方角。例: north、center、all。");
 
                     b.Property<decimal>("CenterX")
                         .HasPrecision(7, 2)
                         .HasColumnType("numeric(7,2)")
-                        .HasColumnName("center_x");
+                        .HasColumnName("center_x")
+                        .HasComment("地変の中心の x 座標。1024 四方の座標空間の数。");
 
                     b.Property<decimal>("CenterY")
                         .HasPrecision(7, 2)
                         .HasColumnType("numeric(7,2)")
-                        .HasColumnName("center_y");
+                        .HasColumnName("center_y")
+                        .HasComment("地変の中心の y 座標。1024 四方の座標空間の数。");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
+                        .HasDefaultValueSql("now()")
+                        .HasComment("行を作った日時(UTC)。データベースの既定値で入る。");
 
                     b.Property<string>("ImagePath")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
-                        .HasColumnName("image_path");
+                        .HasColumnName("image_path")
+                        .HasComment("地変のマップ画像のパス。null は画像なし。");
 
                     b.Property<bool>("IsDlc")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(false)
-                        .HasColumnName("is_dlc");
+                        .HasColumnName("is_dlc")
+                        .HasComment("ダウンロードコンテンツで足された地変か。");
 
                     b.Property<string>("NameJa")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("name_ja");
+                        .HasColumnName("name_ja")
+                        .HasComment("日本語の名前。");
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("integer")
-                        .HasColumnName("sort_order");
+                        .HasColumnName("sort_order")
+                        .HasComment("画面の選択の欄での並び順。1 から(データベースの共通仕様 5.6)。");
 
                     b.Property<string>("UnlockCondition")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
-                        .HasColumnName("unlock_condition");
+                        .HasColumnName("unlock_condition")
+                        .HasComment("起きるようになる条件。null は最初から起きる。");
 
                     b.HasKey("Id")
                         .HasName("pk_jihen");
 
                     b.ToTable("jihen", "game", t =>
                         {
+                            t.HasComment("地変。地変ごとにマップ画像が替わる。中心の座標は 1024 四方の座標空間の数。");
+
                             t.HasCheckConstraint("ck_jihen_center_x", "center_x BETWEEN 0 AND 1024");
 
                             t.HasCheckConstraint("ck_jihen_center_y", "center_y BETWEEN 0 AND 1024");
@@ -616,7 +655,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasComment("識別子。");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
                     NpgsqlPropertyBuilderExtensions.HasIdentityOptions(b.Property<int>("Id"), 1001L, null, null, null, null, null);
@@ -625,23 +665,28 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
+                        .HasDefaultValueSql("now()")
+                        .HasComment("行を作った日時(UTC)。データベースの既定値で入る。");
 
                     b.Property<int>("Day")
                         .HasColumnType("integer")
-                        .HasColumnName("day");
+                        .HasColumnName("day")
+                        .HasComment("出る日。1 か 2。");
 
                     b.Property<string>("NameJa")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("name_ja");
+                        .HasColumnName("name_ja")
+                        .HasComment("日本語の名前。");
 
                     b.HasKey("Id")
                         .HasName("pk_night_bosses");
 
                     b.ToTable("night_bosses", "game", t =>
                         {
+                            t.HasComment("1 日目か 2 日目の夜に出る夜ボス。夜の王とは別に持つ。");
+
                             t.HasCheckConstraint("ck_night_bosses_day", "day IN (1, 2)");
                         });
 
@@ -898,7 +943,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasComment("識別子。初期データは 1000 以下、管理の画面で足した行は 1001 から。");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
                     NpgsqlPropertyBuilderExtensions.HasIdentityOptions(b.Property<int>("Id"), 1001L, null, null, null, null, null);
@@ -907,33 +953,40 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
+                        .HasDefaultValueSql("now()")
+                        .HasComment("行を作った日時(UTC)。データベースの既定値で入る。");
 
                     b.Property<DateTime?>("HiddenAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("hidden_at");
+                        .HasColumnName("hidden_at")
+                        .HasComment("非表示にした日時。null は表示中。");
 
                     b.Property<string>("NameJa")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("name_ja");
+                        .HasColumnName("name_ja")
+                        .HasComment("日本語の名前。");
 
                     b.Property<decimal>("X")
                         .HasPrecision(7, 2)
                         .HasColumnType("numeric(7,2)")
-                        .HasColumnName("x");
+                        .HasColumnName("x")
+                        .HasComment("x 座標。1024 四方の座標空間の数。");
 
                     b.Property<decimal>("Y")
                         .HasPrecision(7, 2)
                         .HasColumnType("numeric(7,2)")
-                        .HasColumnName("y");
+                        .HasColumnName("y")
+                        .HasComment("y 座標。1024 四方の座標空間の数。");
 
                     b.HasKey("Id")
                         .HasName("pk_second_shrink_points");
 
                     b.ToTable("second_shrink_points", "game", t =>
                         {
+                            t.HasComment("第二収縮地点。第 2 次収縮の向かう点(決定の記録 0008)。");
+
                             t.HasCheckConstraint("ck_second_shrink_points_x", "x BETWEEN 0 AND 1024");
 
                             t.HasCheckConstraint("ck_second_shrink_points_y", "y BETWEEN 0 AND 1024");
@@ -1043,7 +1096,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasComment("識別子。初期データは 1000 以下、管理の画面で足した行は 1001 から。");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
                     NpgsqlPropertyBuilderExtensions.HasIdentityOptions(b.Property<int>("Id"), 1001L, null, null, null, null, null);
@@ -1051,44 +1105,53 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("CenterX")
                         .HasPrecision(7, 2)
                         .HasColumnType("numeric(7,2)")
-                        .HasColumnName("center_x");
+                        .HasColumnName("center_x")
+                        .HasComment("円の中心の x 座標。1024 四方の座標空間の数。");
 
                     b.Property<decimal>("CenterY")
                         .HasPrecision(7, 2)
                         .HasColumnType("numeric(7,2)")
-                        .HasColumnName("center_y");
+                        .HasColumnName("center_y")
+                        .HasComment("円の中心の y 座標。1024 四方の座標空間の数。");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
+                        .HasDefaultValueSql("now()")
+                        .HasComment("行を作った日時(UTC)。データベースの既定値で入る。");
 
                     b.Property<DateTime?>("HiddenAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("hidden_at");
+                        .HasColumnName("hidden_at")
+                        .HasComment("非表示にした日時。null は表示中。");
 
                     b.Property<string>("IconPath")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
-                        .HasColumnName("icon_path");
+                        .HasColumnName("icon_path")
+                        .HasComment("アイコンの画像のパス。null はアイコンなし。");
 
                     b.Property<string>("NameJa")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("name_ja");
+                        .HasColumnName("name_ja")
+                        .HasComment("日本語の名前。");
 
                     b.Property<decimal>("Radius")
                         .HasPrecision(7, 2)
                         .HasColumnType("numeric(7,2)")
-                        .HasColumnName("radius");
+                        .HasColumnName("radius")
+                        .HasComment("円の半径。1024 四方の座標空間の数。");
 
                     b.HasKey("Id")
                         .HasName("pk_shrink_zones");
 
                     b.ToTable("shrink_zones", "game", t =>
                         {
+                            t.HasComment("収縮候補地。第 1 次収縮の円の中心と半径。");
+
                             t.HasCheckConstraint("ck_shrink_zones_center_x", "center_x BETWEEN 0 AND 1024");
 
                             t.HasCheckConstraint("ck_shrink_zones_center_y", "center_y BETWEEN 0 AND 1024");
@@ -1212,7 +1275,8 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasComment("識別子。初期データは 1000 以下、管理の画面で足した行は 1001 から。");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
                     NpgsqlPropertyBuilderExtensions.HasIdentityOptions(b.Property<int>("Id"), 1001L, null, null, null, null, null);
@@ -1221,33 +1285,40 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
+                        .HasDefaultValueSql("now()")
+                        .HasComment("行を作った日時(UTC)。データベースの既定値で入る。");
 
                     b.Property<DateTime?>("HiddenAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("hidden_at");
+                        .HasColumnName("hidden_at")
+                        .HasComment("非表示にした日時。null は表示中。");
 
                     b.Property<string>("NameJa")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("name_ja");
+                        .HasColumnName("name_ja")
+                        .HasComment("日本語の名前。");
 
                     b.Property<decimal>("X")
                         .HasPrecision(7, 2)
                         .HasColumnType("numeric(7,2)")
-                        .HasColumnName("x");
+                        .HasColumnName("x")
+                        .HasComment("x 座標。1024 四方の座標空間の数。");
 
                     b.Property<decimal>("Y")
                         .HasPrecision(7, 2)
                         .HasColumnType("numeric(7,2)")
-                        .HasColumnName("y");
+                        .HasColumnName("y")
+                        .HasComment("y 座標。1024 四方の座標空間の数。");
 
                     b.HasKey("Id")
                         .HasName("pk_spawn_points");
 
                     b.ToTable("spawn_points", "game", t =>
                         {
+                            t.HasComment("開始地点。プレイの始まりの場所。");
+
                             t.HasCheckConstraint("ck_spawn_points_x", "x BETWEEN 0 AND 1024");
 
                             t.HasCheckConstraint("ck_spawn_points_y", "y BETWEEN 0 AND 1024");

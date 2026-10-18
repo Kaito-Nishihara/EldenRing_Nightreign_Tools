@@ -16,7 +16,10 @@ public sealed class ShrinkEntry
     {
     }
 
+    /// <summary>識別子。</summary>
     public int Id { get; private set; }
+
+    /// <summary>この収縮先を持つ記録の識別子。</summary>
     public int PlayRecordId { get; private set; }
 
     /// <summary>日。1 か 2。</summary>
@@ -31,6 +34,7 @@ public sealed class ShrinkEntry
     /// <summary>第 2 次の収縮先の第二収縮地点の識別子。第 1 次では null。</summary>
     public int? SecondShrinkPointId { get; private set; }
 
+    /// <summary>行を作った日時(UTC)。データベースの既定値で入る。</summary>
     public DateTime CreatedAt { get; private set; }
 
     /// <summary>規則を確かめて作る。記録の中での重複は <see cref="PlayRecord"/> が確かめる。</summary>

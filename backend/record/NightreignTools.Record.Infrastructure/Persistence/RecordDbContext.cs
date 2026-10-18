@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using NightreignTools.Record.Domain;
 using NightreignTools.Record.Domain.Entities;
 using NightreignTools.ServiceDefaults.Persistence;
 
@@ -31,5 +32,8 @@ public sealed class RecordDbContext(DbContextOptions<RecordDbContext> options) :
             createdAt.SetDefaultValueSql("now()");
             createdAt.ValueGenerated = ValueGenerated.OnAdd;
         }
+
+        // エンティティの <summary> を、テーブルと列のコメントにする(データベースの共通仕様 5.8)
+        modelBuilder.ApplyDocumentationComments(typeof(DomainAssembly).Assembly);
     }
 }

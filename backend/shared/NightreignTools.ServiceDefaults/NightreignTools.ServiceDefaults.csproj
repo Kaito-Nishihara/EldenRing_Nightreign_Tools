@@ -2,6 +2,12 @@
 
   <!-- 3 つのサービスに共通の部品(サービスの共通構成 5.2)。Api と Infrastructure から使う -->
 
+  <!-- AddOpenApi の呼び出しに、OpenAPI のソースジェネレーターが割り込みのコードを差し込むことがある。
+       差し込まれたときに誤りにならないよう、その名前空間で割り込みを許す -->
+  <PropertyGroup>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsNamespaces>
+  </PropertyGroup>
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>

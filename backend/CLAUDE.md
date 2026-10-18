@@ -72,6 +72,7 @@ backend/
 - 初期データは Infrastructure の `Persistence/Seed/` に匿名の型で持ち、`HasData` で渡す。整数の識別子は 1000 以下にし、自動の採番は 1001 から始める。
 - マスタの行は消さず、`hidden_at` で非表示にする。
 - マイグレーションを足す手順は `add-migration` の Skill にある。
+- テーブルと列の説明は、Domain のエンティティの `<summary>` に書く。エンティティかテーブルの設定を変えたら、同じ PR でテーブルの定義書(`docs/database/`)を作り直す。CI が作り直して比べる(データベースの共通仕様 5.8)。
 
 ## テスト
 
@@ -83,6 +84,8 @@ backend/
 
 ```bash
 docker compose run --rm backend-sdk dotnet test NightreignTools.slnx
+# テーブルの定義書を作り直す
+MSYS_NO_PATHCONV=1 docker compose run --rm backend-sdk dotnet run --project tools/NightreignTools.SchemaDoc -- /src/docs/database
 # マイグレーションを足す(dotnet-ef は毎回の新しいコンテナで復元する)
 docker compose run --rm backend-sdk sh -c "dotnet tool restore && dotnet ef migrations add <名前> --project <サービス>/NightreignTools.<サービス>.Infrastructure --output-dir Persistence/Migrations"
 ```

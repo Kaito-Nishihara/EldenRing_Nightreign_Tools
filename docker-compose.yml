@@ -104,6 +104,8 @@ services:
     working_dir: /src/backend
     volumes:
       - ./backend:/src/backend
+      # テーブルの定義書(docs/database/)を書き出す先。ほかの文書には触れない(データベースの共通仕様 5.8)
+      - ./docs/database:/src/docs/database
       # NuGet の置き場を残し、2 回目からの取得を速くする
       - nuget_packages:/root/.nuget/packages
     # テストは本物の PostgreSQL に対して走らせる(サービスの共通構成 5.9)。

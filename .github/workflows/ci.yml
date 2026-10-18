@@ -44,6 +44,7 @@ jobs:
           filters: |
             backend:
               - 'backend/**'
+              - 'docs/database/**'
 
       - name: Setup .NET 10
         if: steps.changes.outputs.backend == 'true' || github.event_name == 'push'
@@ -62,6 +63,16 @@ jobs:
       - name: Test
         if: steps.changes.outputs.backend == 'true' || github.event_name == 'push'
         run: dotnet test NightreignTools.slnx --no-build -c Release
+
+      # テーブルの定義書をエンティティから作り直し、コミットされたものと違えば落とす(データベースの共通仕様 5.8、AC-DB-13)
+      - name: Check schema documents
+        if: steps.changes.outputs.backend == 'true' || github.event_name == 'push'
+        run: |
+          dotnet run --project tools/NightreignTools.SchemaDoc --no-build -c Release -- ../docs/database
+          git diff --exit-code -- ../docs/database || {
+            echo "::error::テーブルの定義書が古くなっています。docker compose run --rm backend-sdk dotnet run --project tools/NightreignTools.SchemaDoc -- /src/docs/database で作り直してコミットしてください"
+            exit 1
+          }
 
   gateway:
     name: Gateway (.NET)

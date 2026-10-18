@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\master\NightreignTools.Master.Infrastructure\NightreignTools.Master.Infrastructure.csproj" />
     <ProjectReference Include="..\..\record\NightreignTools.Record.Infrastructure\NightreignTools.Record.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\relic\NightreignTools.Relic.Infrastructure\NightreignTools.Relic.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

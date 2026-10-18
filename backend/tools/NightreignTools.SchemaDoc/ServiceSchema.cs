@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using NightreignTools.Master.Infrastructure.Persistence;
 using NightreignTools.Record.Infrastructure.Persistence;
+using NightreignTools.Relic.Infrastructure.Persistence;
 using NightreignTools.ServiceDefaults.Persistence;
 
 namespace NightreignTools.SchemaDoc;
@@ -19,6 +20,7 @@ internal sealed record ServiceSchema(string Service, string Database, Func<IMode
     [
         Create<MasterDbContext>("master", "nightreign_master", options => new(options)),
         Create<RecordDbContext>("record", "nightreign_record", options => new(options)),
+        Create<RelicDbContext>("relic", "nightreign_relic", options => new(options)),
     ];
 
     /// <summary>

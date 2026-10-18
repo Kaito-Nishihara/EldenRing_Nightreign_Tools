@@ -22,6 +22,7 @@
 | [機能設計: ビルドシミュレーター](design/build-simulator.md) | 効果の枠、合計の出し方と表示の桁、効果のマスタの API |
 | [テーブルの定義書: master-service](database/master.md) | master-service のテーブル、列、キー、索引、制約。エンティティから作った生成物 |
 | [テーブルの定義書: record-service](database/record.md) | record-service のテーブル、列、キー、索引、制約。エンティティから作った生成物 |
+| [テーブルの定義書: relic-service](database/relic.md) | relic-service のテーブル、列、キー、索引、制約。エンティティから作った生成物 |
 | [決定の記録 0001](decisions/0001-dotnet-backend.md) | バックエンドを ASP.NET Core と C# で作り直す |
 | [決定の記録 0002](decisions/0002-keep-gateway-separate.md) | Gateway とバックエンドを 1 つにまとめない |
 | [決定の記録 0003](decisions/0003-ef-core-migrations.md) | テーブルの変更を EF Core Migrations で管理する |

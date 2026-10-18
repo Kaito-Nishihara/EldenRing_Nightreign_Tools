@@ -63,13 +63,6 @@ export interface BasePoint {
   y: number;
 }
 
-/** 拠点タイプ定義 */
-export interface BaseType {
-  id: string;
-  nameJa: string;
-  imagePath: string;
-}
-
 /** パターン */
 export interface Pattern {
   patternIndex: number;

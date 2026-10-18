@@ -118,4 +118,4 @@ docker compose -f docs-site/compose.yaml up -d
 
 ## 8. 未決事項
 
-- **CI と本番の配置**: [CI/CD と AWS への配置](common-delivery.md) で決める。本番の公開の時期は、マップ画像の権利(要件定義の 12 章)が決まってから決める。
+- **CI と本番の配置**: [CI/CD と AWS への配置](common-delivery.md) で決める。本番の公開の時期は利用者が決める。

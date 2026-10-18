@@ -20,3 +20,9 @@ docker compose -f docs-site/compose.yaml down       # 停止
 ```
 
 文書、見た目、変換の処理のどれを保存しても、表示が自動で更新される。
+
+## 公開
+
+`main` に `docs/`、`docs-site/`、`frontend/public/` の変更が入ると、`.github/workflows/docs.yml` がサイトを作り、GitHub Pages に置く。
+公開先は https://kaito-nishihara.github.io/EldenRing_Nightreign_Tools/ である。
+PR では、警告なしに作れること(`--strict`)だけを確かめ、公開しない。

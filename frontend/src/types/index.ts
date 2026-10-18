@@ -153,7 +153,8 @@ export interface CreatePlayRecordResponse {
 /** 遺物効果ランク別数値 */
 export interface RelicEffectRank {
   rank: number;
-  value: number;
+  /** 数で表せない効果(unit が none)では null */
+  value: number | null;
   unit: "multiplier" | "percent" | "flat" | "per_sec" | "none";
   hasDemerit: boolean;
 }
@@ -163,6 +164,8 @@ export interface RelicEffect {
   id: number;
   categoryId: string;
   categoryNameJa: string;
+  /** 分類の並び順。小さいほうが先(ビルドシミュレーター 3.2) */
+  categorySortOrder: number;
   nameJa: string;
   isDeep: boolean;
   effectSign: "positive" | "negative";
@@ -174,31 +177,4 @@ export interface RelicEffect {
   conditionJa: string | null;
   notesJa: string | null;
   ranks: RelicEffectRank[];
-}
-
-/** ビルドシミュレーター: 遺物スロット内の効果エントリ */
-export interface BuildEffectEntry {
-  id: string;
-  effectId: number | null;
-  rank: number;
-}
-
-/** ビルドシミュレーター: 遺物セクション（通常3枠 or 深層3枠） */
-export interface BuildRelicSlot {
-  id: number;
-  isDeep: boolean;
-  effects: BuildEffectEntry[]; // 固定3枠
-}
-
-/** ビルドシミュレーター: 計算結果グループ */
-export interface BuildResultGroup {
-  key: string;
-  nameJa: string;
-  categoryId: string;
-  categoryNameJa: string;
-  calcType: "multiply" | "percent_add" | "flat_add" | "special";
-  attribute: string | null;
-  unit: string;
-  combined: number;
-  entries: { effectId: number; nameJa: string; value: number }[];
 }

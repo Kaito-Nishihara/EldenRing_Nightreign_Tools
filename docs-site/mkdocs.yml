@@ -85,6 +85,7 @@ nav:
   - テーブルの定義書:
       - master-service: database/master.md
       - record-service: database/record.md
+      - relic-service: database/relic.md
   - 画面の設計:
       - 画面の一覧と遷移: design/screens.md
   - 画面一覧:

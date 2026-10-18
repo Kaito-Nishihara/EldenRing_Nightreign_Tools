@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using NightreignTools.Relic.Application.RelicEffects;
 
 namespace NightreignTools.Relic.Application;
 
@@ -7,6 +8,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        services.AddScoped<IRelicEffectCatalogService, RelicEffectCatalogService>();
         return services;
     }
 }

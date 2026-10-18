@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
+using NightreignTools.Relic.Application.RelicEffects;
 using NightreignTools.Relic.Infrastructure.Persistence;
+using NightreignTools.Relic.Infrastructure.Repositories;
 using NightreignTools.ServiceDefaults.Persistence;
 
 namespace NightreignTools.Relic.Infrastructure;
@@ -13,6 +15,7 @@ public static class DependencyInjection
     {
         // nightreign_relic への接続と、起動のときのマイグレーション(データベースの共通仕様 5.5)
         services.AddServiceDatabase<RelicDbContext>();
+        services.AddScoped<IRelicEffectReadRepository, RelicEffectReadRepository>();
         return services;
     }
 }

@@ -18,6 +18,8 @@ public sealed class XmlDocumentation
     /// アセンブリの隣にある XML ドキュメントのファイルを読む。
     /// ないときは、説明が空のままモデルができてマイグレーションと食い違うので、ここで止める。
     /// </summary>
+    /// <param name="assembly">エンティティを持つアセンブリ。csproj で GenerateDocumentationFile を true にしておく。</param>
+    /// <returns>読んだ説明。</returns>
     public static XmlDocumentation Load(Assembly assembly)
     {
         var path = Path.ChangeExtension(assembly.Location, ".xml");
@@ -30,7 +32,12 @@ public sealed class XmlDocumentation
         return Parse(XDocument.Load(path));
     }
 
-    /// <summary>XML ドキュメントの中身から読む。テストから使う。</summary>
+    /// <summary>
+    /// XML ドキュメントの中身から読む。
+    /// テストから使う。
+    /// </summary>
+    /// <param name="document">XML ドキュメントのファイルの中身。</param>
+    /// <returns>読んだ説明。中身が空の summary は含まない。</returns>
     public static XmlDocumentation Parse(XDocument document)
     {
         var summaries = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -53,21 +60,38 @@ public sealed class XmlDocumentation
         return new XmlDocumentation(summaries);
     }
 
-    /// <summary>型の説明。書いていなければ null。</summary>
+    /// <summary>
+    /// 型の説明。
+    /// 書いていなければ null。
+    /// </summary>
+    /// <param name="type">説明を引く型。</param>
+    /// <returns>1 行にした説明。書いていなければ null。</returns>
     public string? GetSummary(Type type) =>
         _summaries.GetValueOrDefault($"T:{MemberName(type)}");
 
-    /// <summary>プロパティの説明。基底のクラスで宣言したプロパティは、基底のクラスの説明を返す。書いていなければ null。</summary>
+    /// <summary>
+    /// プロパティの説明。
+    /// 基底のクラスで宣言したプロパティは、基底のクラスの説明を返す。
+    /// 書いていなければ null。
+    /// </summary>
+    /// <param name="property">説明を引くプロパティ。</param>
+    /// <returns>1 行にした説明。書いていなければ null。</returns>
     public string? GetSummary(PropertyInfo property) =>
         property.DeclaringType is null ? null : _summaries.GetValueOrDefault($"P:{MemberName(property.DeclaringType)}.{property.Name}");
 
-    /// <summary>入れ子の型は、XML ドキュメントでは + ではなく . でつなぐ。</summary>
+    /// <summary>
+    /// 入れ子の型は、XML ドキュメントでは + ではなく . でつなぐ。
+    /// </summary>
+    /// <param name="type">名前を作る型。</param>
+    /// <returns>XML ドキュメントの member の name に使う、名前空間付きの型の名前。</returns>
     private static string MemberName(Type type) => (type.FullName ?? type.Name).Replace('+', '.');
 
     /// <summary>
     /// &lt;summary&gt; の中身を 1 行の文字列にする。
     /// 行の頭と終わりの空白を除いてつなぎ、&lt;see cref&gt; は型の短い名前に、&lt;c&gt; は中の文字にする。
     /// </summary>
+    /// <param name="summary">XML ドキュメントの summary の要素。</param>
+    /// <returns>1 行にした説明。中身がなければ空の文字列。</returns>
     private static string ToPlainText(XElement summary)
     {
         var builder = new StringBuilder();
@@ -102,7 +126,11 @@ public sealed class XmlDocumentation
         return result.ToString();
     }
 
-    /// <summary>"T:NightreignTools.Master.Domain.Entities.Boss" を "Boss" にする。</summary>
+    /// <summary>
+    /// "T:NightreignTools.Master.Domain.Entities.Boss" を "Boss" にする。
+    /// </summary>
+    /// <param name="cref">see の cref か langword の値。</param>
+    /// <returns>最後の . より後ろの名前。</returns>
     private static string ShortName(string cref)
     {
         var name = cref.Contains(':') ? cref[(cref.IndexOf(':') + 1)..] : cref;

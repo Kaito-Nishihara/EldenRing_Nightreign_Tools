@@ -10,6 +10,7 @@ namespace NightreignTools.ServiceDefaults.ErrorHandling;
 /// 状態は例外の型で決め、文言では決めない。
 /// 想定していない例外は 500 にし、応答には固定の文言だけを返す。スタックトレースや SQL を応答に出さないためである。
 /// </summary>
+/// <param name="logger">例外を書くログ。500 は誤り、503 は警告、ほかは情報として出す。</param>
 public sealed class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : IExceptionHandler
 {
     internal const string InternalErrorMessage = "内部サーバーエラーが発生しました";

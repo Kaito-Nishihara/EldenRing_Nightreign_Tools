@@ -27,6 +27,8 @@ public static class ErrorResponseWriter
     /// <summary>
     /// ルートがない、メソッドが違うなど、本文を持たないまま終わった応答に本文を付ける(UseStatusCodePages から呼ぶ)。
     /// </summary>
+    /// <param name="context">本文を持たないまま終わった応答の文脈。状態は応答に入っているものを使う。</param>
+    /// <returns>本文を書き終えると終わるタスク。</returns>
     public static Task WriteStatusCodePageAsync(StatusCodeContext context)
     {
         var http = context.HttpContext;

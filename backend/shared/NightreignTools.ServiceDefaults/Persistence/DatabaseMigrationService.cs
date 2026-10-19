@@ -10,12 +10,17 @@ namespace NightreignTools.ServiceDefaults.Persistence;
 /// 起動のとき、要求を受け付ける前に、自分のデータベースへ未適用のマイグレーションを適用する(データベースの共通仕様 5.5)。
 /// 適用に失敗したら例外を投げ、起動を止める。文言は RunServiceAsync が起動の失敗としてログに出す。
 /// </summary>
+/// <typeparam name="TContext">マイグレーションを適用するサービスの DbContext。</typeparam>
+/// <param name="scopeFactory">DbContext を取り出すスコープを作る。起動のときだけ使う。</param>
+/// <param name="logger">適用したマイグレーションと、つなげなかった理由を書くログ。</param>
 public sealed class DatabaseMigrationService<TContext>(
     IServiceScopeFactory scopeFactory,
     ILogger<DatabaseMigrationService<TContext>> logger) : IHostedService
     where TContext : DbContext
 {
-    /// <summary>データベースがない、利用者がない、合言葉が違う、作る権限がない、のときの PostgreSQL の SQLSTATE。</summary>
+    /// <summary>
+    /// データベースがない、利用者がない、合言葉が違う、作る権限がない、のときの PostgreSQL の SQLSTATE。
+    /// </summary>
     private static readonly HashSet<string> MissingDatabaseOrUserStates =
     [
         PostgresErrorCodes.InvalidCatalogName,

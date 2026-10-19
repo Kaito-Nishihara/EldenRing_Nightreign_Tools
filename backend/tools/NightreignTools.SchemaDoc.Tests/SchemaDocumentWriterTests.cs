@@ -41,7 +41,12 @@ public class SchemaDocumentWriterTests
         Assert.Equal(Write("record"), Write("record"));
     }
 
-    /// <summary>見出しから次の見出しの前までを返す。</summary>
+    /// <summary>
+    /// 見出しから次の見出しの前までを返す。
+    /// </summary>
+    /// <param name="document">書き出した定義書。</param>
+    /// <param name="heading">探す見出し。見つからなければテストを落とす。</param>
+    /// <returns>見出しから、次の見出しの前までの文字。</returns>
     private static string Section(string document, string heading)
     {
         var start = document.IndexOf(heading, StringComparison.Ordinal);

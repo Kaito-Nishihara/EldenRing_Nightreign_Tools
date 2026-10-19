@@ -39,6 +39,8 @@ public static class DocumentationCommentExtensions
     /// 説明のないテーブルと列を、"テーブル" か "テーブル.列" の形で返す。
     /// どのテーブルとどの列にも説明を書く決まりを、テストで確かめるために使う(AC-DB-10)。
     /// </summary>
+    /// <param name="model">説明を確かめる EF Core のモデル。設計時のモデルを渡す。</param>
+    /// <returns>説明のないテーブルと列。すべてに説明があれば空。</returns>
     public static IReadOnlyList<string> FindMissingComments(IModel model)
     {
         var missing = new List<string>();

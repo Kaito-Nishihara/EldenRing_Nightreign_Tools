@@ -8,6 +8,9 @@ namespace Gateway.Security;
 /// 管理用の API(/api/v1/admin の下)への要求で、X-Admin-Key を確かめる(マスタの管理 4.3)。
 /// 鍵がないときと合わないときで、応答を変えない。合わなかったときは、そのことと送り元の IP だけをログに出す。
 /// </summary>
+/// <param name="next">鍵が合ったときに渡す、次のミドルウェア。</param>
+/// <param name="options">正しい管理用の鍵。</param>
+/// <param name="logger">鍵が合わなかったことと送り元の IP を書くログ。鍵の値は書かない。</param>
 public sealed class AdminKeyMiddleware(RequestDelegate next, AdminKeyOptions options, ILogger<AdminKeyMiddleware> logger)
 {
     public const string InvalidKeyMessage = "管理用の鍵が違います";

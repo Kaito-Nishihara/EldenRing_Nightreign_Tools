@@ -73,7 +73,14 @@ internal static class SchemaDocumentWriter
                 .Select(check => $"| `{check.Name}` | `{check.Sql}` |"));
     }
 
-    /// <summary>表の見出しと行を書く。行がなければ「なし」と書く。</summary>
+    /// <summary>
+    /// 表の見出しと行を書く。
+    /// 行がなければ「なし」と書く。
+    /// </summary>
+    /// <param name="builder">書き足す先。</param>
+    /// <param name="title">表の題。</param>
+    /// <param name="header">表の見出しの行。区切りの行はここで足す。</param>
+    /// <param name="rows">表の行。空なら「なし」とだけ書く。</param>
     private static void WriteSection(StringBuilder builder, string title, string header, IEnumerable<string> rows)
     {
         var lines = rows.ToList();
@@ -98,6 +105,8 @@ internal static class SchemaDocumentWriter
     /// 主キーの列を先に、残りはエンティティで宣言した順(基底のクラスが先)に並べる。
     /// モデルの列は名前の順に並んでいて、エンティティを読むときの順と違うためである。
     /// </summary>
+    /// <param name="table">列を並べるテーブル。</param>
+    /// <returns>主キー、基底のクラスの列、エンティティの列の順に並べた列。</returns>
     private static IEnumerable<IColumn> OrderColumns(ITable table)
     {
         var keyColumns = table.PrimaryKey?.Columns.ToHashSet() ?? [];
@@ -147,6 +156,11 @@ internal static class SchemaDocumentWriter
     private static string Columns(IEnumerable<IColumn> columns) =>
         string.Join("、", columns.Select(column => $"`{column.Name}`"));
 
-    /// <summary>表のセルに入れる文字。縦線は表の区切りと読まれるので逃がす。</summary>
+    /// <summary>
+    /// 表のセルに入れる文字。
+    /// 縦線は表の区切りと読まれるので逃がす。
+    /// </summary>
+    /// <param name="text">セルに入れる文字。null は空にする。</param>
+    /// <returns>縦線を逃がした文字。</returns>
     private static string Cell(string? text) => (text ?? "").Replace("|", "\\|");
 }

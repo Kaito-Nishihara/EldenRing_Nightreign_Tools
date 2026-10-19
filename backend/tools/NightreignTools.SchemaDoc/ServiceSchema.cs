@@ -27,6 +27,11 @@ internal sealed record ServiceSchema(string Service, string Database, Func<IMode
     /// マイグレーションを作るときと同じ設定でモデルを組み立てる。
     /// 説明(コメント)は設計時のモデルにだけ残るので、そちらを使う。接続文字列は仮のもので、データベースにはつながない。
     /// </summary>
+    /// <typeparam name="TContext">サービスの DbContext。</typeparam>
+    /// <param name="service">サービスの名前。定義書のファイルの名前にもなる。</param>
+    /// <param name="database">データベースの名前。仮の接続文字列に入れる。</param>
+    /// <param name="create">設定から DbContext を作る。</param>
+    /// <returns>モデルを組み立てる手順を持つ、サービスの定義。</returns>
     private static ServiceSchema Create<TContext>(string service, string database, Func<DbContextOptions<TContext>, TContext> create)
         where TContext : DbContext =>
         new(service, database, () =>

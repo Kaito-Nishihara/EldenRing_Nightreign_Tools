@@ -90,7 +90,11 @@ public class ApiExceptionHandlerTests
         Assert.DoesNotContain(nameof(AC_API_06_想定していない例外は500になりmessageにSQLとスタックトレースが入らない), body.GetRawText());
     }
 
-    /// <summary>ハンドラに例外を渡し、書かれた状態と本文を返す。</summary>
+    /// <summary>
+    /// ハンドラに例外を渡し、書かれた状態と本文を返す。
+    /// </summary>
+    /// <param name="exception">ハンドラに渡す例外。</param>
+    /// <returns>応答の状態と、本文の JSON。</returns>
     private static async Task<(int Status, JsonElement Body)> HandleAsync(Exception exception)
     {
         var services = new ServiceCollection()

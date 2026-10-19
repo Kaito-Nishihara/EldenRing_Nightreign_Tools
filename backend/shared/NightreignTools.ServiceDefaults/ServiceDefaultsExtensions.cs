@@ -15,10 +15,16 @@ namespace NightreignTools.ServiceDefaults;
 /// </summary>
 public static class ServiceDefaultsExtensions
 {
-    /// <summary>テストの WebApplicationFactory が使う環境の名前。</summary>
+    /// <summary>
+    /// テストの WebApplicationFactory が使う環境の名前。
+    /// </summary>
     public const string TestingEnvironment = "Testing";
 
-    /// <summary>エラーの形、例外の変換、サービス間キー、/health、OpenAPI を登録する。</summary>
+    /// <summary>
+    /// エラーの形、例外の変換、サービス間キー、/health、OpenAPI を登録する。
+    /// </summary>
+    /// <param name="builder">サービスの組み立て。</param>
+    /// <returns>続けて登録できるように、受け取った builder を返す。</returns>
     public static WebApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder)
     {
         var services = builder.Services;
@@ -42,7 +48,12 @@ public static class ServiceDefaultsExtensions
         return builder;
     }
 
-    /// <summary>ミドルウェアと、/health、OpenAPI のエンドポイントを組み立てる。機能のエンドポイントは、この後に足す。</summary>
+    /// <summary>
+    /// ミドルウェアと、/health、OpenAPI のエンドポイントを組み立てる。
+    /// 機能のエンドポイントは、この後に足す。
+    /// </summary>
+    /// <param name="app">組み立てたサービス。</param>
+    /// <returns>続けて組み立てられるように、受け取った app を返す。</returns>
     public static WebApplication UseServiceDefaults(this WebApplication app)
     {
         app.UseExceptionHandler();
@@ -65,6 +76,8 @@ public static class ServiceDefaultsExtensions
     /// サービスを動かす。設定の不足、データベースにつなげない、マイグレーションの失敗で起動できなかったときは、
     /// 理由をログに 1 回だけ出し、終了コード 1 を返す(サービスの共通構成 5.7)。
     /// </summary>
+    /// <param name="app">組み立てたサービス。</param>
+    /// <returns>終了コード。止められて終わったときは 0、起動できなかったときは 1。テストの環境では、起動の失敗の例外をそのまま投げる。</returns>
     public static async Task<int> RunServiceAsync(this WebApplication app)
     {
         try

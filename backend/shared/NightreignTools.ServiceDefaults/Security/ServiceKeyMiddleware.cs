@@ -15,7 +15,9 @@ public sealed class ServiceKeyMiddleware
 {
     public const string HeaderName = "X-Service-Key";
 
-    /// <summary>compose の稼働の確認に使うので、キーなしで答えるパス。</summary>
+    /// <summary>
+    /// compose の稼働の確認に使うので、キーなしで答えるパス。
+    /// </summary>
     public const string HealthPath = "/health";
 
     internal const string UnauthorizedMessage = "サービス間キーがないか、誤っています";

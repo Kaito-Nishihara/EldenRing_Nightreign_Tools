@@ -5,7 +5,10 @@ using Microsoft.Extensions.Options;
 
 namespace NightreignTools.ServiceDefaults.Persistence;
 
-/// <summary>サービスのデータベースの接続文字列。環境変数 <c>ConnectionStrings__Default</c> から読む。</summary>
+/// <summary>
+/// サービスのデータベースの接続文字列。
+/// 環境変数 <c>ConnectionStrings__Default</c> から読む。
+/// </summary>
 public sealed class DatabaseOptions
 {
     public const string ConnectionStringName = "Default";
@@ -18,15 +21,23 @@ public sealed class DatabaseOptions
 /// </summary>
 public static class DatabaseServiceCollectionExtensions
 {
-    /// <summary>どのサービスのデータベースも、スキーマは game の 1 つとする。</summary>
+    /// <summary>
+    /// どのサービスのデータベースも、スキーマは game の 1 つとする。
+    /// </summary>
     public const string Schema = "game";
 
-    /// <summary>マイグレーションの履歴のテーブル。game のスキーマに置く。</summary>
+    /// <summary>
+    /// マイグレーションの履歴のテーブル。
+    /// game のスキーマに置く。
+    /// </summary>
     public const string MigrationsHistoryTable = "__ef_migrations_history";
 
     /// <summary>
     /// DbContext と、起動のときのマイグレーションを登録する。接続文字列がないときは、起動の時点で止める(サービスの共通構成 5.7)。
     /// </summary>
+    /// <typeparam name="TContext">サービスの DbContext。</typeparam>
+    /// <param name="services">登録先。</param>
+    /// <returns>続けて登録できるように、受け取った services を返す。</returns>
     public static IServiceCollection AddServiceDatabase<TContext>(this IServiceCollection services)
         where TContext : DbContext
     {
@@ -48,6 +59,9 @@ public static class DatabaseServiceCollectionExtensions
     /// 接続の設定。アプリと、マイグレーションを作る道具(IDesignTimeDbContextFactory)の両方から使う。
     /// 列とテーブルの名前はスネークケースにする(データベースの共通仕様 5.2)。
     /// </summary>
+    /// <param name="options">設定を足す先。</param>
+    /// <param name="connectionString">サービスのデータベースの接続文字列。空かどうかは呼ぶ側で確かめる。</param>
+    /// <returns>続けて設定できるように、受け取った options を返す。</returns>
     public static DbContextOptionsBuilder UseServiceDatabase(DbContextOptionsBuilder options, string connectionString) =>
         options
             .UseNpgsql(connectionString, npgsql => npgsql.MigrationsHistoryTable(MigrationsHistoryTable, Schema))

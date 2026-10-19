@@ -89,7 +89,12 @@ public class XmlDocumentationTests
         Assert.Contains("GenerateDocumentationFile", exception.Message);
     }
 
-    /// <summary>XML ドキュメントの中の型の名前。入れ子の型は + ではなく . でつなぐ。</summary>
+    /// <summary>
+    /// XML ドキュメントの中の型の名前。
+    /// 入れ子の型は + ではなく . でつなぐ。
+    /// </summary>
+    /// <param name="type">名前を作る型。</param>
+    /// <returns>XML ドキュメントの member の name に使う型の名前。</returns>
     private static string Name(Type type) => type.FullName!.Replace('+', '.');
 
     private static PropertyInfo Property(string name) => typeof(Sample).GetProperty(name)!;

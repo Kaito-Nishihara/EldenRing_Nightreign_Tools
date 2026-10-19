@@ -3,7 +3,11 @@ using NightreignTools.SharedKernel;
 
 namespace NightreignTools.Master.Application.Masters;
 
-/// <summary>プレイヤー向けのマスタの取得。エンティティを DTO に詰め替える。</summary>
+/// <summary>
+/// プレイヤー向けのマスタの取得。
+/// エンティティを DTO に詰め替える。
+/// </summary>
+/// <param name="repository">マスタを読む。</param>
 internal sealed class MasterCatalogService(IMasterReadRepository repository) : IMasterCatalogService
 {
     public async Task<IReadOnlyList<BossDto>> GetBossesAsync(CancellationToken cancellationToken) =>

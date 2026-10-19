@@ -75,7 +75,11 @@ public class DatabaseMigrationTests
         Assert.Equal(PostgresErrorCodes.CheckViolation, exception.SqlState);
     }
 
-    /// <summary>このサービスの持つマイグレーションの一覧(古い順)。</summary>
+    /// <summary>
+    /// このサービスの持つマイグレーションの一覧(古い順)。
+    /// </summary>
+    /// <param name="factory">テストのために起動した relic-service。</param>
+    /// <returns>マイグレーションの名前。古い順。</returns>
     private static List<string> AllMigrations(RelicServiceFactory factory)
     {
         using var scope = factory.Services.CreateScope();

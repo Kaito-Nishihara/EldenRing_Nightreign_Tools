@@ -45,14 +45,18 @@ internal static class RelicEffectSeed
         ("sleep", "睡眠"), ("madness", "発狂"), ("death", "抗死"),
     ];
 
-    /// <summary>深層効果で下がる能力値の組(V11 の並び)。</summary>
+    /// <summary>
+    /// 深層効果で下がる能力値の組(V11 の並び)。
+    /// </summary>
     private static readonly (string First, string Second)[] StatDownPairs =
     [
         ("vigor", "arcane"), ("strength", "intelligence"), ("dexterity", "faith"),
         ("intelligence", "dexterity"), ("faith", "strength"),
     ];
 
-    /// <summary>被ダメージ時に蓄積する状態異常と値(V11 の並び)。</summary>
+    /// <summary>
+    /// 被ダメージ時に蓄積する状態異常と値(V11 の並び)。
+    /// </summary>
     private static readonly (string Attribute, string NameJa, decimal Value)[] Buildups =
     [
         ("poison", "毒", 65), ("rot", "腐敗", 55), ("bleed", "出血", 55), ("frostbite", "冷気", 55),
@@ -162,7 +166,22 @@ internal static class RelicEffectSeed
 
     private static RankValue NoValue() => new(null, RelicValueUnits.None, false);
 
-    /// <summary>1 つの効果の定義。ランクは <paramref name="RankMin"/> から順に並べる。ランクが 1 つなら、ランクのない効果(下限と上限が 0)とする。</summary>
+    /// <summary>
+    /// 1 つの効果の定義。
+    /// ランクは <paramref name="RankMin"/> から順に並べる。
+    /// ランクが 1 つなら、ランクのない効果(下限と上限が 0)とする。
+    /// </summary>
+    /// <param name="CategoryId">分類の識別子。</param>
+    /// <param name="NameJa">効果の日本語の名前。</param>
+    /// <param name="CalcType">重ねるときの合わせ方。</param>
+    /// <param name="Ranks">ランクごとの値。ランクの小さい順。</param>
+    /// <param name="IsDeep">深層効果か。</param>
+    /// <param name="Negative">デメリットの効果か。</param>
+    /// <param name="Attribute">効果がかかる対象。null は効果ごとに別に合わせる。</param>
+    /// <param name="Stackable">同じ効果を重ねて付けられるか。</param>
+    /// <param name="RankMin">ランクの下限。</param>
+    /// <param name="ConditionJa">発動の条件。null は条件なし。</param>
+    /// <param name="NotesJa">備考。null はなし。</param>
     private sealed record EffectDefinition(
         string CategoryId,
         string NameJa,

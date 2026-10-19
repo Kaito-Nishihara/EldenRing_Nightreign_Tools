@@ -2,7 +2,10 @@ using NightreignTools.Relic.Application.RelicEffects;
 
 namespace NightreignTools.Relic.Api.Endpoints;
 
-/// <summary>遺物の効果の取得(ビルドシミュレーター 4 章)。必要な役割はない。</summary>
+/// <summary>
+/// 遺物の効果の取得(ビルドシミュレーター 4 章)。
+/// 必要な役割はない。
+/// </summary>
 public static class RelicEffectEndpoints
 {
     public static IEndpointRouteBuilder MapRelicEffectEndpoints(this IEndpointRouteBuilder api)

@@ -9,6 +9,7 @@ namespace NightreignTools.Relic.Tests.Integration;
 /// マイグレーションに含めた初期データ(データベースの共通仕様 5.6)。旧版の V11 の件数と値に合っていることを確かめる。
 /// API から見た初期データ(AC-BLD-01)は、遺物の効果の API のテストで確かめる。
 /// </summary>
+/// <param name="factory">テストのために起動した relic-service。</param>
 public class SeedDataTests(RelicServiceFactory factory) : IClassFixture<RelicServiceFactory>
 {
     [Fact]

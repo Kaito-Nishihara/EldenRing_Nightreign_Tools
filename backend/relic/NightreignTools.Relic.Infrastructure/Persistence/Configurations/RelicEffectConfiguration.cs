@@ -48,7 +48,12 @@ internal sealed class RelicEffectConfiguration : IEntityTypeConfiguration<RelicE
         builder.HasData(RelicEffectSeed.Effects);
     }
 
-    /// <summary>決まった値の一覧の検査の制約の式(データベースの共通仕様 5.3)。</summary>
+    /// <summary>
+    /// 決まった値の一覧の検査の制約の式(データベースの共通仕様 5.3)。
+    /// </summary>
+    /// <param name="column">列の名前(スネークケース)。</param>
+    /// <param name="values">許す値。SQL に引用符で囲んで埋め込むので、定数だけを渡す。</param>
+    /// <returns>検査の制約の式。例: calc_type IN ('multiply', 'special')</returns>
     internal static string InList(string column, IEnumerable<string> values) =>
         $"{column} IN ({string.Join(", ", values.Select(v => $"'{v}'"))})";
 }

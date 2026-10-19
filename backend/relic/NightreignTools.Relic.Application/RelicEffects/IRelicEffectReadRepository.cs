@@ -9,6 +9,10 @@ public interface IRelicEffectReadRepository
 {
     Task<IReadOnlyList<RelicEffectCategory>> GetCategoriesAsync(CancellationToken cancellationToken);
 
-    /// <summary>効果を、ランクごとの値を含めて返す。</summary>
+    /// <summary>
+    /// 効果を、ランクごとの値を含めて返す。
+    /// </summary>
+    /// <param name="cancellationToken">取り消しの合図。</param>
+    /// <returns>すべての効果。並び順は決めない。</returns>
     Task<IReadOnlyList<RelicEffect>> GetEffectsAsync(CancellationToken cancellationToken);
 }

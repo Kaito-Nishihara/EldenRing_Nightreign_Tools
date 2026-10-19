@@ -1,6 +1,10 @@
 namespace NightreignTools.Relic.Application.RelicEffects;
 
-/// <summary>遺物の効果の一覧の取得。分類を効果に付け、エンティティを DTO に詰め替える。</summary>
+/// <summary>
+/// 遺物の効果の一覧の取得。
+/// 分類を効果に付け、エンティティを DTO に詰め替える。
+/// </summary>
+/// <param name="repository">分類と効果を読む。</param>
 internal sealed class RelicEffectCatalogService(IRelicEffectReadRepository repository) : IRelicEffectCatalogService
 {
     public async Task<IReadOnlyList<RelicEffectDto>> GetEffectsAsync(CancellationToken cancellationToken)

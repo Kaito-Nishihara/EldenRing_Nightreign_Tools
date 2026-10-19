@@ -6,6 +6,7 @@ namespace NightreignTools.Relic.Tests.Integration;
 /// <summary>
 /// 遺物の効果の一覧の API(ビルドシミュレーター 4 章)。
 /// </summary>
+/// <param name="factory">テストのために起動した relic-service。</param>
 public class RelicEffectEndpointsTests(RelicServiceFactory factory) : IClassFixture<RelicServiceFactory>
 {
     [Fact]

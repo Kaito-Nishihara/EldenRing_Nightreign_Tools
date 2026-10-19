@@ -10,6 +10,7 @@ namespace NightreignTools.Relic.Infrastructure.Persistence;
 /// relic-service のデータベース(nightreign_relic)の入口(データベースの共通仕様 5.1)。
 /// リポジトリの実装からだけ使う。
 /// </summary>
+/// <param name="options">接続とスネークケースの設定。UseServiceDatabase で作る。</param>
 public sealed class RelicDbContext(DbContextOptions<RelicDbContext> options) : DbContext(options)
 {
     public DbSet<RelicEffectCategory> RelicEffectCategories => Set<RelicEffectCategory>();

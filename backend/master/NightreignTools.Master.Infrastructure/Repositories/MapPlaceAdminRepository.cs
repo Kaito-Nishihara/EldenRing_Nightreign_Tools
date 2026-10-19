@@ -9,6 +9,7 @@ namespace NightreignTools.Master.Infrastructure.Repositories;
 /// 管理の画面でマップの上の場所を出し入れする。4 つの種類を、DbContext の型ごとの集まり(Set)で同じに扱う。
 /// 行を消す操作は持たない(決定の記録 0013)。
 /// </summary>
+/// <param name="db">master-service のデータベース。</param>
 internal sealed class MapPlaceAdminRepository(MasterDbContext db) : IMapPlaceAdminRepository
 {
     public async Task<IReadOnlyList<TPlace>> ListAsync<TPlace>(CancellationToken cancellationToken) where TPlace : MapPlace =>

@@ -5,7 +5,11 @@ using NightreignTools.Master.Infrastructure.Persistence;
 
 namespace NightreignTools.Master.Infrastructure.Repositories;
 
-/// <summary>マスタを読む。読むだけなので、どのクエリも変更の追跡をしない。</summary>
+/// <summary>
+/// マスタを読む。
+/// 読むだけなので、どのクエリも変更の追跡をしない。
+/// </summary>
+/// <param name="db">master-service のデータベース。</param>
 internal sealed class MasterReadRepository(MasterDbContext db) : IMasterReadRepository
 {
     public async Task<IReadOnlyList<Boss>> GetBossesAsync(CancellationToken cancellationToken) =>

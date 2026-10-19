@@ -5,7 +5,12 @@ using NightreignTools.Master.Infrastructure.Persistence;
 
 namespace NightreignTools.Master.Infrastructure.Repositories;
 
-/// <summary>識別子でマスタを引く。非表示の行も返す。読むだけなので、変更の追跡をしない。</summary>
+/// <summary>
+/// 識別子でマスタを引く。
+/// 非表示の行も返す。
+/// 読むだけなので、変更の追跡をしない。
+/// </summary>
+/// <param name="db">master-service のデータベース。</param>
 internal sealed class ReferenceRepository(MasterDbContext db) : IReferenceRepository
 {
     public async Task<IReadOnlyList<Boss>> FindBossesAsync(IReadOnlyCollection<string> ids, CancellationToken cancellationToken) =>

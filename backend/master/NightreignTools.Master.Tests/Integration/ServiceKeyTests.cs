@@ -7,6 +7,7 @@ namespace NightreignTools.Master.Tests.Integration;
 /// <summary>
 /// サービス間キーの検証(API の共通仕様 4.6)。
 /// </summary>
+/// <param name="factory">テストのために起動した master-service。</param>
 public class ServiceKeyTests(MasterServiceFactory factory) : IClassFixture<MasterServiceFactory>
 {
     [Fact]

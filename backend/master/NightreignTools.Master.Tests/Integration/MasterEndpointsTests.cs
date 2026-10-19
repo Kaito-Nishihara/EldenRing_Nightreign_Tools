@@ -8,6 +8,7 @@ namespace NightreignTools.Master.Tests.Integration;
 /// <summary>
 /// プレイヤー向けのマスタの取得の API(マスタの管理 4.1、データベースの共通仕様 7 章)。
 /// </summary>
+/// <param name="factory">テストのために起動した master-service。</param>
 public class MasterEndpointsTests(MasterServiceFactory factory) : IClassFixture<MasterServiceFactory>
 {
     [Fact]

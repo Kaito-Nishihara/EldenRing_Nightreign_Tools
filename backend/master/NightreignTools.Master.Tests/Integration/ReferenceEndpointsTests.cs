@@ -7,6 +7,7 @@ namespace NightreignTools.Master.Tests.Integration;
 /// <summary>
 /// マスタの参照の解決の内部の API(マスタの管理 4.4)。
 /// </summary>
+/// <param name="factory">テストのために起動した master-service。</param>
 public class ReferenceEndpointsTests(MasterServiceFactory factory) : IClassFixture<MasterServiceFactory>
 {
     private const string Path = "/internal/v1/references/resolve";

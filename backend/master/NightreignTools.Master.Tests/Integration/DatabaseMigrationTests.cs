@@ -56,7 +56,11 @@ public class DatabaseMigrationTests
         Assert.Equal(before, after);
     }
 
-    /// <summary>このサービスの持つマイグレーションの一覧(古い順)。</summary>
+    /// <summary>
+    /// このサービスの持つマイグレーションの一覧(古い順)。
+    /// </summary>
+    /// <param name="factory">テストのために起動した master-service。</param>
+    /// <returns>マイグレーションの名前。古い順。</returns>
     private static List<string> AllMigrations(MasterServiceFactory factory)
     {
         using var scope = factory.Services.CreateScope();

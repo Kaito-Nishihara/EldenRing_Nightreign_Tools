@@ -151,7 +151,13 @@ public class MapPlaceAdminTests
 
         public int SaveCount { get; private set; }
 
-        /// <summary>保存済みの行として置く。識別子はデータベースの代わりに振る</summary>
+        /// <summary>
+        /// 保存済みの行として置く。
+        /// 識別子はデータベースの代わりに振る
+        /// </summary>
+        /// <typeparam name="TPlace">場所の種類。</typeparam>
+        /// <param name="place">置く行。</param>
+        /// <returns>識別子を振った行。</returns>
         public TPlace Seed<TPlace>(TPlace place) where TPlace : MapPlace
         {
             Add(place);

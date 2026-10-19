@@ -13,7 +13,9 @@ internal static class MapPlaceSeed
     /// </summary>
     public const decimal ZoneRadius = 255m;
 
-    /// <summary>開始地点(旧版の V8)。</summary>
+    /// <summary>
+    /// 開始地点(旧版の V8)。
+    /// </summary>
     public static readonly object[] SpawnPoints =
     [
         Point(1, "北東の教会", 351m, 387m),
@@ -46,7 +48,9 @@ internal static class MapPlaceSeed
         ("中央南", 408m, 624m),
     ];
 
-    /// <summary>第二収縮地点(旧版の V10)。</summary>
+    /// <summary>
+    /// 第二収縮地点(旧版の V10)。
+    /// </summary>
     public static readonly object[] SecondShrinkPoints =
         Areas.Select((a, i) => Point(i + 1, a.Name, a.X, a.Y)).ToArray();
 
@@ -59,7 +63,10 @@ internal static class MapPlaceSeed
             Id = i + 1, NameJa = a.Name, CenterX = a.X, CenterY = a.Y, Radius = ZoneRadius, CreatedAt = SeedData.CreatedAt,
         }).ToArray();
 
-    /// <summary>通常のマップの拠点候補地(旧版の V7)。実際のゲームで確かめた座標。</summary>
+    /// <summary>
+    /// 通常のマップの拠点候補地(旧版の V7)。
+    /// 実際のゲームで確かめた座標。
+    /// </summary>
     public static readonly object[] BasePoints =
     [
         Base(1, 404m, 798m),

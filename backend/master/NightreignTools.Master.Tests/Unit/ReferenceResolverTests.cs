@@ -31,7 +31,9 @@ public class ReferenceResolverTests
         Assert.Equal(["zones:4,7", "bosses:gladius"], repository.Calls.Order().Reverse().ToArray());
     }
 
-    /// <summary>呼ばれた問い合わせを記録し、何も見つからなかったとして空を返す偽物。</summary>
+    /// <summary>
+    /// 呼ばれた問い合わせを記録し、何も見つからなかったとして空を返す偽物。
+    /// </summary>
     private sealed class RecordingRepository : IReferenceRepository
     {
         public List<string> Calls { get; } = [];

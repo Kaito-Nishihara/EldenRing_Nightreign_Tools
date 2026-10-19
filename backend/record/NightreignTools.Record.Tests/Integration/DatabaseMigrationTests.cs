@@ -78,14 +78,21 @@ public class DatabaseMigrationTests
         Assert.Equal(PostgresErrorCodes.UniqueViolation, exception.SqlState);
     }
 
-    /// <summary>このサービスの持つマイグレーションの一覧(古い順)。</summary>
+    /// <summary>
+    /// このサービスの持つマイグレーションの一覧(古い順)。
+    /// </summary>
+    /// <param name="factory">テストのために起動した record-service。</param>
+    /// <returns>マイグレーションの名前。古い順。</returns>
     private static List<string> AllMigrations(RecordServiceFactory factory)
     {
         using var scope = factory.Services.CreateScope();
         return scope.ServiceProvider.GetRequiredService<RecordDbContext>().Database.GetMigrations().Order().ToList();
     }
 
-    /// <summary>収縮先を持たない記録を 1 行入れ、その識別子を返す。</summary>
+    /// <summary>
+    /// 収縮先を持たない記録を 1 行入れ、その識別子を返す。
+    /// </summary>
+    /// <returns>入れた記録の識別子。</returns>
     private static async Task<string> InsertPlayRecordAsync()
     {
         var ids = await TestDatabase.QueryAsync(

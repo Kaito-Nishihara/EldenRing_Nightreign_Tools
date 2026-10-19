@@ -57,7 +57,10 @@ public class MasterDirectoryRegistrationTests
         return await scope.ServiceProvider.GetRequiredService<IMasterDirectory>().ResolveAsync(Query, CancellationToken.None);
     }
 
-    /// <summary>master-service のクライアントの送り出しを、偽物に差し替えて起動する。</summary>
+    /// <summary>
+    /// master-service のクライアントの送り出しを、偽物に差し替えて起動する。
+    /// </summary>
+    /// <param name="handler">master-service のクライアントの送り出しに使う偽物。</param>
     private sealed class FactoryWithHandler(StubHttpHandler handler) : RecordServiceFactory
     {
         protected override void ConfigureTestServices(IServiceCollection services) =>

@@ -24,16 +24,29 @@ public class RecordServiceFactory : WebApplicationFactory<Program>
         TestDatabase.EnsureFresh();
     }
 
-    /// <summary>起動に渡すサービス間キー。起動の失敗を確かめるテストで空にする。</summary>
+    /// <summary>
+    /// 起動に渡すサービス間キー。
+    /// 起動の失敗を確かめるテストで空にする。
+    /// </summary>
     protected virtual string ConfiguredServiceKey => ServiceKey;
 
-    /// <summary>起動に渡す接続文字列。接続の失敗を確かめるテストで替える。</summary>
+    /// <summary>
+    /// 起動に渡す接続文字列。
+    /// 接続の失敗を確かめるテストで替える。
+    /// </summary>
     protected virtual string ConfiguredConnectionString => TestDatabase.ConnectionString;
 
-    /// <summary>起動に渡す master-service の呼び先。起動の失敗を確かめるテストで空にする。</summary>
+    /// <summary>
+    /// 起動に渡す master-service の呼び先。
+    /// 起動の失敗を確かめるテストで空にする。
+    /// </summary>
     protected virtual string ConfiguredMasterServiceUrl => MasterServiceUrl;
 
-    /// <summary>登録を差し替える。master-service のクライアントを偽物にするテストで使う。</summary>
+    /// <summary>
+    /// 登録を差し替える。
+    /// master-service のクライアントを偽物にするテストで使う。
+    /// </summary>
+    /// <param name="services">差し替える登録。</param>
     protected virtual void ConfigureTestServices(IServiceCollection services)
     {
     }

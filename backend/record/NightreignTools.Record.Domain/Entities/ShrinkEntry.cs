@@ -16,28 +16,52 @@ public sealed class ShrinkEntry
     {
     }
 
-    /// <summary>識別子。</summary>
+    /// <summary>
+    /// 識別子。
+    /// </summary>
     public int Id { get; private set; }
 
-    /// <summary>この収縮先を持つ記録の識別子。</summary>
+    /// <summary>
+    /// この収縮先を持つ記録の識別子。
+    /// </summary>
     public int PlayRecordId { get; private set; }
 
-    /// <summary>日。1 か 2。</summary>
+    /// <summary>
+    /// 日。
+    /// 1 か 2。
+    /// </summary>
     public int Day { get; private set; }
 
-    /// <summary>段階。1 か 2。</summary>
+    /// <summary>
+    /// 段階。
+    /// 1 か 2。
+    /// </summary>
     public int Phase { get; private set; }
 
-    /// <summary>第 1 次の収縮先の収縮候補地の識別子。第 2 次では null。</summary>
+    /// <summary>
+    /// 第 1 次の収縮先の収縮候補地の識別子。
+    /// 第 2 次では null。
+    /// </summary>
     public int? ZoneId { get; private set; }
 
-    /// <summary>第 2 次の収縮先の第二収縮地点の識別子。第 1 次では null。</summary>
+    /// <summary>
+    /// 第 2 次の収縮先の第二収縮地点の識別子。
+    /// 第 1 次では null。
+    /// </summary>
     public int? SecondShrinkPointId { get; private set; }
 
-    /// <summary>行を作った日時(UTC)。データベースの既定値で入る。</summary>
+    /// <summary>
+    /// 行を作った日時(UTC)。
+    /// データベースの既定値で入る。
+    /// </summary>
     public DateTime CreatedAt { get; private set; }
 
-    /// <summary>規則を確かめて作る。記録の中での重複は <see cref="PlayRecord"/> が確かめる。</summary>
+    /// <summary>
+    /// 規則を確かめて作る。
+    /// 記録の中での重複は <see cref="PlayRecord"/> が確かめる。
+    /// </summary>
+    /// <param name="target">作る収縮先。</param>
+    /// <returns>記録に付ける前の収縮先。</returns>
     internal static ShrinkEntry Create(ShrinkTarget target)
     {
         if (target.Day is not (1 or 2))
@@ -71,5 +95,11 @@ public sealed class ShrinkEntry
     }
 }
 
-/// <summary>記録を作るときに渡す、1 つの収縮先。</summary>
+/// <summary>
+/// 記録を作るときに渡す、1 つの収縮先。
+/// </summary>
+/// <param name="Day">日。1 か 2。</param>
+/// <param name="Phase">段階。1 か 2。</param>
+/// <param name="ZoneId">第 1 次の収縮候補地の識別子。第 2 次では null。</param>
+/// <param name="SecondShrinkPointId">第 2 次の第二収縮地点の識別子。第 1 次では null。</param>
 public readonly record struct ShrinkTarget(int Day, int Phase, int? ZoneId, int? SecondShrinkPointId);

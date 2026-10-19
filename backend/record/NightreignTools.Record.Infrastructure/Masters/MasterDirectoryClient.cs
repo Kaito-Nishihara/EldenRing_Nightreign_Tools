@@ -13,6 +13,8 @@ namespace NightreignTools.Record.Infrastructure.Masters;
 /// 呼び先、サービス間キー、期限と再試行は、登録のとき(<see cref="DependencyInjection"/>)に HttpClient に付ける。
 /// 応答がない、5xx、応答の形が読めないときは、<see cref="ServiceUnavailableException"/>(503)にする。
 /// </summary>
+/// <param name="http">呼び先とサービス間キー、期限と再試行を付けた HttpClient。</param>
+/// <param name="logger">master-service が返した誤りの状態と、呼べなかったことを書くログ。</param>
 internal sealed class MasterDirectoryClient(HttpClient http, ILogger<MasterDirectoryClient> logger) : IMasterDirectory
 {
     public const string ResolvePath = "internal/v1/references/resolve";
@@ -41,7 +43,13 @@ internal sealed class MasterDirectoryClient(HttpClient http, ILogger<MasterDirec
         }
     }
 
-    /// <summary>応答がないことを表す例外か。呼んだ側が取り消したときは含めない。</summary>
+    /// <summary>
+    /// 応答がないことを表す例外か。
+    /// 呼んだ側が取り消したときは含めない。
+    /// </summary>
+    /// <param name="ex">呼び出しで起きた例外。</param>
+    /// <param name="ct">呼んだ側の取り消しの合図。</param>
+    /// <returns>応答がないことを表すなら true。</returns>
     private static bool IsUnavailable(Exception ex, CancellationToken ct) => ex switch
     {
         HttpRequestException or TimeoutRejectedException or BrokenCircuitException or JsonException => true,

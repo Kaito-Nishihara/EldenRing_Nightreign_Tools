@@ -12,13 +12,19 @@ internal sealed class FakeMasterDirectory : IMasterDirectory
 {
     public List<MasterReferenceQuery> Queries { get; } = [];
 
-    /// <summary>非表示にした収縮候補地。</summary>
+    /// <summary>
+    /// 非表示にした収縮候補地。
+    /// </summary>
     public HashSet<int> HiddenZoneIds { get; } = [];
 
-    /// <summary>4 のほかに持たせる第二収縮地点。</summary>
+    /// <summary>
+    /// 4 のほかに持たせる第二収縮地点。
+    /// </summary>
     public HashSet<int> ExtraPointIds { get; } = [];
 
-    /// <summary>true にすると、master-service が応答しないときと同じ例外を投げる。</summary>
+    /// <summary>
+    /// true にすると、master-service が応答しないときと同じ例外を投げる。
+    /// </summary>
     public bool Unavailable { get; set; }
 
     public Task<MasterReferences> ResolveAsync(MasterReferenceQuery query, CancellationToken ct)

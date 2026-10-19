@@ -4,7 +4,10 @@ using NightreignTools.Record.Infrastructure.Persistence;
 
 namespace NightreignTools.Record.Infrastructure.Repositories;
 
-/// <summary>プレイ記録の保存(プレイ記録 5 章)。</summary>
+/// <summary>
+/// プレイ記録の保存(プレイ記録 5 章)。
+/// </summary>
+/// <param name="db">record-service のデータベース。</param>
 internal sealed class PlayRecordRepository(RecordDbContext db) : IPlayRecordRepository
 {
     public async Task AddAsync(PlayRecord record, CancellationToken ct)

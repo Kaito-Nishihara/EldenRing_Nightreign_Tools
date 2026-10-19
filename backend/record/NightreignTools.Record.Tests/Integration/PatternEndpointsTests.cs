@@ -141,7 +141,9 @@ public class PatternEndpointsTests : IClassFixture<PatternEndpointsTests.Factory
         Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
     }
 
-    /// <summary>master-service のクライアントを偽物に差し替えて起動する。</summary>
+    /// <summary>
+    /// master-service のクライアントを偽物に差し替えて起動する。
+    /// </summary>
     public sealed class Factory : RecordServiceFactory
     {
         internal FakeMasterDirectory Masters { get; } = new();

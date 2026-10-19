@@ -9,6 +9,8 @@ namespace NightreignTools.Record.Application.PlayRecords;
 /// 記録の中の規則を確かめてから、master-service に参照を 1 回だけ問い合わせ、ない行は 404、非表示の行は 400 にする。
 /// どこかで失敗したときは何も保存しない。
 /// </summary>
+/// <param name="masters">master-service に参照を問い合わせる。</param>
+/// <param name="repository">記録を保存する。</param>
 internal sealed class PlayRecordService(IMasterDirectory masters, IPlayRecordRepository repository) : IPlayRecordService
 {
     public async Task<CreatePlayRecordResponse> CreateAsync(CreatePlayRecordRequest request, CancellationToken ct)
@@ -30,7 +32,11 @@ internal sealed class PlayRecordService(IMasterDirectory masters, IPlayRecordRep
         return new CreatePlayRecordResponse(record.Id, record.CreatedAt);
     }
 
-    /// <summary>記録が参照するマスタの識別子をまとめる。</summary>
+    /// <summary>
+    /// 記録が参照するマスタの識別子をまとめる。
+    /// </summary>
+    /// <param name="record">参照を引く記録。</param>
+    /// <returns>記録が参照する識別子。使っていない種類は空。</returns>
     private static MasterReferenceQuery QueryFor(PlayRecord record) => new(
         BossIds: [record.BossId],
         JihenIds: record.JihenId is null ? [] : [record.JihenId],
@@ -39,7 +45,12 @@ internal sealed class PlayRecordService(IMasterDirectory masters, IPlayRecordRep
         SecondShrinkPointIds: record.Entries.Where(e => e.SecondShrinkPointId is not null).Select(e => e.SecondShrinkPointId!.Value).Distinct().ToList(),
         NightBossIds: new[] { record.Day1NightBossId, record.Day2NightBossId }.OfType<int>().Distinct().ToList());
 
-    /// <summary>参照する行があり、記録に使える状態かを確かめる。入力の項目の順に確かめ、最初の誤りを投げる。</summary>
+    /// <summary>
+    /// 参照する行があり、記録に使える状態かを確かめる。
+    /// 入力の項目の順に確かめ、最初の誤りを投げる。
+    /// </summary>
+    /// <param name="record">確かめる記録。</param>
+    /// <param name="found">master-service から引いた行。</param>
     private static void EnsureReferences(PlayRecord record, MasterReferences found)
     {
         RequireFound("bossId", record.BossId, found.Bosses.Any(b => b.Id == record.BossId));
@@ -75,7 +86,13 @@ internal sealed class PlayRecordService(IMasterDirectory masters, IPlayRecordRep
         }
     }
 
-    /// <summary>行があり、非表示でないこと。<paramref name="isHidden"/> が null なら行がない。</summary>
+    /// <summary>
+    /// 行があり、非表示でないこと。
+    /// <paramref name="isHidden"/> が null なら行がない。
+    /// </summary>
+    /// <param name="field">例外の文言に入れる項目の名前。</param>
+    /// <param name="id">確かめる識別子。</param>
+    /// <param name="isHidden">行の非表示の状態。null は行がない。</param>
     private static void RequireUsable(string field, int id, bool? isHidden)
     {
         RequireFound(field, id, isHidden is not null);
@@ -85,7 +102,13 @@ internal sealed class PlayRecordService(IMasterDirectory masters, IPlayRecordRep
         }
     }
 
-    /// <summary>夜ボスがあり、その日の夜ボスであること。</summary>
+    /// <summary>
+    /// 夜ボスがあり、その日の夜ボスであること。
+    /// </summary>
+    /// <param name="field">例外の文言に入れる項目の名前。</param>
+    /// <param name="id">夜ボスの識別子。null なら確かめない。</param>
+    /// <param name="day">夜ボスを指定した日。</param>
+    /// <param name="nightBosses">master-service から引いた夜ボス。</param>
     private static void RequireNightBoss(string field, int? id, int day, IReadOnlyList<MasterNightBoss> nightBosses)
     {
         if (id is not { } nightBossId)

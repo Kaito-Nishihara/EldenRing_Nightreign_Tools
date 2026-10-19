@@ -16,13 +16,22 @@ internal static class TestDatabase
         return true;
     });
 
-    /// <summary>テスト用のデータベースへの接続文字列。</summary>
+    /// <summary>
+    /// テスト用のデータベースへの接続文字列。
+    /// </summary>
     public static string ConnectionString => ForDatabase(Name);
 
-    /// <summary>テストの始めに 1 回だけ、前の実行で残ったデータベースを消す。作り直しは起動のときのマイグレーションが行う。</summary>
+    /// <summary>
+    /// テストの始めに 1 回だけ、前の実行で残ったデータベースを消す。
+    /// 作り直しは起動のときのマイグレーションが行う。
+    /// </summary>
     public static void EnsureFresh() => _ = ResetOnce.Value;
 
-    /// <summary>同じサーバーの、指定した名前のデータベースへの接続文字列。</summary>
+    /// <summary>
+    /// 同じサーバーの、指定した名前のデータベースへの接続文字列。
+    /// </summary>
+    /// <param name="database">つなぐデータベースの名前。</param>
+    /// <returns>接続文字列。</returns>
     public static string ForDatabase(string database)
     {
         var server = Environment.GetEnvironmentVariable("ConnectionStrings__Test")
@@ -31,7 +40,11 @@ internal static class TestDatabase
         return new NpgsqlConnectionStringBuilder(server) { Database = database }.ToString();
     }
 
-    /// <summary>データベースを消す。つないでいる接続があっても消す。</summary>
+    /// <summary>
+    /// データベースを消す。
+    /// つないでいる接続があっても消す。
+    /// </summary>
+    /// <param name="database">消すデータベースの名前。ないときは何もしない。</param>
     public static void Drop(string database)
     {
         using var connection = new NpgsqlConnection(ForDatabase("postgres"));
@@ -43,7 +56,11 @@ internal static class TestDatabase
         NpgsqlConnection.ClearAllPools();
     }
 
-    /// <summary>SQL を流し、1 列目の値を並べて返す。</summary>
+    /// <summary>
+    /// SQL を流し、1 列目の値を並べて返す。
+    /// </summary>
+    /// <param name="sql">流す SQL。テストの中で書いた定数だけを渡す。</param>
+    /// <returns>1 列目の値を文字にしたもの。</returns>
     public static async Task<List<string>> QueryAsync(string sql)
     {
         await using var connection = new NpgsqlConnection(ConnectionString);
@@ -59,7 +76,11 @@ internal static class TestDatabase
         return values;
     }
 
-    /// <summary>SQL を流す。結果は読まない。</summary>
+    /// <summary>
+    /// SQL を流す。
+    /// 結果は読まない。
+    /// </summary>
+    /// <param name="sql">流す SQL。テストの中で書いた定数だけを渡す。</param>
     public static async Task ExecuteAsync(string sql)
     {
         await using var connection = new NpgsqlConnection(ConnectionString);

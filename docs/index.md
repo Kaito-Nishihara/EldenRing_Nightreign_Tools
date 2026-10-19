@@ -14,6 +14,8 @@
 | [共通設計: サービスの共通構成](design/common-service.md) | 3 つのサービスの分け方、クリーンアーキテクチャの層、サービスの間の呼び出し、例外の変換、設定と秘密の値、ログ、テストの方針 |
 | [共通設計: 画面の共通仕様](design/common-frontend.md) | エルデンリングに寄せた色、書体、飾り枠、部品、マップの描き方、状態の表し方、API のエラー、アクセシビリティ |
 | [共通設計: 実行環境](design/common-runtime.md) | compose のサービス、道具のコンテナ、環境変数、よく使うコマンド |
+| [共通設計: CI/CD と AWS への配置](design/common-delivery.md) | AWS の上の配置、環境、PR とマージとリリースのパイプライン、データベースの更新、テストの計画 |
+| [CI/CD の流れ](deploy.html) | パイプライン、AWS の構成、データベースの更新、テストの計画を絵にしたもの |
 | [画面設計: 画面の一覧と遷移](design/screens.md) | 画面の一覧とパス、URL に残すもの、遷移、各画面の骨組み |
 | [画面一覧](screens/index.md) | 画面ごとのページ。見た目の試作と、対応する設計へのリンク |
 | [機能設計: パターン検索](design/pattern-search.md) | 条件の選び方、パターンのまとめ方と並び順、カードとマップ、検索の API |
@@ -36,6 +38,8 @@
 | [決定の記録 0011](decisions/0011-clean-architecture.md) | サービスの中をクリーンアーキテクチャで分ける |
 | [決定の記録 0012](decisions/0012-split-services-by-feature.md) | バックエンドを機能ごとに 3 つのサービスに分ける |
 | [決定の記録 0013](decisions/0013-hide-masters-instead-of-delete.md) | マスタを消さずに非表示にする |
+| [決定の記録 0014](decisions/0014-deploy-to-aws-ecs.md) | AWS の ECS on Fargate に配置し、GitHub Actions で配る |
+| [決定の記録 0015](decisions/0015-migrate-before-deploy.md) | ステージングと本番では、配置の前にマイグレーションを適用する |
 | [決定の記録 0016](decisions/0016-publish-game-images.md) | ゲームの画像を公開の場で使う |
 | [決定の記録 0017](decisions/0017-schema-doc-from-entities.md) | テーブルの定義書をエンティティから作る |
 

@@ -16,8 +16,7 @@
 
 やらないこと:
 
-- 本番の配置。置く場所が決まってから決める
-- CI。段階 0 の後に決める
+- 本番の配置と CI。[CI/CD と AWS への配置](common-delivery.md) に書く
 
 ## 3. 画面
 
@@ -119,5 +118,4 @@ docker compose -f docs-site/compose.yaml up -d
 
 ## 8. 未決事項
 
-- **CI**: GitHub Actions で何を走らせるか。段階 0 の後に決める。
-- **本番の配置**: 置く場所と、HTTPS の終端。マップ画像の権利(要件定義の 12 章)が決まってから決める。
+- **CI と本番の配置**: [CI/CD と AWS への配置](common-delivery.md) で決める。本番の公開の時期は利用者が決める。

@@ -9,8 +9,7 @@ import SpawnPointMarkers from "@/components/map/SpawnPointMarkers";
 import ZoneOverlay from "@/components/map/ZoneOverlay";
 import SecondShrinkPointOverlay from "@/components/map/SecondShrinkPointOverlay";
 import SlotPanel, { slotLabel } from "@/components/record/SlotPanel";
-import RecordConditionPanel from "@/components/record/RecordConditionPanel";
-import RecordSavePanel from "@/components/record/RecordSavePanel";
+import RecordExpeditionPanel from "@/components/record/RecordExpeditionPanel";
 import Panel from "@/components/ui/Panel";
 import BottomSheet from "@/components/ui/BottomSheet";
 import SegmentedControl from "@/components/ui/SegmentedControl";
@@ -109,26 +108,29 @@ function RecordPage() {
         onFill={fillActiveSlot}
         onNightBossChange={form.setNightBossId}
       />
-      <RecordConditionPanel
-        bosses={masters.bosses}
-        jihenList={masters.jihenList}
-        spawnPoints={masters.spawnPoints}
-        bossId={draft.bossId}
-        jihenId={draft.jihenId}
-        spawnPointId={draft.spawnPointId}
-        onChange={(patch) => {
-          if (patch.bossId !== undefined) setBossId(patch.bossId);
-          if (patch.jihenId !== undefined) setJihenId(patch.jihenId);
-          if (patch.spawnPointId !== undefined) setSpawnPointId(patch.spawnPointId);
+      <RecordExpeditionPanel
+        condition={{
+          bosses: masters.bosses,
+          jihenList: masters.jihenList,
+          spawnPoints: masters.spawnPoints,
+          bossId: draft.bossId,
+          jihenId: draft.jihenId,
+          spawnPointId: draft.spawnPointId,
+          onChange: (patch) => {
+            if (patch.bossId !== undefined) setBossId(patch.bossId);
+            if (patch.jihenId !== undefined) setJihenId(patch.jihenId);
+            if (patch.spawnPointId !== undefined) setSpawnPointId(patch.spawnPointId);
+          },
         }}
-      />
-      <RecordSavePanel
-        note={draft.note}
-        missing={form.missing}
-        save={form.save}
-        onNoteChange={form.setNote}
-        onSubmit={() => void form.submit()}
-        onReset={form.reset}
+        save={{
+          note: draft.note,
+          missing: form.missing,
+          save: form.save,
+          draftSavedAt: form.draftSavedAt,
+          onNoteChange: form.setNote,
+          onSubmit: () => void form.submit(),
+          onReset: form.reset,
+        }}
       />
     </>
   );

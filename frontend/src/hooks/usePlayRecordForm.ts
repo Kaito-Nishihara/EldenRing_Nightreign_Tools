@@ -41,6 +41,8 @@ export function usePlayRecordForm() {
   const [activeSlot, setActiveSlot] = useState<Slot | null>({ day: 1, phase: 1 });
   const [restored, setRestored] = useState(false);
   const [save, setSave] = useState<SaveState>({ kind: "idle" });
+  // 下書きを最後に書けた時刻。書けていなければ null(試作の「最後に残した時刻」)
+  const [draftSavedAt, setDraftSavedAt] = useState<Date | null>(null);
   // 下書きを読み終えるまで書かない。読む前の空の入力で、残っていた下書きを上書きしないためである
   const loaded = useRef(false);
 
@@ -63,7 +65,9 @@ export function usePlayRecordForm() {
     if (!loaded.current) {
       return;
     }
-    const timer = setTimeout(() => writeStorage(draft), DRAFT_SAVE_DELAY_MS);
+    const timer = setTimeout(() => {
+      if (writeStorage(draft)) setDraftSavedAt(new Date());
+    }, DRAFT_SAVE_DELAY_MS);
     return () => clearTimeout(timer);
   }, [draft]);
 
@@ -125,6 +129,7 @@ export function usePlayRecordForm() {
     try {
       const created = await createPlayRecord(request);
       removeStorage();
+      setDraftSavedAt(null);
       setDraft(clearAfterSave(draft));
       setActiveSlot({ day: 1, phase: 1 });
       setRestored(false);
@@ -146,6 +151,7 @@ export function usePlayRecordForm() {
     setActiveSlot,
     restored,
     dismissRestored,
+    draftSavedAt,
     save,
     dismissSave,
     filledCount: filledCount(draft),
@@ -183,11 +189,14 @@ function readStorage(): string | null {
   }
 }
 
-function writeStorage(draft: RecordDraft): void {
+/** 書けたら true を返す */
+function writeStorage(draft: RecordDraft): boolean {
   try {
     localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
+    return true;
   } catch {
     // 書けなくても入力は画面に残っている
+    return false;
   }
 }
 

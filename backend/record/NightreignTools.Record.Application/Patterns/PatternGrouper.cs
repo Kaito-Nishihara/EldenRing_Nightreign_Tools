@@ -9,10 +9,20 @@ namespace NightreignTools.Record.Application.Patterns;
 /// </summary>
 internal static class PatternGrouper
 {
-    /// <summary>まとめた 1 つのパターン。収縮先は日、段階の順。</summary>
+    /// <summary>
+    /// まとめた 1 つのパターン。
+    /// 収縮先は日、段階の順。
+    /// </summary>
+    /// <param name="Shrinks">日、段階の順の収縮先。</param>
+    /// <param name="RecordCount">このパターンになった記録の数。</param>
+    /// <param name="LastRecordedAt">このパターンの最後の記録の日時(UTC)。</param>
     public sealed record PatternGroup(IReadOnlyList<ShrinkTarget> Shrinks, int RecordCount, DateTime LastRecordedAt);
 
-    /// <summary>まとめて、記録の数の多い順、同じなら最後の記録の新しい順に並べる。</summary>
+    /// <summary>
+    /// まとめて、記録の数の多い順、同じなら最後の記録の新しい順に並べる。
+    /// </summary>
+    /// <param name="records">まとめる記録。収縮先の並びは問わない。</param>
+    /// <returns>まとめたパターン。記録がなければ空。</returns>
     public static IReadOnlyList<PatternGroup> Group(IEnumerable<RecordedShrinks> records) =>
         records
             .Select(r => (Shrinks: r.Shrinks.OrderBy(s => s.Day).ThenBy(s => s.Phase).ToList(), r.CreatedAt))
@@ -22,7 +32,12 @@ internal static class PatternGrouper
             .ThenByDescending(g => g.LastRecordedAt)
             .ToList();
 
-    /// <summary>並びを 1 つの文字列の鍵にする。例: 1-1-z4|1-2-p4</summary>
+    /// <summary>
+    /// 並びを 1 つの文字列の鍵にする。
+    /// 例: 1-1-z4|1-2-p4
+    /// </summary>
+    /// <param name="shrinks">日、段階の順に並べた収縮先。</param>
+    /// <returns>並びを表す鍵。</returns>
     private static string KeyOf(IEnumerable<ShrinkTarget> shrinks) =>
         string.Join('|', shrinks.Select(s => s.ZoneId is { } zone ? $"{s.Day}-{s.Phase}-z{zone}" : $"{s.Day}-{s.Phase}-p{s.SecondShrinkPointId}"));
 }

@@ -3,7 +3,10 @@ using NightreignTools.ServiceDefaults.ErrorHandling;
 
 namespace NightreignTools.Record.Api.Endpoints;
 
-/// <summary>プレイ記録の API(プレイ記録 4 章)。/api/v1 のグループに足す。</summary>
+/// <summary>
+/// プレイ記録の API(プレイ記録 4 章)。
+/// /api/v1 のグループに足す。
+/// </summary>
 public static class PlayRecordEndpoints
 {
     public static IEndpointRouteBuilder MapPlayRecordEndpoints(this IEndpointRouteBuilder api)

@@ -5,7 +5,11 @@ using NightreignTools.Record.Infrastructure.Persistence;
 
 namespace NightreignTools.Record.Infrastructure.Repositories;
 
-/// <summary>パターン検索のための記録の読み出し(パターン検索 5 章)。読むだけで、書かない。</summary>
+/// <summary>
+/// パターン検索のための記録の読み出し(パターン検索 5 章)。
+/// 読むだけで、書かない。
+/// </summary>
+/// <param name="db">record-service のデータベース。</param>
 internal sealed class PatternRecordReader(RecordDbContext db) : IPatternRecordReader
 {
     public async Task<IReadOnlyList<RecordedShrinks>> FindAsync(string bossId, int spawnPointId, string? jihenId, CancellationToken ct)

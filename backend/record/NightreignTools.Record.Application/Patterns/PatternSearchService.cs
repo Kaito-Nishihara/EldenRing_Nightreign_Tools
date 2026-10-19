@@ -8,6 +8,8 @@ namespace NightreignTools.Record.Application.Patterns;
 /// 条件に合う記録を読んでまとめ、出てきた収縮先の名前と座標を master-service に 1 回だけ問い合わせて入れる。
 /// 条件の夜の王、開始地点、地変があるかも、同じ問い合わせで確かめる。
 /// </summary>
+/// <param name="reader">条件に合う記録を読む。</param>
+/// <param name="masters">master-service から名前と座標を引く。</param>
 internal sealed class PatternSearchService(IPatternRecordReader reader, IMasterDirectory masters) : IPatternSearchService
 {
     public async Task<PatternResponse> SearchAsync(PatternSearchRequest request, CancellationToken ct)
@@ -48,7 +50,14 @@ internal sealed class PatternSearchService(IPatternRecordReader reader, IMasterD
         return new PatternResponse(records.Count, patterns);
     }
 
-    /// <summary>条件の行があること。ない行は 404 にする。</summary>
+    /// <summary>
+    /// 条件の行があること。
+    /// ない行は 404 にする。
+    /// </summary>
+    /// <param name="bossId">条件の夜の王の識別子。</param>
+    /// <param name="spawnPointId">条件の開始地点の識別子。</param>
+    /// <param name="jihenId">条件の地変の識別子。null なら確かめない。</param>
+    /// <param name="found">master-service から引いた行。</param>
     private static void EnsureConditions(string bossId, int spawnPointId, string? jihenId, MasterReferences found)
     {
         if (found.Bosses.All(b => b.Id != bossId))
@@ -71,6 +80,11 @@ internal sealed class PatternSearchService(IPatternRecordReader reader, IMasterD
     /// 記録が指す収縮先を引く。マスタの行は消さないので(決定の記録 0013)、見つからないのはデータの食い違いである。
     /// 利用者には直せないので、想定していない誤り(500)にする。
     /// </summary>
+    /// <typeparam name="T">マスタの行の型。</typeparam>
+    /// <param name="rows">識別子で引けるようにしたマスタの行。</param>
+    /// <param name="id">記録が指す識別子。</param>
+    /// <param name="field">例外の文言に入れる項目の名前。</param>
+    /// <returns>見つかった行。</returns>
     private static T Lookup<T>(IReadOnlyDictionary<int, T> rows, int id, string field) =>
         rows.TryGetValue(id, out var row)
             ? row

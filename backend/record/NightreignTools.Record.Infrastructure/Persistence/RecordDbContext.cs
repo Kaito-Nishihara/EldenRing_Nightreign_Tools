@@ -10,6 +10,7 @@ namespace NightreignTools.Record.Infrastructure.Persistence;
 /// record-service のデータベース(nightreign_record)の入口(データベースの共通仕様 5.1)。
 /// リポジトリの実装からだけ使う。
 /// </summary>
+/// <param name="options">接続とスネークケースの設定。UseServiceDatabase で作る。</param>
 public sealed class RecordDbContext(DbContextOptions<RecordDbContext> options) : DbContext(options)
 {
     public DbSet<PlayRecord> PlayRecords => Set<PlayRecord>();

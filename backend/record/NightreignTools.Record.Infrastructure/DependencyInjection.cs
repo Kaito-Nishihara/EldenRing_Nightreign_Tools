@@ -31,6 +31,7 @@ public static class DependencyInjection
     /// <summary>
     /// master-service のクライアント(サービスの共通構成 5.5)。呼び先がないときは、起動の時点で止める(AC-SVC-10)。
     /// </summary>
+    /// <param name="services">登録先。</param>
     private static void AddMasterDirectory(this IServiceCollection services)
     {
         services.AddOptions<MasterServiceOptions>()

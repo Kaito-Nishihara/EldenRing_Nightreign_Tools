@@ -27,7 +27,11 @@ public class PlayRecordEndpointsTests : IClassFixture<PlayRecordEndpointsTests.F
 
     public void Dispose() => _client.Dispose();
 
-    /// <summary>正しい入力。1 日目の第 1 次と第 2 次、2 日目の第 1 次を持つ。</summary>
+    /// <summary>
+    /// 正しい入力。
+    /// 1 日目の第 1 次と第 2 次、2 日目の第 1 次を持つ。
+    /// </summary>
+    /// <returns>保存の API に送る本文。テストごとに項目を書き換えて使う。</returns>
     private static Dictionary<string, object?> ValidRequest() => new()
     {
         ["bossId"] = "gladius",
@@ -62,7 +66,12 @@ public class PlayRecordEndpointsTests : IClassFixture<PlayRecordEndpointsTests.F
         return body.RootElement.GetProperty("message").GetString()!;
     }
 
-    /// <summary>保存されずに、指定した状態と文言が返ることを確かめる。</summary>
+    /// <summary>
+    /// 保存されずに、指定した状態と文言が返ることを確かめる。
+    /// </summary>
+    /// <param name="request">保存の API に送る本文。</param>
+    /// <param name="status">期待する HTTP の状態。</param>
+    /// <param name="message">期待する文言。null なら文言は確かめない。</param>
     private async Task AssertRejectedAsync(object request, HttpStatusCode status, string? message = null)
     {
         var before = await CountAsync("play_records");
@@ -198,7 +207,9 @@ public class PlayRecordEndpointsTests : IClassFixture<PlayRecordEndpointsTests.F
         return body.RootElement.GetProperty("id").GetInt32();
     }
 
-    /// <summary>master-service のクライアントを偽物に差し替えて起動する。</summary>
+    /// <summary>
+    /// master-service のクライアントを偽物に差し替えて起動する。
+    /// </summary>
     public sealed class Factory : RecordServiceFactory
     {
         internal FakeMasterDirectory Masters { get; } = new();

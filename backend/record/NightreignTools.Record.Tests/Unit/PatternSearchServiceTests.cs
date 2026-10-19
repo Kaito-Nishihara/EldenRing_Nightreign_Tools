@@ -164,7 +164,10 @@ public class PatternSearchServiceTests
         await Assert.ThrowsAsync<ServiceUnavailableException>(() => SearchAsync());
     }
 
-    /// <summary>記録の読み出しの偽物。条件に関係なく、足した記録をすべて返す。</summary>
+    /// <summary>
+    /// 記録の読み出しの偽物。
+    /// 条件に関係なく、足した記録をすべて返す。
+    /// </summary>
     private sealed class FakeReader : IPatternRecordReader
     {
         private readonly List<RecordedShrinks> _records = [];

@@ -3,7 +3,10 @@ using NightreignTools.ServiceDefaults.ErrorHandling;
 
 namespace NightreignTools.Record.Api.Endpoints;
 
-/// <summary>パターン検索の API(パターン検索 4 章)。/api/v1 のグループに足す。</summary>
+/// <summary>
+/// パターン検索の API(パターン検索 4 章)。
+/// /api/v1 のグループに足す。
+/// </summary>
 public static class PatternEndpoints
 {
     public static IEndpointRouteBuilder MapPatternEndpoints(this IEndpointRouteBuilder api)

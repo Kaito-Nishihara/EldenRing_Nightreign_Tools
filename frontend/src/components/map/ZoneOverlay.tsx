@@ -57,7 +57,8 @@ export default function ZoneOverlay({ zones, selectedEntries = [], activeZoneId,
               />
             )}
 
-            <Group opacity={pickable ? 1 : MAP_STYLE.inactiveZoneOpacity} listening={pickable}>
+            {/* 押せない間も、入れた収縮先の印は薄くしない(試作) */}
+            <Group opacity={pickable || isSelected ? 1 : MAP_STYLE.inactiveZoneOpacity} listening={pickable}>
               {/* 中心の印。選んだものは tide で塗り、今入力しているスロットの収縮先は azure-bright の線にする */}
               <Circle
                 x={zone.centerX}
@@ -71,20 +72,23 @@ export default function ZoneOverlay({ zones, selectedEntries = [], activeZoneId,
                 onTap={() => onZoneSelect?.(zone)}
               />
 
-              <Text
-                x={zone.centerX - 60}
-                y={zone.centerY - markerRadius - 24}
-                width={120}
-                align="center"
-                text={label}
-                fontSize={16}
-                fontStyle="bold"
-                fill={isActive ? THEME.azureBright : THEME.ash}
-                stroke={THEME.night}
-                strokeWidth={MAP_STYLE.labelStrokeWidth}
-                fillAfterStrokeEnabled
-                listening={false}
-              />
+              {/* 押せない薄い印は名前を出さない。第 2 次の地点の名前と重なって読めなくなるためである(試作) */}
+              {(pickable || isSelected) && (
+                <Text
+                  x={zone.centerX - 60}
+                  y={zone.centerY - markerRadius - 24}
+                  width={120}
+                  align="center"
+                  text={label}
+                  fontSize={16}
+                  fontStyle="bold"
+                  fill={isActive ? THEME.azureBright : THEME.ash}
+                  stroke={THEME.night}
+                  strokeWidth={MAP_STYLE.labelStrokeWidth}
+                  fillAfterStrokeEnabled
+                  listening={false}
+                />
+              )}
             </Group>
           </Fragment>
         );

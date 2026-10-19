@@ -113,6 +113,16 @@ export function fillSlot(draft: RecordDraft, slot: Slot, targetId: number): { dr
   return { draft: filled, next: null };
 }
 
+/** 下書きを残した時刻を、日本時間の「21:42」の形にする */
+export function formatDraftTime(savedAt: Date): string {
+  return new Intl.DateTimeFormat("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(savedAt);
+}
+
 /**
  * 「記録を保存する」を使えない理由。空なら保存できる(プレイ記録 3.5、AC-REC-12)。
  */

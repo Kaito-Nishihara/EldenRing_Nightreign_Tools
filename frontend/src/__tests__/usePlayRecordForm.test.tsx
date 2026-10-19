@@ -42,6 +42,17 @@ describe("usePlayRecordForm の下書き(プレイ記録 3.6)", () => {
     expect(second.result.current.activeSlot).toEqual({ day: 1, phase: 2 });
   });
 
+  it("下書きを書くまでは残した時刻が null で、書いた後はその時刻になる", () => {
+    vi.setSystemTime(new Date("2026-10-19T12:42:00Z"));
+    const { result } = renderHook(() => usePlayRecordForm());
+    fillMinimum(result);
+
+    expect(result.current.draftSavedAt).toBeNull();
+    act(() => vi.advanceTimersByTime(DRAFT_SAVE_DELAY_MS));
+
+    expect(result.current.draftSavedAt?.toISOString()).toBe("2026-10-19T12:42:01.000Z");
+  });
+
   it("AC-REC-22: 版 1 の下書きが残っていると、戻さずに消し、知らせを出さない", () => {
     localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({ bossId: "gladius", spawnPointId: 1, note: "", entries: { "1-1": 4 } }));
 

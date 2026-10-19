@@ -42,9 +42,12 @@ export default function SecondShrinkPointOverlay({ points, selectedId, activeId,
               offsetX={size / 2}
               offsetY={size / 2}
               rotation={45}
-              fill={selected ? THEME.tide : MAP_STYLE.zoneMarkerFill}
-              stroke={active ? THEME.azureBright : THEME.tide}
+              // 試作のとおり tide で塗る。押せるものは ash の縁と tide の光で目立たせ、入れたものは azure-bright で塗る
+              fill={selected ? THEME.azureBright : THEME.tide}
+              stroke={active ? THEME.azureBright : onSelect ? THEME.ash : THEME.tide}
               strokeWidth={MAP_STYLE.zoneStrokeWidth}
+              shadowColor={THEME.tide}
+              shadowBlur={onSelect ? 8 : 0}
               hitStrokeWidth={18}
               listening={Boolean(onSelect)}
               onClick={() => onSelect?.(point)}

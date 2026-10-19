@@ -8,17 +8,40 @@ namespace NightreignTools.Master.Application.Admin;
 /// </summary>
 public interface IMapPlaceAdminRepository
 {
-    /// <summary>非表示の行も含めて、識別子の順に返す。</summary>
+    /// <summary>
+    /// 非表示の行も含めて、識別子の順に返す。
+    /// </summary>
+    /// <typeparam name="TPlace">場所の種類。</typeparam>
+    /// <param name="cancellationToken">取り消しの合図。</param>
+    /// <returns>その種類のすべての行。</returns>
     Task<IReadOnlyList<TPlace>> ListAsync<TPlace>(CancellationToken cancellationToken) where TPlace : MapPlace;
 
-    /// <summary>直すために、変更を追跡する状態で 1 行を返す。なければ null。</summary>
+    /// <summary>
+    /// 直すために、変更を追跡する状態で 1 行を返す。
+    /// なければ null。
+    /// </summary>
+    /// <typeparam name="TPlace">場所の種類。</typeparam>
+    /// <param name="id">識別子。</param>
+    /// <param name="cancellationToken">取り消しの合図。</param>
+    /// <returns>見つかった行。なければ null。</returns>
     Task<TPlace?> FindAsync<TPlace>(int id, CancellationToken cancellationToken) where TPlace : MapPlace;
 
-    /// <summary>新しい行を足す。保存は <see cref="SaveChangesAsync"/> で行う。</summary>
+    /// <summary>
+    /// 新しい行を足す。
+    /// 保存は <see cref="SaveChangesAsync"/> で行う。
+    /// </summary>
+    /// <typeparam name="TPlace">場所の種類。</typeparam>
+    /// <param name="place">足す行。識別子は保存のときに振られる。</param>
     void Add<TPlace>(TPlace place) where TPlace : MapPlace;
 
     Task SaveChangesAsync(CancellationToken cancellationToken);
 
-    /// <summary>地変の識別子があるか。拠点候補地のマップの確かめに使う。</summary>
+    /// <summary>
+    /// 地変の識別子があるか。
+    /// 拠点候補地のマップの確かめに使う。
+    /// </summary>
+    /// <param name="jihenId">確かめる地変の識別子。</param>
+    /// <param name="cancellationToken">取り消しの合図。</param>
+    /// <returns>あれば true。</returns>
     Task<bool> JihenExistsAsync(string jihenId, CancellationToken cancellationToken);
 }

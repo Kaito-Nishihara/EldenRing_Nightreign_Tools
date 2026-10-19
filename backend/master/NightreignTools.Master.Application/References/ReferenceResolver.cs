@@ -1,6 +1,8 @@
 namespace NightreignTools.Master.Application.References;
 
-/// <summary>マスタの参照の解決(マスタの管理 4.4)。</summary>
+/// <summary>
+/// マスタの参照の解決(マスタの管理 4.4)。
+/// </summary>
 public interface IReferenceResolver
 {
     Task<ResolvedReferences> ResolveAsync(ResolveReferencesRequest request, CancellationToken cancellationToken);
@@ -10,6 +12,7 @@ public interface IReferenceResolver
 /// 識別子をまとめて引き、見つかった行を返す。足りないものを 404 にするかは、呼ぶ側(record-service)が決める。
 /// 空の配列と省いた配列は、データベースに問い合わせずに空で返す。
 /// </summary>
+/// <param name="repository">識別子でマスタを引く。</param>
 internal sealed class ReferenceResolver(IReferenceRepository repository) : IReferenceResolver
 {
     public async Task<ResolvedReferences> ResolveAsync(ResolveReferencesRequest request, CancellationToken cancellationToken)
@@ -30,7 +33,16 @@ internal sealed class ReferenceResolver(IReferenceRepository repository) : IRefe
             nightBosses.Select(n => new ResolvedNightBoss(n.Id, n.NameJa, n.Day)).ToList());
     }
 
-    /// <summary>重なりを除いてから引く。何も渡されていなければ、問い合わせずに空を返す。</summary>
+    /// <summary>
+    /// 重なりを除いてから引く。
+    /// 何も渡されていなければ、問い合わせずに空を返す。
+    /// </summary>
+    /// <typeparam name="TId">識別子の型。</typeparam>
+    /// <typeparam name="TEntity">引くマスタの型。</typeparam>
+    /// <param name="ids">引く識別子。重なりがあってもよい。null か空なら問い合わせない。</param>
+    /// <param name="find">識別子の集まりで引くリポジトリのメソッド。</param>
+    /// <param name="cancellationToken">取り消しの合図。</param>
+    /// <returns>見つかった行。見つからない識別子の行は含まない。</returns>
     private static async Task<IReadOnlyList<TEntity>> FindAsync<TId, TEntity>(
         IReadOnlyList<TId>? ids,
         Func<IReadOnlyCollection<TId>, CancellationToken, Task<IReadOnlyList<TEntity>>> find,

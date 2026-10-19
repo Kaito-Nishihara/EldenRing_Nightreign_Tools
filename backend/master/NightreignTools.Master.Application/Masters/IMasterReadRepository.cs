@@ -8,7 +8,11 @@ namespace NightreignTools.Master.Application.Masters;
 /// </summary>
 public interface IMasterReadRepository
 {
-    /// <summary>夜の王を、弱点を含めて返す。</summary>
+    /// <summary>
+    /// 夜の王を、弱点を含めて返す。
+    /// </summary>
+    /// <param name="cancellationToken">取り消しの合図。</param>
+    /// <returns>すべての夜の王。並び順、識別子の順。</returns>
     Task<IReadOnlyList<Boss>> GetBossesAsync(CancellationToken cancellationToken);
 
     Task<IReadOnlyList<Jihen>> GetJihenAsync(CancellationToken cancellationToken);

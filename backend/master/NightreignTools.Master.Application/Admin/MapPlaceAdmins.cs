@@ -5,7 +5,11 @@ namespace NightreignTools.Master.Application.Admin;
 
 // 種類ごとの管理(マスタの管理 4.2)。共通の流れは MapPlaceAdmin にあり、ここには種類ごとの違いだけを書く
 
-/// <summary>開始地点の管理</summary>
+/// <summary>
+/// 開始地点の管理
+/// </summary>
+/// <param name="repository">場所を出し入れする。</param>
+/// <param name="clock">非表示にした日時を決める。</param>
 internal sealed class SpawnPointAdmin(IMapPlaceAdminRepository repository, TimeProvider clock)
     : MapPlaceAdmin<SpawnPoint, SaveSpawnPointRequest, AdminSpawnPointDto>(repository, clock)
 {
@@ -22,7 +26,11 @@ internal sealed class SpawnPointAdmin(IMapPlaceAdminRepository repository, TimeP
     protected override AdminSpawnPointDto ToDto(SpawnPoint p) => new(p.Id, p.NameJa, p.X, p.Y, p.IsHidden);
 }
 
-/// <summary>収縮候補地の管理</summary>
+/// <summary>
+/// 収縮候補地の管理
+/// </summary>
+/// <param name="repository">場所を出し入れする。</param>
+/// <param name="clock">非表示にした日時を決める。</param>
 internal sealed class ShrinkZoneAdmin(IMapPlaceAdminRepository repository, TimeProvider clock)
     : MapPlaceAdmin<ShrinkZone, SaveShrinkZoneRequest, AdminShrinkZoneDto>(repository, clock)
 {
@@ -39,7 +47,11 @@ internal sealed class ShrinkZoneAdmin(IMapPlaceAdminRepository repository, TimeP
     protected override AdminShrinkZoneDto ToDto(ShrinkZone z) => new(z.Id, z.NameJa, z.IconPath, z.CenterX, z.CenterY, z.Radius, z.IsHidden);
 }
 
-/// <summary>第二収縮地点の管理</summary>
+/// <summary>
+/// 第二収縮地点の管理
+/// </summary>
+/// <param name="repository">場所を出し入れする。</param>
+/// <param name="clock">非表示にした日時を決める。</param>
 internal sealed class SecondShrinkPointAdmin(IMapPlaceAdminRepository repository, TimeProvider clock)
     : MapPlaceAdmin<SecondShrinkPoint, SaveSecondShrinkPointRequest, AdminSecondShrinkPointDto>(repository, clock)
 {
@@ -56,7 +68,12 @@ internal sealed class SecondShrinkPointAdmin(IMapPlaceAdminRepository repository
     protected override AdminSecondShrinkPointDto ToDto(SecondShrinkPoint p) => new(p.Id, p.NameJa, p.X, p.Y, p.IsHidden);
 }
 
-/// <summary>拠点候補地の管理。マップは通常のマップか、ある地変の識別子に限る(マスタの管理 3.4)</summary>
+/// <summary>
+/// 拠点候補地の管理。
+/// マップは通常のマップか、ある地変の識別子に限る(マスタの管理 3.4)
+/// </summary>
+/// <param name="repository">場所を出し入れする。地変があるかの確かめにも使う。</param>
+/// <param name="clock">非表示にした日時を決める。</param>
 internal sealed class BasePointAdmin(IMapPlaceAdminRepository repository, TimeProvider clock)
     : MapPlaceAdmin<BasePoint, SaveBasePointRequest, AdminBasePointDto>(repository, clock)
 {
@@ -81,7 +98,11 @@ internal sealed class BasePointAdmin(IMapPlaceAdminRepository repository, TimePr
 
     protected override AdminBasePointDto ToDto(BasePoint p) => new(p.Id, p.MapId, p.NameJa, p.X, p.Y, p.IsHidden);
 
-    /// <summary>省いたときは通常のマップ</summary>
+    /// <summary>
+    /// 省いたときは通常のマップ
+    /// </summary>
+    /// <param name="r">拠点候補地の入力。</param>
+    /// <returns>前後の空白を除いたマップの識別子。</returns>
     private static string MapId(SaveBasePointRequest r) =>
         string.IsNullOrWhiteSpace(r.MapId) ? BasePoint.NormalMapId : r.MapId.Trim();
 }

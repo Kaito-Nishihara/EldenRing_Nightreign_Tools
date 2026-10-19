@@ -10,6 +10,7 @@ namespace NightreignTools.Master.Tests.Integration;
 /// マイグレーションに含めた初期データと、テーブルの制約(データベースの共通仕様 5.3、5.6)。
 /// API から見た初期データ(AC-DB-03〜05)は、マスタの API のテストで確かめる。
 /// </summary>
+/// <param name="factory">テストのために起動した master-service。</param>
 public class SeedDataTests(MasterServiceFactory factory) : IClassFixture<MasterServiceFactory>
 {
     [Fact]
@@ -77,7 +78,10 @@ public class SeedDataTests(MasterServiceFactory factory) : IClassFixture<MasterS
         Assert.Contains("ck_spawn_points_x", exception.Message);
     }
 
-    /// <summary>起動(とマイグレーション)を済ませてから、アプリと同じ設定の DbContext を持つスコープを作る。</summary>
+    /// <summary>
+    /// 起動(とマイグレーション)を済ませてから、アプリと同じ設定の DbContext を持つスコープを作る。
+    /// </summary>
+    /// <returns>呼んだ側で破棄するスコープ。</returns>
     private AsyncServiceScope CreateScope()
     {
         factory.CreateClient();

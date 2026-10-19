@@ -1,6 +1,8 @@
 namespace NightreignTools.Master.Infrastructure.Persistence.Seed;
 
-/// <summary>夜の王と弱点の初期データ(旧版の V3)。</summary>
+/// <summary>
+/// 夜の王と弱点の初期データ(旧版の V3)。
+/// </summary>
 internal static class BossSeed
 {
     public static readonly object[] Bosses =
@@ -36,7 +38,17 @@ internal static class BossSeed
         Weakness(15, "strages", "fire"),
     ];
 
-    /// <summary><paramref name="sortOrder"/> は画面での並び順。旧版の V3 の並びのとおり</summary>
+    /// <summary>
+    /// <paramref name="sortOrder"/> は画面での並び順。
+    /// 旧版の V3 の並びのとおり
+    /// </summary>
+    /// <param name="sortOrder">画面での並び順。</param>
+    /// <param name="id">識別子。</param>
+    /// <param name="nameJa">日本語の名前。</param>
+    /// <param name="nameEn">英語の名前。</param>
+    /// <param name="isDlc">ダウンロードコンテンツで足された夜の王か。</param>
+    /// <param name="unlockCondition">戦えるようになる条件。null は最初から戦える。</param>
+    /// <returns>HasData に渡す匿名の型の行。</returns>
     private static object Boss(int sortOrder, string id, string nameJa, string nameEn, bool isDlc = false, string? unlockCondition = null) =>
         new { Id = id, NameJa = nameJa, NameEn = nameEn, IsDlc = isDlc, UnlockCondition = unlockCondition, SortOrder = sortOrder, CreatedAt = SeedData.CreatedAt };
 

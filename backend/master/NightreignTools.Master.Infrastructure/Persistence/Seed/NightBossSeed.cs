@@ -1,6 +1,9 @@
 namespace NightreignTools.Master.Infrastructure.Persistence.Seed;
 
-/// <summary>夜ボスの初期データ(旧版の V10)。1 日目 14 体、2 日目 21 体。</summary>
+/// <summary>
+/// 夜ボスの初期データ(旧版の V10)。
+/// 1 日目 14 体、2 日目 21 体。
+/// </summary>
 internal static class NightBossSeed
 {
     public static readonly object[] Rows =

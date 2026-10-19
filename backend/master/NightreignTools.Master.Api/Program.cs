@@ -29,5 +29,7 @@ internalApi.MapReferenceEndpoints();
 
 return await app.RunServiceAsync();
 
-/// <summary>テストの WebApplicationFactory から参照するための宣言。</summary>
+/// <summary>
+/// テストの WebApplicationFactory から参照するための宣言。
+/// </summary>
 public partial class Program;

@@ -9,6 +9,7 @@ namespace NightreignTools.Master.Tests.Integration;
 /// ほかのテストは初期データの件数を見るので、足した行はテストの終わりに消す。
 /// 行を消す API はないので、テスト用のデータベースへ直に DELETE を流す。
 /// </summary>
+/// <param name="factory">テストのために起動した master-service。</param>
 public class AdminEndpointsTests(MasterServiceFactory factory) : IClassFixture<MasterServiceFactory>
 {
     [Fact]
@@ -169,11 +170,24 @@ public class AdminEndpointsTests(MasterServiceFactory factory) : IClassFixture<M
     private static Task DeleteAsync(string table, int id) =>
         TestDatabase.QueryAsync($"DELETE FROM game.{table} WHERE id = {id} RETURNING id");
 
-    /// <summary>管理用の一覧から 1 行を取る。初期データの行を、今の値のまま直すために使う</summary>
+    /// <summary>
+    /// 管理用の一覧から 1 行を取る。
+    /// 初期データの行を、今の値のまま直すために使う
+    /// </summary>
+    /// <param name="client">サービス間キーを付けたクライアント。</param>
+    /// <param name="path">管理用の一覧のパス。</param>
+    /// <param name="id">取る行の識別子。1 行だけあることを前提にする。</param>
+    /// <returns>見つかった行。</returns>
     private static async Task<JsonElement> FindAsync(HttpClient client, string path, int id) =>
         (await GetArrayAsync(client, path)).Single(p => p.GetProperty("id").GetInt32() == id);
 
-    /// <summary>初期データの行を表示中に戻す。値は今のまま送っているので変わっていない</summary>
+    /// <summary>
+    /// 初期データの行を表示中に戻す。
+    /// 値は今のまま送っているので変わっていない
+    /// </summary>
+    /// <param name="table">テーブルの名前。テストの中で書いた定数だけを渡す。</param>
+    /// <param name="id">戻す行の識別子。</param>
+    /// <returns>戻し終えると終わるタスク。</returns>
     private static Task RestoreSeedAsync(string table, int id) =>
         TestDatabase.QueryAsync($"UPDATE game.{table} SET hidden_at = NULL WHERE id = {id} RETURNING id");
 }

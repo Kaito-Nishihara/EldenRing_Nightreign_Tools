@@ -14,7 +14,18 @@ internal static class JihenSeed
         Jihen(5, "great_cavern", "大空洞", "all", 512m, 512m, isDlc: true),
     ];
 
-    /// <summary><paramref name="sortOrder"/> は画面での並び順。旧版の V3 の並びのとおり</summary>
+    /// <summary>
+    /// <paramref name="sortOrder"/> は画面での並び順。
+    /// 旧版の V3 の並びのとおり
+    /// </summary>
+    /// <param name="sortOrder">画面での並び順。</param>
+    /// <param name="id">識別子。</param>
+    /// <param name="nameJa">日本語の名前。</param>
+    /// <param name="area">地変が起きる方角。</param>
+    /// <param name="centerX">中心の X 座標(1024 四方の座標空間)。</param>
+    /// <param name="centerY">中心の Y 座標(1024 四方の座標空間)。</param>
+    /// <param name="isDlc">ダウンロードコンテンツで足された地変か。</param>
+    /// <returns>HasData に渡す匿名の型の行。</returns>
     private static object Jihen(int sortOrder, string id, string nameJa, string area, decimal centerX, decimal centerY, bool isDlc = false) =>
         new { Id = id, NameJa = nameJa, Area = area, CenterX = centerX, CenterY = centerY, IsDlc = isDlc, SortOrder = sortOrder, CreatedAt = SeedData.CreatedAt };
 }

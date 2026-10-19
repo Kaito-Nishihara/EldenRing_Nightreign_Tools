@@ -10,6 +10,7 @@ namespace NightreignTools.Master.Infrastructure.Persistence;
 /// master-service のデータベース(nightreign_master)の入口(データベースの共通仕様 5.1)。
 /// リポジトリの実装からだけ使う。
 /// </summary>
+/// <param name="options">接続とスネークケースの設定。UseServiceDatabase で作る。</param>
 public sealed class MasterDbContext(DbContextOptions<MasterDbContext> options) : DbContext(options)
 {
     public DbSet<Boss> Bosses => Set<Boss>();

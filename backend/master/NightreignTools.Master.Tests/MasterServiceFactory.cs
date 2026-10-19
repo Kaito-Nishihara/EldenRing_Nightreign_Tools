@@ -19,10 +19,16 @@ public class MasterServiceFactory : WebApplicationFactory<Program>
         TestDatabase.EnsureFresh();
     }
 
-    /// <summary>起動に渡すサービス間キー。起動の失敗を確かめるテストで空にする。</summary>
+    /// <summary>
+    /// 起動に渡すサービス間キー。
+    /// 起動の失敗を確かめるテストで空にする。
+    /// </summary>
     protected virtual string ConfiguredServiceKey => ServiceKey;
 
-    /// <summary>起動に渡す接続文字列。接続の失敗を確かめるテストで替える。</summary>
+    /// <summary>
+    /// 起動に渡す接続文字列。
+    /// 接続の失敗を確かめるテストで替える。
+    /// </summary>
     protected virtual string ConfiguredConnectionString => TestDatabase.ConnectionString;
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -32,7 +38,10 @@ public class MasterServiceFactory : WebApplicationFactory<Program>
         builder.UseSetting($"ConnectionStrings:{DatabaseOptions.ConnectionStringName}", ConfiguredConnectionString);
     }
 
-    /// <summary>Gateway と同じく、正しいサービス間キーを付けて呼ぶクライアント。</summary>
+    /// <summary>
+    /// Gateway と同じく、正しいサービス間キーを付けて呼ぶクライアント。
+    /// </summary>
+    /// <returns>X-Service-Key を付けたクライアント。</returns>
     public HttpClient CreateClientWithServiceKey()
     {
         var client = CreateClient();

@@ -3,7 +3,10 @@ using NightreignTools.ServiceDefaults.ErrorHandling;
 
 namespace NightreignTools.Master.Api.Endpoints;
 
-/// <summary>プレイヤー向けのマスタの取得(マスタの管理 4.1)。必要な役割はない。</summary>
+/// <summary>
+/// プレイヤー向けのマスタの取得(マスタの管理 4.1)。
+/// 必要な役割はない。
+/// </summary>
 public static class MasterEndpoints
 {
     public static IEndpointRouteBuilder MapMasterEndpoints(this IEndpointRouteBuilder api)

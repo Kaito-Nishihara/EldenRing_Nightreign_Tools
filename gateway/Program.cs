@@ -1,4 +1,5 @@
 using Gateway.Errors;
+using Gateway.Security;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +34,7 @@ builder.Services.AddHealthChecks();
 // record-service は master-service を呼ぶので(最長 10 秒)、record-cluster の期限は 15 秒にしてある
 OverrideDestination("MASTER_SERVICE_URL", "master-cluster", "master");
 OverrideDestination("RECORD_SERVICE_URL", "record-cluster", "record");
+OverrideDestination("RELIC_SERVICE_URL", "relic-cluster", "relic");
 
 void OverrideDestination(string variable, string cluster, string destination)
 {
@@ -48,17 +50,22 @@ var serviceKey = Environment.GetEnvironmentVariable("SERVICE_KEY")
     ?? builder.Configuration["ServiceKey"]
     ?? throw new InvalidOperationException("SERVICE_KEY が設定されていません。環境変数または appsettings.json で設定してください。");
 
+// 管理用の鍵と、管理用の API の回数の制限(マスタの管理 4.3)。ADMIN_KEY がないか 16 文字より短いときは、ここで起動を止める
+builder.Services.AddAdminProtection(Environment.GetEnvironmentVariable(AdminKeyOptions.EnvironmentVariable));
+
 // YARP リバースプロキシ設定(appsettings.json から読み込み)。振り分けの表は API の共通仕様 4.6
 builder.Services
     .AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
     .AddTransforms(transformContext =>
     {
-        // 画面から来た X-Service-Key を消し、Gateway の値を付け直す
+        // 画面から来た X-Service-Key を消し、Gateway の値を付け直す。
+        // 確かめに通った X-Admin-Key は、サービスへ渡さない(マスタの管理 4.3)
         transformContext.AddRequestTransform(context =>
         {
             context.ProxyRequest.Headers.Remove("X-Service-Key");
             context.ProxyRequest.Headers.Add("X-Service-Key", serviceKey);
+            context.ProxyRequest.Headers.Remove(AdminKeyOptions.HeaderName);
             return ValueTask.CompletedTask;
         });
     });
@@ -81,6 +88,9 @@ app.UseStatusCodePages(GatewayErrorResponse.WriteStatusCodePageAsync);
 
 // ヘルスチェックエンドポイント
 app.MapHealthChecks("/health");
+
+// /api/v1/admin の下だけに、回数の制限と管理用の鍵の確かめをかける。CORS の事前の確かめ(OPTIONS)は UseCors が先に返す
+app.UseAdminProtection();
 
 // YARP リバースプロキシをマッピング。/internal/v1 は振り分けないので、Gateway が 404 を返す
 app.MapReverseProxy();

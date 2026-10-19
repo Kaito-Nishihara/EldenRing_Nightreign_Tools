@@ -10,7 +10,10 @@ import type {
   SecondShrinkPoint,
   SpawnPoint,
   PatternResponse,
-  PlayRecordRequest,
+  CreatePlayRecordRequest,
+  CreatePlayRecordResponse,
+  AdminPlaceDtoMap,
+  AdminPlaceKind,
 } from "@/types";
 
 /**
@@ -96,16 +99,10 @@ export async function getPatterns(
 }
 
 /**
- * プレイ記録を作成する
- * @param request - プレイ記録リクエスト
+ * プレイ記録を保存する(プレイ記録 4 章)。受け持ちは record-service
  */
-export async function createPlayRecord(
-  request: PlayRecordRequest
-): Promise<{ id: number; createdAt: string }> {
-  const response = await apiClient.post<{ id: number; createdAt: string }>(
-    "/api/v1/play-records",
-    request
-  );
+export async function createPlayRecord(request: CreatePlayRecordRequest): Promise<CreatePlayRecordResponse> {
+  const response = await apiClient.post<CreatePlayRecordResponse>("/api/v1/play-records", request);
   return response.data;
 }
 
@@ -113,60 +110,45 @@ export async function createPlayRecord(
 // 管理画面用API
 // ==========================================
 
-/** 管理用: 開始地点を登録する */
-export async function adminCreateSpawnPoint(
-  data: Omit<SpawnPoint, "id">
-): Promise<SpawnPoint> {
-  const response = await apiClient.post<SpawnPoint>(
-    "/api/v1/admin/spawn-points",
-    data
-  );
+/** 管理用の鍵を付ける見出し(マスタの管理 3.1)。プレイヤー向けの API には付けない */
+function adminHeaders(adminKey: string) {
+  return { "X-Admin-Key": adminKey };
+}
+
+/** 管理用: 種類ごとの一覧。非表示の行も入る(マスタの管理 4.2) */
+export async function adminListPlaces<K extends AdminPlaceKind>(
+  kind: K,
+  adminKey: string
+): Promise<AdminPlaceDtoMap[K][]> {
+  const response = await apiClient.get<AdminPlaceDtoMap[K][]>(`/api/v1/admin/${kind}`, {
+    headers: adminHeaders(adminKey),
+  });
   return response.data;
 }
 
-/** 管理用: 開始地点を更新する */
-export async function adminUpdateSpawnPoint(
+/** 管理用: 登録する。作った行を返す */
+export async function adminCreatePlace<K extends AdminPlaceKind>(
+  kind: K,
+  request: object,
+  adminKey: string
+): Promise<AdminPlaceDtoMap[K]> {
+  const response = await apiClient.post<AdminPlaceDtoMap[K]>(`/api/v1/admin/${kind}`, request, {
+    headers: adminHeaders(adminKey),
+  });
+  return response.data;
+}
+
+/** 管理用: 修正、非表示、表示に戻す。直した行を返す */
+export async function adminUpdatePlace<K extends AdminPlaceKind>(
+  kind: K,
   id: number,
-  data: Omit<SpawnPoint, "id">
-): Promise<SpawnPoint> {
-  const response = await apiClient.put<SpawnPoint>(
-    `/api/v1/admin/spawn-points/${id}`,
-    data
-  );
+  request: object,
+  adminKey: string
+): Promise<AdminPlaceDtoMap[K]> {
+  const response = await apiClient.put<AdminPlaceDtoMap[K]>(`/api/v1/admin/${kind}/${id}`, request, {
+    headers: adminHeaders(adminKey),
+  });
   return response.data;
-}
-
-/** 管理用: 開始地点を削除する */
-export async function adminDeleteSpawnPoint(id: number): Promise<void> {
-  await apiClient.delete(`/api/v1/admin/spawn-points/${id}`);
-}
-
-/** 管理用: 収縮候補地を登録する */
-export async function adminCreateShrinkZone(
-  data: Omit<ShrinkZone, "id">
-): Promise<ShrinkZone> {
-  const response = await apiClient.post<ShrinkZone>(
-    "/api/v1/admin/shrink-zones",
-    data
-  );
-  return response.data;
-}
-
-/** 管理用: 収縮候補地を更新する */
-export async function adminUpdateShrinkZone(
-  id: number,
-  data: Omit<ShrinkZone, "id">
-): Promise<ShrinkZone> {
-  const response = await apiClient.put<ShrinkZone>(
-    `/api/v1/admin/shrink-zones/${id}`,
-    data
-  );
-  return response.data;
-}
-
-/** 管理用: 収縮候補地を削除する */
-export async function adminDeleteShrinkZone(id: number): Promise<void> {
-  await apiClient.delete(`/api/v1/admin/shrink-zones/${id}`);
 }
 
 /**
@@ -185,34 +167,6 @@ export async function getSecondShrinkPoints(): Promise<SecondShrinkPoint[]> {
   return response.data;
 }
 
-/** 管理用: 第二収縮地点候補を登録する */
-export async function adminCreateSecondShrinkPoint(
-  data: Omit<SecondShrinkPoint, "id">
-): Promise<SecondShrinkPoint> {
-  const response = await apiClient.post<SecondShrinkPoint>(
-    "/api/v1/admin/second-shrink-points",
-    data
-  );
-  return response.data;
-}
-
-/** 管理用: 第二収縮地点候補を更新する */
-export async function adminUpdateSecondShrinkPoint(
-  id: number,
-  data: Omit<SecondShrinkPoint, "id">
-): Promise<SecondShrinkPoint> {
-  const response = await apiClient.put<SecondShrinkPoint>(
-    `/api/v1/admin/second-shrink-points/${id}`,
-    data
-  );
-  return response.data;
-}
-
-/** 管理用: 第二収縮地点候補を削除する */
-export async function adminDeleteSecondShrinkPoint(id: number): Promise<void> {
-  await apiClient.delete(`/api/v1/admin/second-shrink-points/${id}`);
-}
-
 /**
  * 拠点候補地一覧を取得する（マップIDで絞り込み）
  * @param mapId - マップ識別子（デフォルト: normal）
@@ -222,34 +176,6 @@ export async function getBasePoints(mapId: string = "normal"): Promise<BasePoint
     params: { mapId },
   });
   return response.data;
-}
-
-/** 管理用: 拠点候補地を登録する */
-export async function adminCreateBasePoint(
-  data: Omit<BasePoint, "id">
-): Promise<BasePoint> {
-  const response = await apiClient.post<BasePoint>(
-    "/api/v1/admin/base-points",
-    data
-  );
-  return response.data;
-}
-
-/** 管理用: 拠点候補地を更新する */
-export async function adminUpdateBasePoint(
-  id: number,
-  data: Omit<BasePoint, "id">
-): Promise<BasePoint> {
-  const response = await apiClient.put<BasePoint>(
-    `/api/v1/admin/base-points/${id}`,
-    data
-  );
-  return response.data;
-}
-
-/** 管理用: 拠点候補地を削除する */
-export async function adminDeleteBasePoint(id: number): Promise<void> {
-  await apiClient.delete(`/api/v1/admin/base-points/${id}`);
 }
 
 /**

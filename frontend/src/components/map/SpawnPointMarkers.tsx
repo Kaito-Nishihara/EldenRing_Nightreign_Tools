@@ -15,7 +15,7 @@ interface SpawnPointMarkersProps {
 
 /**
  * 開始地点の印(画面の共通仕様 3.8)。spawn.webp のアイコンを置く。
- * 選んだものは大きくして gold-bright の輪で囲み、ほかは薄く出す。選び直せるよう、選んだ後もほかを消さない。
+ * 選んだものは大きくして azure-bright の輪で囲み、ほかは薄く出す。選び直せるよう、選んだ後もほかを消さない。
  * 親の MapCanvas が dynamic import で SSR から隔離しているので、require で react-konva を取る。
  */
 export default function SpawnPointMarkers({ spawnPoints, selectedId, onSelect }: SpawnPointMarkersProps) {
@@ -53,16 +53,16 @@ export default function SpawnPointMarkers({ spawnPoints, selectedId, onSelect }:
                 y={sp.y}
                 radius={size / 2 + 4}
                 fill={MAP_STYLE.zoneMarkerFill}
-                stroke={THEME.goldBright}
+                stroke={THEME.azureBright}
                 strokeWidth={3}
-                shadowColor={THEME.gold}
+                shadowColor={THEME.azure}
                 shadowBlur={12}
               />
             )}
             {icon ? (
               <KonvaImage image={icon} x={sp.x - size / 2} y={sp.y - size / 2} width={size} height={size} />
             ) : (
-              <Circle x={sp.x} y={sp.y} radius={8} fill={THEME.goldBright} stroke={THEME.night} strokeWidth={2} />
+              <Circle x={sp.x} y={sp.y} radius={8} fill={THEME.azureBright} stroke={THEME.night} strokeWidth={2} />
             )}
             {/* 押しやすくするため、アイコンより少し広い当たりを置く */}
             <Circle x={sp.x} y={sp.y} radius={size / 2 + 6} fill={MAP_STYLE.maskClear} />
@@ -74,7 +74,7 @@ export default function SpawnPointMarkers({ spawnPoints, selectedId, onSelect }:
               text={sp.nameJa}
               fontSize={14}
               fontStyle="bold"
-              fill={isSelected ? THEME.goldBright : THEME.ash}
+              fill={isSelected ? THEME.azureBright : THEME.ash}
               stroke={THEME.night}
               strokeWidth={MAP_STYLE.labelStrokeWidth}
               fillAfterStrokeEnabled

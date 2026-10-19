@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using NightreignTools.Master.Domain;
 using NightreignTools.Master.Domain.Entities;
 using NightreignTools.ServiceDefaults.Persistence;
 
@@ -37,5 +38,8 @@ public sealed class MasterDbContext(DbContextOptions<MasterDbContext> options) :
             createdAt.SetDefaultValueSql("now()");
             createdAt.ValueGenerated = ValueGenerated.OnAdd;
         }
+
+        // エンティティの <summary> を、テーブルと列のコメントにする(データベースの共通仕様 5.8)
+        modelBuilder.ApplyDocumentationComments(typeof(DomainAssembly).Assembly);
     }
 }

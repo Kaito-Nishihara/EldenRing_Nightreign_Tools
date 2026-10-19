@@ -17,11 +17,16 @@ services:
         condition: service_healthy
       record-service:
         condition: service_healthy
+      relic-service:
+        condition: service_healthy
     environment:
       - MASTER_SERVICE_URL=http://master-service:8081
       - RECORD_SERVICE_URL=http://record-service:8082
+      - RELIC_SERVICE_URL=http://relic-service:8083
       - SERVICE_KEY=${SERVICE_KEY}
       - CORS_ORIGINS=${CORS_ORIGINS:-}
+      # 管理用の鍵。16 文字以上。ないか短いと Gateway が起動しない(マスタの管理 4.3)
+      - ADMIN_KEY=${ADMIN_KEY}
 
   # master-service: マスタの取得と管理(サービスの共通構成 5.1)
   master-service:
@@ -70,6 +75,27 @@ services:
       retries: 10
       start_period: 10s
 
+  # relic-service: ビルドシミュレーターの遺物の効果のマスタ(サービスの共通構成 5.1)
+  relic-service:
+    build:
+      context: ./backend
+      dockerfile: relic/Dockerfile
+    # 8083 はコンテナの間だけに公開する(実行環境 5.1)
+    expose:
+      - "8083"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - SERVICE_KEY=${SERVICE_KEY}
+      - ConnectionStrings__Default=Host=db;Port=5432;Database=nightreign_relic;Username=nightreign_relic;Password=${RELIC_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8083/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
   db:
     image: postgres:16
     ports:
@@ -104,6 +130,8 @@ services:
     working_dir: /src/backend
     volumes:
       - ./backend:/src/backend
+      # テーブルの定義書(docs/database/)を書き出す先。ほかの文書には触れない(データベースの共通仕様 5.8)
+      - ./docs/database:/src/docs/database
       # NuGet の置き場を残し、2 回目からの取得を速くする
       - nuget_packages:/root/.nuget/packages
     # テストは本物の PostgreSQL に対して走らせる(サービスの共通構成 5.9)。

@@ -8,11 +8,11 @@ export type ButtonVariant = "primary" | "secondary" | "danger" | "ghost";
  */
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary:
-    "bg-gold text-night font-bold hover:bg-gold-bright hover:shadow-glow-strong disabled:bg-night-sunk disabled:text-ash-soft disabled:shadow-none",
+    "bg-azure text-night font-bold hover:bg-azure-bright hover:shadow-glow-strong disabled:bg-night-sunk disabled:text-ash-soft disabled:shadow-none",
   secondary:
-    "border border-line-strong text-ash hover:border-gold hover:text-gold disabled:border-line disabled:text-ash-soft",
+    "border border-line-strong text-ash hover:border-azure hover:text-azure disabled:border-line disabled:text-ash-soft",
   danger: "border border-ember text-ember hover:bg-ember-soft disabled:border-line disabled:text-ash-soft disabled:bg-transparent",
-  ghost: "text-gold hover:underline disabled:text-ash-soft disabled:no-underline",
+  ghost: "text-azure hover:underline disabled:text-ash-soft disabled:no-underline",
 };
 
 /** ボタンと、ボタンの見た目のリンクで共通の形。高さは 44px 以上(指で押しやすくするため) */

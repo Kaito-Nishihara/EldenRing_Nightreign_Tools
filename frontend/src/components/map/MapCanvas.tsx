@@ -23,7 +23,7 @@ interface MapCanvasProps {
   children?: ReactNode;
   /** 収縮暗転レイヤー（destination-outが必要なため専用Layerで描画） */
   shrinkOverlay?: ReactNode;
-  /** マップ上のクリックイベント（マップ座標系のx,yを返す） */
+  /** マップ上のクリックイベント（マップ座標系のx,yを丸めずに返す） */
   onStageClick?: (x: number, y: number) => void;
 }
 
@@ -138,7 +138,8 @@ function MapCanvasInner({
       const mapX = (pointer.x - position.x) / scale;
       const mapY = (pointer.y - position.y) / scale;
 
-      onStageClick(Math.round(mapX), Math.round(mapY));
+      // 丸め方と座標空間への収め方は、呼ぶ側の決まりに任せる(マスタの管理 3.3 では小数 2 桁)
+      onStageClick(mapX, mapY);
     },
     [onStageClick, position, scale]
   );
@@ -187,7 +188,7 @@ function MapCanvasInner({
       </Stage>
 
       {/* ズーム表示 */}
-      <div className="absolute bottom-2 right-2 border border-line bg-night/85 px-2 font-display text-xs tracking-display text-gold-bright">
+      <div className="absolute bottom-2 right-2 border border-line bg-night/85 px-2 font-display text-xs tracking-display text-azure-bright">
         {Math.round(scale * 100)}%
       </div>
     </div>

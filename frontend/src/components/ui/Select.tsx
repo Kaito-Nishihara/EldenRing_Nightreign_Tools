@@ -24,7 +24,7 @@ export default function Select({ label, hint, id, className = "", children, ...p
         {...props}
         id={selectId}
         aria-describedby={hintId}
-        className="min-h-11 w-full border border-line-strong bg-night px-3 text-base text-ash transition-colors duration-200 ease-out hover:border-gold disabled:border-line disabled:text-ash-soft"
+        className="min-h-11 w-full border border-line-strong bg-night px-3 text-base text-ash transition-colors duration-200 ease-out hover:border-azure disabled:border-line disabled:text-ash-soft"
       >
         {children}
       </select>

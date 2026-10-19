@@ -84,6 +84,10 @@ nav:
       - 画面の共通仕様: design/common-frontend.md
       - 実行環境: design/common-runtime.md
       - CI/CD と AWS への配置: design/common-delivery.md
+  - テーブルの定義書:
+      - master-service: database/master.md
+      - record-service: database/record.md
+      - relic-service: database/relic.md
   - 画面の設計:
       - 画面の一覧と遷移: design/screens.md
   - 画面一覧:
@@ -115,3 +119,4 @@ nav:
       - 0014 AWS の ECS on Fargate に配置する: decisions/0014-deploy-to-aws-ecs.md
       - 0015 配置の前にマイグレーションを適用する: decisions/0015-migrate-before-deploy.md
       - 0016 ゲームの画像を公開の場で使う: decisions/0016-publish-game-images.md
+      - 0017 テーブルの定義書をエンティティから作る: decisions/0017-schema-doc-from-entities.md

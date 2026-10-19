@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- relic-service の入口。登録の組み立てとエンドポイントだけを書く(サービスの共通構成 5.3) -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\NightreignTools.Relic.Application\NightreignTools.Relic.Application.csproj" />
+    <ProjectReference Include="..\NightreignTools.Relic.Infrastructure\NightreignTools.Relic.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\shared\NightreignTools.ServiceDefaults\NightreignTools.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>

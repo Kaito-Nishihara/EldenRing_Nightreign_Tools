@@ -18,12 +18,16 @@ public sealed class PlayRecord
     {
     }
 
+    /// <summary>識別子。</summary>
     public int Id { get; private set; }
+
+    /// <summary>夜の王の識別子。master-service の bosses の id。</summary>
     public string BossId { get; private set; } = "";
 
     /// <summary>地変の識別子。null は地変なし。</summary>
     public string? JihenId { get; private set; }
 
+    /// <summary>開始地点の識別子。master-service の spawn_points の id。</summary>
     public int SpawnPointId { get; private set; }
 
     /// <summary>1 日目の夜ボスの識別子。null は選ばなかった。</summary>
@@ -35,6 +39,7 @@ public sealed class PlayRecord
     /// <summary>備考。前後の空白を除いたもの。空なら null。</summary>
     public string? Note { get; private set; }
 
+    /// <summary>記録を保存した日時(UTC)。データベースの既定値で入る。</summary>
     public DateTime CreatedAt { get; private set; }
 
     /// <summary>収縮先。日、段階の順に並べる。</summary>

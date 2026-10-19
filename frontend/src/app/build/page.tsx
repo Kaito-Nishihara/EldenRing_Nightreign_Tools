@@ -1,85 +1,75 @@
 "use client";
 
 import Button from "@/components/ui/Button";
-import { useBuildSimulator } from "@/hooks/useBuildSimulator";
-import RelicSlotPanel from "@/components/build/RelicSlotPanel";
-import BuildResultPanel from "@/components/build/BuildResultPanel";
+import Panel from "@/components/ui/Panel";
+import SectionHeading from "@/components/ui/SectionHeading";
+import { ErrorNotice, Skeleton } from "@/components/ui/StatusViews";
+import BuildSlotColumn from "@/components/build/BuildSlotColumn";
+import BuildTotalsPanel from "@/components/build/BuildTotalsPanel";
+import { useBuildSlots } from "@/hooks/useBuildSlots";
+import { useRelicEffects } from "@/hooks/useRelicEffects";
+import { SLOTS_PER_KIND, type BuildSlot } from "@/lib/buildCalc";
+
+const KINDS: BuildSlot["kind"][] = ["normal", "deep"];
+
+/** 読み込み中の 6 枠分の骨組み(ビルドシミュレーター 3.3) */
+function SlotSkeletons() {
+  return (
+    <>
+      {KINDS.map((kind) => (
+        <Panel key={kind} aria-busy="true" aria-label="読み込み中">
+          <Skeleton className="mb-4 h-10 w-32" />
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: SLOTS_PER_KIND }, (_, i) => (
+              <Skeleton key={i} className="h-24" />
+            ))}
+          </div>
+        </Panel>
+      ))}
+    </>
+  );
+}
 
 /**
- * ビルドシミュレーターページ
- * 通常効果3枠 + 深層効果3枠を設定し合算効果をリアルタイム計算する
+ * ビルドシミュレーター(ビルドシミュレーター 3 章)。
+ * 広い幅では通常効果、深層効果、効果の合計の 3 列、狭い幅では縦に並べる。
+ * 効果のマスタは開いたときに 1 回だけ取り、合計はブラウザで計算する(決定の記録 0006)。
  */
 export default function BuildPage() {
-  const {
-    loading,
-    error,
-    slots,
-    effectMap,
-    normalEffectsByCategory,
-    deepEffectsByCategory,
-    resultGroups,
-    updateEffect,
-    updateRank,
-    resetAll,
-  } = useBuildSimulator();
+  const relic = useRelicEffects();
+  const build = useBuildSlots(relic.effectMap);
 
   return (
-    <div className="min-h-full">
-      <div className="flex items-center justify-between gap-3 px-4 pt-4">
-        <h1 className="font-serif text-2xl font-extrabold text-gold-bright">ビルドシミュレーター</h1>
-        {/* 保存していないので失うものが少なく、確かめの枠は出さない(ビルドシミュレーター 3.1) */}
-        <Button variant="ghost" onClick={resetAll}>
+    <main className="mx-auto grid max-w-[1200px] items-start gap-4 px-4 pb-12 pt-6 lg:grid-cols-[1fr_1fr_340px]">
+      <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-end lg:col-span-3">
+        <SectionHeading level="h1" eyebrow="Relic Rite" title="ビルドシミュレーター" />
+        {/* 保存していないので失うものが少なく、確かめの枠は出さない(3.1) */}
+        <Button variant="danger" onClick={build.clearAll} disabled={relic.loading || relic.error !== null}>
           すべて外す
         </Button>
       </div>
 
-      {error && (
-        <div className="m-4 p-3 bg-red-900/50 border border-red-700 rounded text-sm text-red-300">
-          {error}
+      {relic.error ? (
+        <div className="lg:col-span-3">
+          <ErrorNotice message={relic.error} onRetry={relic.retry} />
         </div>
+      ) : relic.loading ? (
+        <SlotSkeletons />
+      ) : (
+        KINDS.map((kind) => (
+          <BuildSlotColumn
+            key={kind}
+            kind={kind}
+            slots={build.slots.filter((slot) => slot.kind === kind)}
+            options={kind === "deep" ? relic.deepOptions : relic.normalOptions}
+            effectMap={relic.effectMap}
+            onEffectChange={build.chooseEffect}
+            onRankChange={build.chooseRank}
+          />
+        ))
       )}
 
-      {loading && (
-        <div className="flex items-center justify-center h-64 text-gray-400 text-sm">
-          データ読み込み中...
-        </div>
-      )}
-
-      {!loading && !error && (
-        <div className="flex flex-col lg:flex-row h-[calc(100vh-57px)]">
-          {/* 左ペイン: 通常効果 + 深層効果 */}
-          <div className="lg:w-2/3 p-4 space-y-4 overflow-y-auto">
-            <p className="text-xs text-gray-500">
-              遺物の通常効果（3枠）と深層効果（3枠）を選択すると、右に合算効果が表示されます。
-            </p>
-
-            {slots.map((slot) => (
-              <RelicSlotPanel
-                key={slot.id}
-                slot={slot}
-                effectsByCategory={
-                  slot.isDeep ? deepEffectsByCategory : normalEffectsByCategory
-                }
-                effectMap={effectMap}
-                onEffectChange={(entryId, effectId) =>
-                  updateEffect(slot.id, entryId, effectId)
-                }
-                onRankChange={(entryId, rank) =>
-                  updateRank(slot.id, entryId, rank)
-                }
-              />
-            ))}
-          </div>
-
-          {/* 右ペイン: 計算結果 */}
-          <div className="lg:w-1/3 border-t lg:border-t-0 lg:border-l border-gray-800 p-4 overflow-y-auto bg-gray-900/50">
-            <h2 className="text-sm font-semibold text-gray-300 mb-4">
-              合算効果
-            </h2>
-            <BuildResultPanel resultGroups={resultGroups} />
-          </div>
-        </div>
-      )}
-    </div>
+      {!relic.error && <BuildTotalsPanel totals={build.totals} />}
+    </main>
   );
 }

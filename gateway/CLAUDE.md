@@ -11,6 +11,7 @@
 - **画面から来た `X-Service-Key` を消し、Gateway の値を付け直して渡す。**
 - **管理用の API(`/api/v1/admin`)は、`X-Admin-Key` を確かめてから渡す(段階 2)。** 管理者の判定は Gateway だけで行う。
 - 振り分け先は環境変数(`MASTER_SERVICE_URL` など)、許すオリジンは `CORS_ORIGINS` で受け取る。
+- C# のドキュメントコメントは、[backend の決まり](../backend/CLAUDE.md) の「コメントの決まり」に従う。
 - Gateway が自分で返すエラー(404、502、504、401、429)も、`{ status, error, message, timestamp }` の形にする。
 
 ## 確かめ方

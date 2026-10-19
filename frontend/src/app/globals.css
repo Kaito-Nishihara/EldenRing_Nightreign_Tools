@@ -6,23 +6,23 @@
  */
 @theme {
   /* 色(3.2) */
-  --color-night: #0e0c0a;
-  --color-night-raised: #1a1612;
-  --color-night-sunk: #24201a;
-  --color-ash: #e8dfcc;
-  --color-ash-soft: #a89c86;
-  --color-gold: #c9a45c;
-  --color-gold-bright: #e6c886;
-  --color-gold-deep: #8a6d32;
-  --color-ember: #d0654a;
-  --color-ember-soft: #3a1d16;
-  --color-tide: #8c7cf0;
-  --color-tide-soft: #221d3d;
-  --color-grace: #9cc08a;
-  --color-line: #3a3226;
-  --color-line-strong: #7a6a4e;
+  --color-night: #070b16;
+  --color-night-raised: #0e1526;
+  --color-night-sunk: #172038;
+  --color-ash: #e4eaf3;
+  --color-ash-soft: #8f9ab0;
+  --color-azure: #5b93ff;
+  --color-azure-bright: #a8c8ff;
+  --color-azure-deep: #3b63b3;
+  --color-ember: #ec6a72;
+  --color-ember-soft: #3a1520;
+  --color-tide: #b18cff;
+  --color-tide-soft: #231a40;
+  --color-grace: #86c9a0;
+  --color-line: #1f2a44;
+  --color-line-strong: #5a70a8;
   /* マップの画像の下の地。画像の背景が透けるので、night より暗くする(3.8) */
-  --color-abyss: #07060a;
+  --color-abyss: #03050b;
 
   /* 書体(3.3)。値は layout.tsx の next/font が CSS の変数で渡す */
   --font-sans: var(--font-noto-sans-jp), "Hiragino Sans", "Yu Gothic", sans-serif;
@@ -49,16 +49,16 @@
   --tracking-display: 0.18em;
 
   /* 主なパネルの外の光(3.4)。影の代わりに使う */
-  --shadow-glow: 0 0 24px rgba(201, 164, 92, 0.06);
-  --shadow-glow-strong: 0 0 24px rgba(230, 200, 134, 0.25);
+  --shadow-glow: 0 0 24px rgba(91, 147, 255, 0.06);
+  --shadow-glow-strong: 0 0 24px rgba(168, 200, 255, 0.25);
 }
 
-/* ページの地。上の端から差す金の薄いぼかしと、細かい粒の模様を重ねる(3.2) */
+/* ページの地。上の端から差す青の薄いぼかしと、細かい粒の模様を重ねる(3.2) */
 body {
   background-color: var(--color-night);
   background-image:
-    radial-gradient(ellipse 70% 40% at 50% -10%, rgba(201, 164, 92, 0.08), transparent 70%),
-    radial-gradient(rgba(232, 223, 204, 0.03) 1px, transparent 1px);
+    radial-gradient(ellipse 70% 40% at 50% -10%, rgba(91, 147, 255, 0.08), transparent 70%),
+    radial-gradient(rgba(228, 234, 243, 0.03) 1px, transparent 1px);
   background-size: 100% 100%, 3px 3px;
   background-attachment: fixed;
   color: var(--color-ash);
@@ -67,7 +67,7 @@ body {
 
 /* フォーカスの輪郭(3.7)。キーボードで動かしたときだけ出す */
 :focus-visible {
-  outline: 2px solid var(--color-gold-bright);
+  outline: 2px solid var(--color-azure-bright);
   outline-offset: 2px;
 }
 

@@ -72,6 +72,28 @@ backend/
 - 初期データは Infrastructure の `Persistence/Seed/` に匿名の型で持ち、`HasData` で渡す。整数の識別子は 1000 以下にし、自動の採番は 1001 から始める。
 - マスタの行は消さず、`hidden_at` で非表示にする。
 - マイグレーションを足す手順は `add-migration` の Skill にある。
+- テーブルと列の説明は、Domain のエンティティの `<summary>` に書く。エンティティかテーブルの設定を変えたら、同じ PR でテーブルの定義書(`docs/database/`)を作り直す。CI が作り直して比べる(データベースの共通仕様 5.8)。
+
+## コメントの決まり
+
+- **`<summary>` の中身は、開きと閉じのタグとは別の行に書く。** 1 行で済む説明でも、`/// <summary>説明</summary>` と 1 行にまとめない。
+- **引数があるメソッド、コンストラクター、デリゲートには、引数ごとに `<param>` を書く。** 何を渡すか、空や範囲外のときにどう扱うかを書く。型の名前を言い換えるだけにしない。
+- 型引数には `<typeparam>` を書く。
+- 戻り値があるときは `<returns>` を書く。`Task<T>` と `ValueTask<T>` は、待った後に得るものを書く。戻り値がない `Task` には書かない。
+- エンティティの `<summary>` はテーブルと列の説明になる。行の頭と終わりの空白を除いてつなぐので、改行しても説明は変わらない。
+- `CancellationToken` の `<param>` は「取り消しの合図」と書けば足りる。
+- 既にあるコメントは、そのファイルを直すときに合わせる。
+
+```csharp
+/// <summary>
+/// 重なりを除いてから引く。
+/// 何も渡されていなければ、問い合わせずに空を返す。
+/// </summary>
+/// <param name="ids">引く識別子。重なりがあってもよい。空なら問い合わせない。</param>
+/// <param name="ct">取り消しの合図。</param>
+/// <returns>見つかった行。見つからない識別子の行は含まない。</returns>
+Task<IReadOnlyList<SpawnPoint>> FindByIdsAsync(IEnumerable<int> ids, CancellationToken ct);
+```
 
 ## テスト
 
@@ -83,6 +105,8 @@ backend/
 
 ```bash
 docker compose run --rm backend-sdk dotnet test NightreignTools.slnx
+# テーブルの定義書を作り直す
+MSYS_NO_PATHCONV=1 docker compose run --rm backend-sdk dotnet run --project tools/NightreignTools.SchemaDoc -- /src/docs/database
 # マイグレーションを足す(dotnet-ef は毎回の新しいコンテナで復元する)
 docker compose run --rm backend-sdk sh -c "dotnet tool restore && dotnet ef migrations add <名前> --project <サービス>/NightreignTools.<サービス>.Infrastructure --output-dir Persistence/Migrations"
 ```

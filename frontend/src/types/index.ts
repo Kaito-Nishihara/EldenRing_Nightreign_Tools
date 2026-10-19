@@ -63,11 +63,35 @@ export interface BasePoint {
   y: number;
 }
 
-/** 拠点タイプ定義 */
-export interface BaseType {
-  id: string;
-  nameJa: string;
-  imagePath: string;
+/** 管理用の API が受け持つ場所の種類(マスタの管理 4.2)。API のパスの一部になる */
+export type AdminPlaceKind = "spawn-points" | "shrink-zones" | "second-shrink-points" | "base-points";
+
+/** 管理用の開始地点。プレイヤー向けの形に isHidden を足したもの */
+export interface AdminSpawnPoint extends SpawnPoint {
+  isHidden: boolean;
+}
+
+/** 管理用の収縮候補地 */
+export interface AdminShrinkZone extends ShrinkZone {
+  isHidden: boolean;
+}
+
+/** 管理用の第二収縮地点 */
+export interface AdminSecondShrinkPoint extends SecondShrinkPoint {
+  isHidden: boolean;
+}
+
+/** 管理用の拠点候補地 */
+export interface AdminBasePoint extends BasePoint {
+  isHidden: boolean;
+}
+
+/** 種類ごとの、管理用の API の出力の形 */
+export interface AdminPlaceDtoMap {
+  "spawn-points": AdminSpawnPoint;
+  "shrink-zones": AdminShrinkZone;
+  "second-shrink-points": AdminSecondShrinkPoint;
+  "base-points": AdminBasePoint;
 }
 
 /** パターン */
@@ -95,20 +119,31 @@ export interface PatternResponse {
   patterns: Pattern[];
 }
 
-/** プレイ記録リクエスト */
-export interface PlayRecordRequest {
+/** プレイ記録の保存の入力(POST /api/v1/play-records、プレイ記録 4 章) */
+export interface CreatePlayRecordRequest {
   bossId: string;
-  jihenId?: string | null;
+  jihenId: string | null;
   spawnPointId: number;
-  note?: string;
-  entries: ShrinkEntryRequest[];
+  day1NightBossId: number | null;
+  day2NightBossId: number | null;
+  note: string | null;
+  entries: CreatePlayRecordEntry[];
 }
 
-/** 収縮エントリリクエスト */
-export interface ShrinkEntryRequest {
+/**
+ * 保存する収縮先。第 1 次は zoneId(収縮候補地)だけ、第 2 次は secondShrinkPointId(第二収縮地点)だけを持つ(決定の記録 0008)。
+ */
+export interface CreatePlayRecordEntry {
   day: 1 | 2;
   phase: 1 | 2;
-  zoneId: number;
+  zoneId: number | null;
+  secondShrinkPointId: number | null;
+}
+
+/** プレイ記録の保存の出力(201) */
+export interface CreatePlayRecordResponse {
+  id: number;
+  createdAt: string;
 }
 
 // ==========================================
@@ -118,7 +153,8 @@ export interface ShrinkEntryRequest {
 /** 遺物効果ランク別数値 */
 export interface RelicEffectRank {
   rank: number;
-  value: number;
+  /** 数で表せない効果(unit が none)では null */
+  value: number | null;
   unit: "multiplier" | "percent" | "flat" | "per_sec" | "none";
   hasDemerit: boolean;
 }
@@ -128,6 +164,8 @@ export interface RelicEffect {
   id: number;
   categoryId: string;
   categoryNameJa: string;
+  /** 分類の並び順。小さいほうが先(ビルドシミュレーター 3.2) */
+  categorySortOrder: number;
   nameJa: string;
   isDeep: boolean;
   effectSign: "positive" | "negative";
@@ -139,31 +177,4 @@ export interface RelicEffect {
   conditionJa: string | null;
   notesJa: string | null;
   ranks: RelicEffectRank[];
-}
-
-/** ビルドシミュレーター: 遺物スロット内の効果エントリ */
-export interface BuildEffectEntry {
-  id: string;
-  effectId: number | null;
-  rank: number;
-}
-
-/** ビルドシミュレーター: 遺物セクション（通常3枠 or 深層3枠） */
-export interface BuildRelicSlot {
-  id: number;
-  isDeep: boolean;
-  effects: BuildEffectEntry[]; // 固定3枠
-}
-
-/** ビルドシミュレーター: 計算結果グループ */
-export interface BuildResultGroup {
-  key: string;
-  nameJa: string;
-  categoryId: string;
-  categoryNameJa: string;
-  calcType: "multiply" | "percent_add" | "flat_add" | "special";
-  attribute: string | null;
-  unit: string;
-  combined: number;
-  entries: { effectId: number; nameJa: string; value: number }[];
 }

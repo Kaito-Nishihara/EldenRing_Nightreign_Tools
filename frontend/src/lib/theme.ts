@@ -4,28 +4,28 @@
  * THEME の値は globals.css の @theme と同じにする。食い違いは theme.test.ts が見つける。
  */
 export const THEME = {
-  night: "#0e0c0a",
-  nightRaised: "#1a1612",
-  nightSunk: "#24201a",
-  ash: "#e8dfcc",
-  ashSoft: "#a89c86",
-  gold: "#c9a45c",
-  goldBright: "#e6c886",
-  goldDeep: "#8a6d32",
-  ember: "#d0654a",
-  emberSoft: "#3a1d16",
-  tide: "#8c7cf0",
-  tideSoft: "#221d3d",
-  grace: "#9cc08a",
-  line: "#3a3226",
-  lineStrong: "#7a6a4e",
-  abyss: "#07060a",
+  night: "#070b16",
+  nightRaised: "#0e1526",
+  nightSunk: "#172038",
+  ash: "#e4eaf3",
+  ashSoft: "#8f9ab0",
+  azure: "#5b93ff",
+  azureBright: "#a8c8ff",
+  azureDeep: "#3b63b3",
+  ember: "#ec6a72",
+  emberSoft: "#3a1520",
+  tide: "#b18cff",
+  tideSoft: "#231a40",
+  grace: "#86c9a0",
+  line: "#1f2a44",
+  lineStrong: "#5a70a8",
+  abyss: "#03050b",
 } as const;
 
 /** マップの上の印の決まり(画面の共通仕様 3.8) */
 export const MAP_STYLE = {
   /** 選んだ収縮の円の外を塗る、夜の雨の暗がり */
-  rain: "rgba(11, 9, 32, 0.72)",
+  rain: "rgba(8, 10, 34, 0.72)",
   /** 暗がりの縁をぼかす幅(px) */
   rainEdge: 10,
   /** 暗がりを切り抜くときの、穴の色(不透明)と、縁の外の色(透明) */
@@ -35,7 +35,7 @@ export const MAP_STYLE = {
   zoneMarkerRadius: 16,
   zoneStrokeWidth: 3,
   /** 中心の印の地。地図の上で印を見分けやすくする */
-  zoneMarkerFill: "rgba(14, 12, 10, 0.75)",
+  zoneMarkerFill: "rgba(7, 11, 22, 0.75)",
   /** 地図は明るいので、文字に night の縁取りを付ける太さ */
   labelStrokeWidth: 4,
   /** 開始地点のアイコンの大きさ。選んだものは大きくする */
@@ -44,14 +44,23 @@ export const MAP_STYLE = {
   /** 選んでいない開始地点の不透明度 */
   spawnDimmedOpacity: 0.45,
   /** 拠点候補地の印の地 */
-  baseMarkerFill: "rgba(26, 22, 18, 0.85)",
+  baseMarkerFill: "rgba(14, 21, 38, 0.85)",
   /** パターンの第 1 次の中心に置く、日の丸の半径 */
   dayChipRadius: 18,
   /** 第 2 次の菱形の一辺と、第 1 次の中心とつなぐ破線 */
   secondPointSize: 20,
   secondPointDash: [6, 5],
+  /** 同じ日の第 1 次の円の外にある第二収縮地点の不透明度(プレイ記録 3.3) */
+  dimmedPointOpacity: 0.4,
+  /** 第 2 次のスロットを選んでいる間の、押せない収縮候補地の印の不透明度(プレイ記録 3.3) */
+  inactiveZoneOpacity: 0.35,
   /** 開始地点から第 1 次の中心へつなぐ線の太さ */
   routeStrokeWidth: 4,
+  /** 管理の画面で、直している収縮候補地の円の破線(マスタの管理 3.3) */
+  editingDash: [12, 8],
+  /** 管理の画面で、非表示の行の印の点線と不透明度(マスタの管理 3.3) */
+  hiddenDash: [3, 4],
+  hiddenOpacity: 0.6,
 } as const;
 
 /**

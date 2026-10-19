@@ -28,7 +28,8 @@ namespace NightreignTools.Record.Infrastructure.Persistence.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasComment("識別子。");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
@@ -36,35 +37,42 @@ namespace NightreignTools.Record.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("boss_id");
+                        .HasColumnName("boss_id")
+                        .HasComment("夜の王の識別子。master-service の bosses の id。");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
+                        .HasDefaultValueSql("now()")
+                        .HasComment("記録を保存した日時(UTC)。データベースの既定値で入る。");
 
                     b.Property<int?>("Day1NightBossId")
                         .HasColumnType("integer")
-                        .HasColumnName("day1_night_boss_id");
+                        .HasColumnName("day1_night_boss_id")
+                        .HasComment("1 日目の夜ボスの識別子。null は選ばなかった。");
 
                     b.Property<int?>("Day2NightBossId")
                         .HasColumnType("integer")
-                        .HasColumnName("day2_night_boss_id");
+                        .HasColumnName("day2_night_boss_id")
+                        .HasComment("2 日目の夜ボスの識別子。null は選ばなかった。");
 
                     b.Property<string>("JihenId")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("jihen_id");
+                        .HasColumnName("jihen_id")
+                        .HasComment("地変の識別子。null は地変なし。");
 
                     b.Property<string>("Note")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
-                        .HasColumnName("note");
+                        .HasColumnName("note")
+                        .HasComment("備考。前後の空白を除いたもの。空なら null。");
 
                     b.Property<int>("SpawnPointId")
                         .HasColumnType("integer")
-                        .HasColumnName("spawn_point_id");
+                        .HasColumnName("spawn_point_id")
+                        .HasComment("開始地点の識別子。master-service の spawn_points の id。");
 
                     b.HasKey("Id")
                         .HasName("pk_play_records");
@@ -72,7 +80,10 @@ namespace NightreignTools.Record.Infrastructure.Persistence.Migrations
                     b.HasIndex("BossId", "SpawnPointId", "JihenId")
                         .HasDatabaseName("ix_play_records_boss_id_spawn_point_id_jihen_id");
 
-                    b.ToTable("play_records", "game");
+                    b.ToTable("play_records", "game", t =>
+                        {
+                            t.HasComment("1 回のプレイの記録(プレイ記録 5 章)。作った後は直さず、消さない(決定の記録 0005)。夜の王、地変、開始地点、夜ボスは master-service の行の識別子だけを持つ。あるかどうかはアプリケーションサービスが確かめる。");
+                        });
                 });
 
             modelBuilder.Entity("NightreignTools.Record.Domain.Entities.ShrinkEntry", b =>
@@ -80,7 +91,8 @@ namespace NightreignTools.Record.Infrastructure.Persistence.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasComment("識別子。");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
@@ -88,27 +100,33 @@ namespace NightreignTools.Record.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
+                        .HasDefaultValueSql("now()")
+                        .HasComment("行を作った日時(UTC)。データベースの既定値で入る。");
 
                     b.Property<int>("Day")
                         .HasColumnType("integer")
-                        .HasColumnName("day");
+                        .HasColumnName("day")
+                        .HasComment("日。1 か 2。");
 
                     b.Property<int>("Phase")
                         .HasColumnType("integer")
-                        .HasColumnName("phase");
+                        .HasColumnName("phase")
+                        .HasComment("段階。1 か 2。");
 
                     b.Property<int>("PlayRecordId")
                         .HasColumnType("integer")
-                        .HasColumnName("play_record_id");
+                        .HasColumnName("play_record_id")
+                        .HasComment("この収縮先を持つ記録の識別子。");
 
                     b.Property<int?>("SecondShrinkPointId")
                         .HasColumnType("integer")
-                        .HasColumnName("second_shrink_point_id");
+                        .HasColumnName("second_shrink_point_id")
+                        .HasComment("第 2 次の収縮先の第二収縮地点の識別子。第 1 次では null。");
 
                     b.Property<int?>("ZoneId")
                         .HasColumnType("integer")
-                        .HasColumnName("zone_id");
+                        .HasColumnName("zone_id")
+                        .HasComment("第 1 次の収縮先の収縮候補地の識別子。第 2 次では null。");
 
                     b.HasKey("Id")
                         .HasName("pk_shrink_entries");
@@ -119,6 +137,8 @@ namespace NightreignTools.Record.Infrastructure.Persistence.Migrations
 
                     b.ToTable("shrink_entries", "game", t =>
                         {
+                            t.HasComment("1 つの記録の中の、日と段階ごとの収縮先(プレイ記録 5 章)。第 1 次(phase=1)は収縮候補地(ZoneId)だけ、第 2 次(phase=2)は第二収縮地点(SecondShrinkPointId)だけを持つ(決定の記録 0008)。マスタの行は master-service が持つので、識別子だけを持つ。");
+
                             t.HasCheckConstraint("ck_shrink_entries_day", "day IN (1, 2)");
 
                             t.HasCheckConstraint("ck_shrink_entries_phase", "phase IN (1, 2)");

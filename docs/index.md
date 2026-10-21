@@ -42,6 +42,7 @@
 | [決定の記録 0015](decisions/0015-migrate-before-deploy.md) | ステージングと本番では、配置の前にマイグレーションを適用する |
 | [決定の記録 0016](decisions/0016-publish-game-images.md) | ゲームの画像を公開の場で使う |
 | [決定の記録 0017](decisions/0017-schema-doc-from-entities.md) | テーブルの定義書をエンティティから作る |
+| [決定の記録 0018](decisions/0018-base-point-kinds.md) | 拠点候補地を大拠点、小拠点、強敵に分ける |
 
 仕様に迷ったときは、要件定義を正本とする。
 図や試作と要件定義が食い違っていたら、要件定義が正しい。

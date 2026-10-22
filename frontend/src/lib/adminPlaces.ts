@@ -1,4 +1,4 @@
-import type { AdminPlaceDtoMap, AdminPlaceKind } from "@/types";
+import type { AdminPlaceDtoMap, AdminPlaceKind, BasePointKind } from "@/types";
 
 // マスタの管理の画面で、4 種類の場所を同じ形で扱うための決まり(マスタの管理 3.2、3.4)
 
@@ -23,6 +23,17 @@ export const RADIUS_MESSAGE = `${RADIUS_MIN} から ${RADIUS_MAX} の数を入�
 /** 通常のマップの識別子。拠点候補地はマップごとに持つ */
 export const NORMAL_MAP_ID = "normal";
 
+/** 拠点の種類を選ぶ欄の並びと、新しく登録するときの種類(マスタの管理 3.2) */
+export const BASE_POINT_KIND_ORDER: readonly BasePointKind[] = ["major", "minor", "field_boss"];
+export const DEFAULT_BASE_POINT_KIND: BasePointKind = "major";
+
+/** 拠点の種類の名前と、マップの印の丸に出す字(画面の共通仕様 3.8) */
+export const BASE_POINT_KIND_LABELS: Record<BasePointKind, { label: string; mark: string }> = {
+  major: { label: "大拠点", mark: "大" },
+  minor: { label: "小拠点", mark: "小" },
+  field_boss: { label: "強敵", mark: "強" },
+};
+
 /**
  * 画面の中で扱う場所の形。種類にない項目は null にする。
  * 収縮候補地の中心も x と y に入れる。
@@ -36,6 +47,8 @@ export interface AdminPlace {
   radius: number | null;
   /** 拠点候補地だけ */
   mapId: string | null;
+  /** 拠点候補地だけ */
+  baseKind: BasePointKind | null;
   /** 収縮候補地だけ。画面では直さず、修正のときにそのまま送り返す */
   iconPath: string | null;
   isHidden: boolean;
@@ -47,6 +60,8 @@ export interface AdminPlaceInput {
   x: string;
   y: string;
   radius: number;
+  /** 拠点候補地だけが使う。選択の欄で選ぶので、誤った値は入らない */
+  baseKind: BasePointKind;
 }
 
 export type AdminPlaceErrors = Partial<Record<keyof AdminPlaceInput, string>>;
@@ -57,6 +72,7 @@ export interface AdminPlaceValues {
   x: number;
   y: number;
   radius: number;
+  baseKind: BasePointKind;
 }
 
 /** 管理用の API に送る値。isHidden を省くと、登録では表示中、修正では今のまま(マスタの管理 4.2) */
@@ -75,12 +91,14 @@ export interface AdminPlaceKindSpec<K extends AdminPlaceKind = AdminPlaceKind> {
   hasRadius: boolean;
   /** マップの種類(通常、各地変)ごとに持つか */
   hasMap: boolean;
+  /** 大拠点、小拠点、強敵の種類を持つか */
+  hasBaseKind: boolean;
   // 種類を決めずに扱えるよう、メソッドの書き方にする(引数の型を厳しく比べない)
   fromDto(dto: AdminPlaceDtoMap[K]): AdminPlace;
   toRequest(values: AdminPlaceSaveValues): object;
 }
 
-const BASE = { radius: null, mapId: null, iconPath: null } as const;
+const BASE = { radius: null, mapId: null, baseKind: null, iconPath: null } as const;
 
 export const ADMIN_PLACE_KINDS: { [K in AdminPlaceKind]: AdminPlaceKindSpec<K> } = {
   "spawn-points": {
@@ -89,6 +107,7 @@ export const ADMIN_PLACE_KINDS: { [K in AdminPlaceKind]: AdminPlaceKindSpec<K> }
     nameRequired: true,
     hasRadius: false,
     hasMap: false,
+    hasBaseKind: false,
     fromDto: (d) => ({ ...BASE, id: d.id, nameJa: d.nameJa, x: d.x, y: d.y, isHidden: d.isHidden }),
     toRequest: (v) => ({ nameJa: v.nameJa, x: v.x, y: v.y, isHidden: v.isHidden }),
   },
@@ -98,6 +117,7 @@ export const ADMIN_PLACE_KINDS: { [K in AdminPlaceKind]: AdminPlaceKindSpec<K> }
     nameRequired: true,
     hasRadius: true,
     hasMap: false,
+    hasBaseKind: false,
     fromDto: (d) => ({
       ...BASE,
       id: d.id,
@@ -116,6 +136,7 @@ export const ADMIN_PLACE_KINDS: { [K in AdminPlaceKind]: AdminPlaceKindSpec<K> }
     nameRequired: true,
     hasRadius: false,
     hasMap: false,
+    hasBaseKind: false,
     fromDto: (d) => ({ ...BASE, id: d.id, nameJa: d.nameJa, x: d.x, y: d.y, isHidden: d.isHidden }),
     toRequest: (v) => ({ nameJa: v.nameJa, x: v.x, y: v.y, isHidden: v.isHidden }),
   },
@@ -125,8 +146,18 @@ export const ADMIN_PLACE_KINDS: { [K in AdminPlaceKind]: AdminPlaceKindSpec<K> }
     nameRequired: false,
     hasRadius: false,
     hasMap: true,
-    fromDto: (d) => ({ ...BASE, id: d.id, nameJa: d.nameJa ?? null, x: d.x, y: d.y, mapId: d.mapId, isHidden: d.isHidden }),
-    toRequest: (v) => ({ mapId: v.mapId, nameJa: v.nameJa, x: v.x, y: v.y, isHidden: v.isHidden }),
+    hasBaseKind: true,
+    fromDto: (d) => ({
+      ...BASE,
+      id: d.id,
+      nameJa: d.nameJa ?? null,
+      x: d.x,
+      y: d.y,
+      mapId: d.mapId,
+      baseKind: d.kind,
+      isHidden: d.isHidden,
+    }),
+    toRequest: (v) => ({ mapId: v.mapId, kind: v.baseKind, nameJa: v.nameJa, x: v.x, y: v.y, isHidden: v.isHidden }),
   },
 };
 
@@ -150,7 +181,7 @@ export function pickedCoordinate(value: number): number {
 }
 
 export function emptyInput(): AdminPlaceInput {
-  return { nameJa: "", x: "", y: "", radius: DEFAULT_RADIUS };
+  return { nameJa: "", x: "", y: "", radius: DEFAULT_RADIUS, baseKind: DEFAULT_BASE_POINT_KIND };
 }
 
 /** 登録済みの場所を直すときの、入力の欄の値 */
@@ -160,6 +191,7 @@ export function inputFromPlace(place: AdminPlace): AdminPlaceInput {
     x: formatCoordinate(place.x),
     y: formatCoordinate(place.y),
     radius: place.radius ?? DEFAULT_RADIUS,
+    baseKind: place.baseKind ?? DEFAULT_BASE_POINT_KIND,
   };
 }
 
@@ -194,7 +226,7 @@ export function validateInput(
   if (spec.hasRadius && !(input.radius >= RADIUS_MIN && input.radius <= RADIUS_MAX)) errors.radius = RADIUS_MESSAGE;
 
   if (Object.keys(errors).length > 0 || x === null || y === null) return { values: null, errors };
-  return { values: { nameJa: name.length > 0 ? name : null, x, y, radius: input.radius }, errors };
+  return { values: { nameJa: name.length > 0 ? name : null, x, y, radius: input.radius, baseKind: input.baseKind }, errors };
 }
 
 /** 一覧と題に出す名前。名前のない拠点候補地は番号で出す */

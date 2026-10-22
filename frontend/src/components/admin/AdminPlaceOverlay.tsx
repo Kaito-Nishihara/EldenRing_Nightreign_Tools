@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { MAP_STYLE, THEME } from "@/lib/theme";
-import { placeName, type AdminPlace } from "@/lib/adminPlaces";
+import { BASE_POINT_KIND_LABELS, placeName, type AdminPlace } from "@/lib/adminPlaces";
 import type { AdminPlacePreview } from "@/hooks/useAdminEditor";
-import type { AdminPlaceKind } from "@/types";
+import type { AdminPlaceKind, BasePointKind } from "@/types";
 
 interface AdminPlaceOverlayProps {
   kind: AdminPlaceKind;
@@ -19,6 +19,13 @@ interface AdminPlaceOverlayProps {
 /** 印の当たりの半径。指で押しやすくする */
 const HIT_RADIUS = 22;
 const BASE_MARKER_RADIUS = 14;
+
+/** 拠点の種類ごとの丸の地と字と枠の色(画面の共通仕様 3.8) */
+const BASE_KIND_STYLE: Record<BasePointKind, { fill: string; text: string; stroke: string }> = {
+  major: { fill: THEME.ember, text: THEME.night, stroke: THEME.night },
+  minor: { fill: THEME.azure, text: THEME.night, stroke: THEME.night },
+  field_boss: { fill: THEME.night, text: THEME.ember, stroke: THEME.ember },
+};
 
 /**
  * 管理の画面のマップの印(マスタの管理 3.2、3.3)。選んだ種類の印だけを出す。
@@ -39,8 +46,9 @@ export default function AdminPlaceOverlay({ kind, places, editingId, preview, on
     img.onload = () => setSpawnIcon(img);
   }, [kind]);
 
-  /** 種類ごとの印。線の色と点線は、直しているかと非表示かで変える */
-  const renderMarker = (place: AdminPlace, stroke: string, dash: readonly number[] | undefined) => {
+  /** 種類ごとの印。線の色と点線は、直しているかと非表示かで変える。stroke が null ならふだんの色 */
+  const renderMarker = (place: AdminPlace, stateStroke: string | null, dash: readonly number[] | undefined) => {
+    const stroke = stateStroke ?? normalStroke;
     switch (kind) {
       case "spawn-points": {
         const size = MAP_STYLE.spawnIconSize;
@@ -85,15 +93,16 @@ export default function AdminPlaceOverlay({ kind, places, editingId, preview, on
           />
         );
       }
-      case "base-points":
+      case "base-points": {
+        const style = place.baseKind ? BASE_KIND_STYLE[place.baseKind] : null;
         return (
           <>
             <Circle
               x={place.x}
               y={place.y}
               radius={BASE_MARKER_RADIUS}
-              fill={MAP_STYLE.baseMarkerFill}
-              stroke={stroke}
+              fill={style?.fill ?? MAP_STYLE.baseMarkerFill}
+              stroke={stateStroke ?? style?.stroke ?? THEME.lineStrong}
               strokeWidth={2}
               dash={dash}
             />
@@ -102,18 +111,19 @@ export default function AdminPlaceOverlay({ kind, places, editingId, preview, on
               y={place.y - 8}
               width={BASE_MARKER_RADIUS * 2}
               align="center"
-              text="?"
+              text={place.baseKind ? BASE_POINT_KIND_LABELS[place.baseKind].mark : "?"}
               fontSize={16}
               fontStyle="bold"
-              fill={THEME.ash}
+              fill={style?.text ?? THEME.ash}
             />
           </>
         );
+      }
     }
   };
 
-  /** 種類ごとの、ふだんの線の色(画面の共通仕様 3.8) */
-  const baseStroke = kind === "base-points" ? THEME.lineStrong : kind === "spawn-points" ? MAP_STYLE.maskClear : THEME.tide;
+  /** 種類ごとの、ふだんの線の色(画面の共通仕様 3.8)。拠点候補地は拠点の種類ごとに決める */
+  const normalStroke = kind === "spawn-points" ? MAP_STYLE.maskClear : THEME.tide;
   const editingZone = kind === "shrink-zones" && preview;
 
   return (
@@ -131,7 +141,7 @@ export default function AdminPlaceOverlay({ kind, places, editingId, preview, on
       )}
       {places.map((place) => {
         const editing = place.id === editingId;
-        const stroke = editing ? THEME.azureBright : place.isHidden ? THEME.ashSoft : baseStroke;
+        const stroke = editing ? THEME.azureBright : place.isHidden ? THEME.ashSoft : null;
         const select = (event: { cancelBubble: boolean }) => {
           event.cancelBubble = true;
           onSelect(place);

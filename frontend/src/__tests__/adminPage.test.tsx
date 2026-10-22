@@ -6,9 +6,10 @@ import type { AdminPlaceKind } from "@/types";
 // 管理用の API は差し替える
 const adminListPlaces = vi.fn();
 const adminUpdatePlace = vi.fn();
+const adminCreatePlace = vi.fn();
 vi.mock("@/lib/api", () => ({
   adminListPlaces: (...args: unknown[]) => adminListPlaces(...args),
-  adminCreatePlace: vi.fn(),
+  adminCreatePlace: (...args: unknown[]) => adminCreatePlace(...args),
   adminUpdatePlace: (...args: unknown[]) => adminUpdatePlace(...args),
 }));
 vi.mock("@/hooks/useMasterData", () => ({
@@ -24,6 +25,7 @@ const spawn = { id: 9, nameJa: "南の教会", x: 500, y: 900, isHidden: false }
 beforeEach(() => {
   adminListPlaces.mockReset().mockImplementation((kind: AdminPlaceKind) => Promise.resolve(kind === "spawn-points" ? [spawn] : []));
   adminUpdatePlace.mockReset();
+  adminCreatePlace.mockReset();
   sessionStorage.clear();
 });
 
@@ -54,6 +56,26 @@ describe("マスタの管理の画面(マスタの管理 3 章)", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(screen.getByRole("button", { name: "表示に戻す" })).toBeTruthy();
     expect(adminUpdatePlace).toHaveBeenCalledWith("spawn-points", 9, { nameJa: "南の教会", x: 500, y: 900, isHidden: true }, "correct-admin-key-0001");
+  });
+
+  it("AC-ADM-29: 拠点候補地で種類に「強敵」を選んで保存すると、kind を field_boss で送り、一覧の行に「強敵」と出る", async () => {
+    saveAdminKey("correct-admin-key-0001");
+    adminCreatePlace.mockResolvedValue({ id: 1001, mapId: "normal", kind: "field_boss", nameJa: null, x: 400, y: 300, isHidden: false });
+    render(<AdminPage />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "拠点候補地" }));
+    fireEvent.change(screen.getByLabelText("種類"), { target: { value: "field_boss" } });
+    fireEvent.change(screen.getByLabelText("X"), { target: { value: "400" } });
+    fireEvent.change(screen.getByLabelText("Y"), { target: { value: "300" } });
+    fireEvent.click(screen.getByRole("button", { name: "保存する" }));
+
+    expect(await screen.findByRole("button", { name: "1001 番" })).toBeTruthy();
+    expect(screen.getByRole("cell", { name: "強敵" })).toBeTruthy();
+    expect(adminCreatePlace).toHaveBeenCalledWith(
+      "base-points",
+      { mapId: "normal", kind: "field_boss", nameJa: null, x: 400, y: 300, isHidden: undefined },
+      "correct-admin-key-0001"
+    );
   });
 
   it("確かめの枠で「やめる」を押すと、送らずに閉じる", async () => {

@@ -10,9 +10,9 @@ afterEach(() => {
 });
 
 const zones = ADMIN_PLACE_KINDS["shrink-zones"];
-const north: AdminPlace = { id: 4, nameJa: "最北", x: 583, y: 297, radius: 255, mapId: null, iconPath: "/icons/zones/north.webp", isHidden: false };
+const north: AdminPlace = { id: 4, nameJa: "最北", x: 583, y: 297, radius: 255, mapId: null, baseKind: null, iconPath: "/icons/zones/north.webp", isHidden: false };
 const east: AdminPlace = { ...north, id: 7, nameJa: "最東", x: 739.5, y: 518, isHidden: true };
-const crater: AdminPlace = { id: 30, nameJa: null, x: 100, y: 200, radius: null, mapId: "crater", iconPath: null, isHidden: false };
+const crater: AdminPlace = { id: 30, nameJa: null, x: 100, y: 200, radius: null, mapId: "crater", baseKind: "minor", iconPath: null, isHidden: false };
 
 function renderForm(props: Partial<Parameters<typeof AdminPlaceForm>[0]> = {}) {
   const handlers = { onChange: vi.fn(), onSave: vi.fn(), onCancel: vi.fn(), onHide: vi.fn(), onRestore: vi.fn() };
@@ -66,6 +66,19 @@ describe("AdminPlaceForm(マスタの管理 3.3、3.4)", () => {
     renderForm({ spec: ADMIN_PLACE_KINDS["spawn-points"] });
     expect(screen.queryByLabelText(/半径/)).toBeNull();
   });
+
+  it("拠点候補地だけ、大拠点、小拠点、強敵を選ぶ欄を出し、選ぶと呼ぶ側に知らせる", () => {
+    const handlers = renderForm({ spec: ADMIN_PLACE_KINDS["base-points"] });
+
+    const select = screen.getByLabelText("種類");
+    expect(Array.from(select.querySelectorAll("option")).map((o) => o.textContent)).toEqual(["大拠点", "小拠点", "強敵"]);
+    fireEvent.change(select, { target: { value: "field_boss" } });
+    expect(handlers.onChange).toHaveBeenCalledWith({ baseKind: "field_boss" });
+    cleanup();
+
+    renderForm();
+    expect(screen.queryByLabelText("種類")).toBeNull();
+  });
 });
 
 describe("AdminPlaceList(マスタの管理 3.3)", () => {
@@ -76,6 +89,13 @@ describe("AdminPlaceList(マスタの管理 3.3)", () => {
     expect(screen.getByRole("button", { name: /最東/ }).textContent).toContain("非表示");
     expect(screen.getByRole("button", { name: /最北/ }).textContent).not.toContain("非表示");
     expect(screen.getByText("739.50")).toBeTruthy();
+  });
+
+  it("拠点候補地の一覧には種類の名前を出す", () => {
+    render(<AdminPlaceList spec={ADMIN_PLACE_KINDS["base-points"]} places={[crater]} selectedId={null} onSelect={vi.fn()} />);
+
+    expect(screen.getByRole("columnheader", { name: "種類" })).toBeTruthy();
+    expect(screen.getByText("小拠点")).toBeTruthy();
   });
 
   it("行の名前を押すと、その行を知らせる", () => {
@@ -105,10 +125,10 @@ describe("useAdminEditor(マスタの管理 3.3)", () => {
     act(() => result.current.pick(10, 20));
 
     expect(result.current.editing).toBeNull();
-    expect(result.current.input).toEqual({ nameJa: "", x: "10.00", y: "20.00", radius: 255 });
+    expect(result.current.input).toEqual({ ...emptyInput(), x: "10.00", y: "20.00" });
   });
 
-  it("直している行の、マップとアイコンのパスを送る値に入れる", () => {
+  it("直している行の、マップと種類とアイコンのパスを送る値に入れる", () => {
     const { result } = renderHook(() => useAdminEditor());
     act(() => result.current.changeKind("base-points"));
     act(() => result.current.select(crater));
@@ -118,7 +138,7 @@ describe("useAdminEditor(マスタの管理 3.3)", () => {
       values = result.current.toSaveValues();
     });
 
-    expect(values).toEqual({ nameJa: null, x: 100, y: 200, radius: 255, mapId: "crater", iconPath: null });
+    expect(values).toEqual({ nameJa: null, x: 100, y: 200, radius: 255, baseKind: "minor", mapId: "crater", iconPath: null });
   });
 
   it("誤りがあると送る値を作らず、欄ごとの文言を持つ", () => {

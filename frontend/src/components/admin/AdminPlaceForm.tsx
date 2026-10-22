@@ -4,8 +4,12 @@ import { useId, type FormEvent, type ReactNode } from "react";
 import Button from "@/components/ui/Button";
 import Panel from "@/components/ui/Panel";
 import SectionHeading from "@/components/ui/SectionHeading";
+import Select from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/StatusViews";
+import type { BasePointKind } from "@/types";
 import {
+  BASE_POINT_KIND_LABELS,
+  BASE_POINT_KIND_ORDER,
   RADIUS_SLIDER_MAX,
   RADIUS_SLIDER_MIN,
   formTitle,
@@ -94,6 +98,19 @@ export default function AdminPlaceForm({
     <Panel ornate aria-labelledby={headingId}>
       <SectionHeading eyebrow={editing ? "Edit" : "New"} title={formTitle(spec, editing)} id={headingId} />
       <form className="flex flex-col gap-3" onSubmit={handleSubmit} noValidate>
+        {spec.hasBaseKind && (
+          <Select
+            label="種類"
+            value={input.baseKind}
+            onChange={(e) => onChange({ baseKind: e.target.value as BasePointKind })}
+          >
+            {BASE_POINT_KIND_ORDER.map((value) => (
+              <option key={value} value={value}>
+                {BASE_POINT_KIND_LABELS[value].label}
+              </option>
+            ))}
+          </Select>
+        )}
         <Field label={spec.nameRequired ? "名前" : "名前(任意)"} error={errors.nameJa} id={nameId}>
           <input {...fieldProps(nameId, errors.nameJa)} value={input.nameJa} onChange={(e) => onChange({ nameJa: e.target.value })} />
         </Field>

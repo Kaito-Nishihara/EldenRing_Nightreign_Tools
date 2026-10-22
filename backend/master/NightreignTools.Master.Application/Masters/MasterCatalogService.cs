@@ -47,7 +47,7 @@ internal sealed class MasterCatalogService(IMasterReadRepository repository) : I
         }
 
         return (await repository.GetVisibleBasePointsAsync(map, cancellationToken))
-            .Select(p => new BasePointDto(p.Id, p.MapId, p.NameJa, p.X, p.Y))
+            .Select(p => new BasePointDto(p.Id, p.MapId, p.Kind, p.NameJa, p.X, p.Y))
             .ToList();
     }
 

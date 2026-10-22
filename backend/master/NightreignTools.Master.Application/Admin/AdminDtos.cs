@@ -55,12 +55,14 @@ public sealed record SaveSecondShrinkPointRequest(
 /// <paramref name="MapId"/> を省くと通常のマップ。
 /// </summary>
 /// <param name="MapId">マップの識別子。normal か地変の識別子。</param>
+/// <param name="Kind">拠点の種類。必須。major、minor、field_boss のどれか。</param>
 /// <param name="NameJa">日本語の名前。任意。前後の空白を除いて 100 文字まで。</param>
 /// <param name="X">X 座標。必須。0 以上 1024 以下で、小数は 2 桁まで。</param>
 /// <param name="Y">Y 座標。必須。0 以上 1024 以下で、小数は 2 桁まで。</param>
 /// <param name="IsHidden">非表示にするか。省くと、登録では表示中、修正では今のまま。</param>
 public sealed record SaveBasePointRequest(
     string? MapId,
+    string? Kind,
     string? NameJa,
     decimal? X,
     decimal? Y,
@@ -103,8 +105,9 @@ public sealed record AdminSecondShrinkPointDto(int Id, string NameJa, decimal X,
 /// </summary>
 /// <param name="Id">識別子。</param>
 /// <param name="MapId">マップの識別子。normal か地変の識別子。</param>
+/// <param name="Kind">拠点の種類。major は大拠点、minor は小拠点、field_boss は強敵。</param>
 /// <param name="NameJa">日本語の名前。null は名前なし。</param>
 /// <param name="X">X 座標(1024 四方の座標空間)。</param>
 /// <param name="Y">Y 座標(1024 四方の座標空間)。</param>
 /// <param name="IsHidden">非表示か。</param>
-public sealed record AdminBasePointDto(int Id, string MapId, string? NameJa, decimal X, decimal Y, bool IsHidden);
+public sealed record AdminBasePointDto(int Id, string MapId, string Kind, string? NameJa, decimal X, decimal Y, bool IsHidden);

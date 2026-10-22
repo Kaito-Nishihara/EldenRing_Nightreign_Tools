@@ -102,7 +102,7 @@ public class MapPlaceAdminTests
     {
         var admin = new BasePointAdmin(_repository, _clock);
 
-        var created = await admin.CreateAsync(new SaveBasePointRequest(null, null, 1m, 1m, null), CancellationToken.None);
+        var created = await admin.CreateAsync(new SaveBasePointRequest(null, "major", null, 1m, 1m, null), CancellationToken.None);
 
         Assert.Equal(BasePoint.NormalMapId, created.MapId);
     }
@@ -113,7 +113,7 @@ public class MapPlaceAdminTests
         var admin = new BasePointAdmin(_repository, _clock);
 
         var error = await Assert.ThrowsAsync<BusinessRuleException>(
-            () => admin.CreateAsync(new SaveBasePointRequest("unknown", null, 1m, 1m, null), CancellationToken.None));
+            () => admin.CreateAsync(new SaveBasePointRequest("unknown", "major", null, 1m, 1m, null), CancellationToken.None));
 
         Assert.Equal("mapId 'unknown' は normal か地変の識別子にしてください", error.Message);
         Assert.Equal(0, _repository.SaveCount);
@@ -125,9 +125,33 @@ public class MapPlaceAdminTests
         _repository.JihenIds.Add("crater");
         var admin = new BasePointAdmin(_repository, _clock);
 
-        var created = await admin.CreateAsync(new SaveBasePointRequest("crater", "火口の拠点", 1m, 1m, null), CancellationToken.None);
+        var created = await admin.CreateAsync(new SaveBasePointRequest("crater", "major", "火口の拠点", 1m, 1m, null), CancellationToken.None);
 
         Assert.Equal("crater", created.MapId);
+    }
+
+    [Fact]
+    public async Task 拠点候補地を強敵で登録すると種類が返る()
+    {
+        var admin = new BasePointAdmin(_repository, _clock);
+
+        var created = await admin.CreateAsync(new SaveBasePointRequest(null, "field_boss", null, 400m, 300m, null), CancellationToken.None);
+
+        Assert.Equal(BasePointKinds.FieldBoss, created.Kind);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("unknown")]
+    public async Task 拠点候補地の種類を省くか誤ると400にして保存しない(string? kind)
+    {
+        var admin = new BasePointAdmin(_repository, _clock);
+
+        var error = await Assert.ThrowsAsync<BusinessRuleException>(
+            () => admin.CreateAsync(new SaveBasePointRequest(null, kind, null, 1m, 1m, null), CancellationToken.None));
+
+        Assert.Equal("種類を選んでください", error.Message);
+        Assert.Equal(0, _repository.SaveCount);
     }
 
     [Fact]

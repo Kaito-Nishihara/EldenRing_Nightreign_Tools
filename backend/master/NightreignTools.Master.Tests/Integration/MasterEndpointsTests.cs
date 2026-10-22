@@ -72,12 +72,17 @@ public class MasterEndpointsTests(MasterServiceFactory factory) : IClassFixture<
     }
 
     [Fact]
-    public async Task 拠点候補地はmapIdを省くと通常のマップの15件を返す()
+    public async Task AC_ADM_27_拠点候補地はmapIdを省くと通常のマップの37件を種類ごとの数で返す()
     {
         var bases = await GetArrayAsync("/api/v1/base-points");
 
-        Assert.Equal(15, bases.Count);
+        Assert.Equal(37, bases.Count);
         Assert.All(bases, b => Assert.Equal("normal", b.GetProperty("mapId").GetString()));
+        var counts = bases.GroupBy(b => b.GetProperty("kind").GetString()).ToDictionary(g => g.Key!, g => g.Count());
+        Assert.Equal(16, counts["major"]);
+        Assert.Equal(11, counts["minor"]);
+        Assert.Equal(10, counts["field_boss"]);
+        Assert.Equal(["id", "mapId", "kind", "nameJa", "x", "y"], bases[0].EnumerateObject().Select(p => p.Name).ToArray());
     }
 
     [Fact]

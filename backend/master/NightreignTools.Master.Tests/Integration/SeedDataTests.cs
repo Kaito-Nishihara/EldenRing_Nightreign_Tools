@@ -14,7 +14,7 @@ namespace NightreignTools.Master.Tests.Integration;
 public class SeedDataTests(MasterServiceFactory factory) : IClassFixture<MasterServiceFactory>
 {
     [Fact]
-    public async Task 初期データの件数が旧版のマイグレーションと一致する()
+    public async Task 初期データの件数が旧版のマイグレーションと決定の記録0018と一致する()
     {
         await using var scope = CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<MasterDbContext>();
@@ -25,7 +25,7 @@ public class SeedDataTests(MasterServiceFactory factory) : IClassFixture<MasterS
         Assert.Equal(12, await db.ShrinkZones.CountAsync());
         Assert.Equal(12, await db.SecondShrinkPoints.CountAsync());
         Assert.Equal(9, await db.SpawnPoints.CountAsync());
-        Assert.Equal(15, await db.BasePoints.CountAsync(b => b.MapId == BasePoint.NormalMapId));
+        Assert.Equal(37, await db.BasePoints.CountAsync(b => b.MapId == BasePoint.NormalMapId));
         Assert.Equal(35, await db.NightBosses.CountAsync());
         Assert.Equal(14, await db.NightBosses.CountAsync(n => n.Day == 1));
     }

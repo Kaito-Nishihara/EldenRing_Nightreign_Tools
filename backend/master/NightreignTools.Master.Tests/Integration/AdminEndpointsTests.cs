@@ -107,7 +107,7 @@ public class AdminEndpointsTests(MasterServiceFactory factory) : IClassFixture<M
     {
         var client = factory.CreateClientWithServiceKey();
 
-        var created = await ReadAsync(await client.PostAsJsonAsync("/api/v1/admin/base-points", new { mapId = "crater", x = 100, y = 200 }));
+        var created = await ReadAsync(await client.PostAsJsonAsync("/api/v1/admin/base-points", new { mapId = "crater", kind = "major", x = 100, y = 200 }));
         var id = created.GetProperty("id").GetInt32();
         try
         {
@@ -118,6 +118,70 @@ public class AdminEndpointsTests(MasterServiceFactory factory) : IClassFixture<M
         finally
         {
             await DeleteAsync("base_points", id);
+        }
+    }
+
+    [Fact]
+    public async Task AC_ADM_24_強敵を登録すると201が返りプレイヤー向けの一覧に種類つきで入る()
+    {
+        var client = factory.CreateClientWithServiceKey();
+
+        var response = await client.PostAsJsonAsync("/api/v1/admin/base-points",
+            new { mapId = "normal", kind = "field_boss", nameJa = (string?)null, x = 400, y = 300 });
+
+        var id = (await ReadAsync(response)).GetProperty("id").GetInt32();
+        try
+        {
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            var bases = await GetArrayAsync(client, "/api/v1/base-points");
+            Assert.Equal("field_boss", bases.Single(b => b.GetProperty("id").GetInt32() == id).GetProperty("kind").GetString());
+        }
+        finally
+        {
+            await DeleteAsync("base_points", id);
+        }
+    }
+
+    [Fact]
+    public async Task AC_ADM_25_種類を誤って拠点候補地を登録すると400が返る()
+    {
+        var client = factory.CreateClientWithServiceKey();
+
+        var response = await client.PostAsJsonAsync("/api/v1/admin/base-points", new { kind = "unknown", x = 1, y = 1 });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("種類を選んでください", (await ReadAsync(response)).GetProperty("message").GetString());
+    }
+
+    [Fact]
+    public async Task AC_ADM_26_種類を省いて拠点候補地を登録すると400が返り行が増えない()
+    {
+        var client = factory.CreateClientWithServiceKey();
+        var before = (await GetArrayAsync(client, "/api/v1/admin/base-points")).Count;
+
+        var response = await client.PostAsJsonAsync("/api/v1/admin/base-points", new { x = 1, y = 1 });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(before, (await GetArrayAsync(client, "/api/v1/admin/base-points")).Count);
+    }
+
+    [Fact]
+    public async Task AC_ADM_28_大拠点を小拠点に直すとプレイヤー向けの一覧でも小拠点になる()
+    {
+        var client = factory.CreateClientWithServiceKey();
+        try
+        {
+            var current = await FindAsync(client, "/api/v1/admin/base-points", 1);
+            var response = await client.PutAsJsonAsync("/api/v1/admin/base-points/1",
+                new { mapId = "normal", kind = "minor", x = current.GetProperty("x").GetDecimal(), y = current.GetProperty("y").GetDecimal() });
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var bases = await GetArrayAsync(client, "/api/v1/base-points");
+            Assert.Equal("minor", bases.Single(b => b.GetProperty("id").GetInt32() == 1).GetProperty("kind").GetString());
+        }
+        finally
+        {
+            await TestDatabase.QueryAsync("UPDATE game.base_points SET kind = 'major' WHERE id = 1 RETURNING id");
         }
     }
 

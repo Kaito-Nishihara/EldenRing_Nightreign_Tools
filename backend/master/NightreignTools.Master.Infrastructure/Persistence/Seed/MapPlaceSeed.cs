@@ -64,31 +64,55 @@ internal static class MapPlaceSeed
         }).ToArray();
 
     /// <summary>
-    /// 通常のマップの拠点候補地(旧版の V7)。
-    /// 実際のゲームで確かめた座標。
+    /// 通常のマップの拠点候補地(決定の記録 0018)。
+    /// 攻略 wiki の「地図と拠点の詳細」と「フィールドボス」の地図を、マップ画像に特徴点で重ねて写した座標。
+    /// 1 から 15 は旧版の V7 の行で、どれも大拠点の丸に重なったので、大拠点にして座標を直した。
+    /// 実際のゲームでは確かめていない(要件定義の 12 章)。
     /// </summary>
     public static readonly object[] BasePoints =
     [
-        Base(1, 404m, 798m),
-        Base(2, 615m, 698m),
-        Base(3, 279m, 667m),
-        Base(4, 317m, 562m),
-        Base(5, 278m, 459m),
-        Base(6, 225m, 272m),
-        Base(7, 410m, 197m),
-        Base(8, 434m, 316m),
-        Base(9, 638m, 301m),
-        Base(10, 742m, 232m),
-        Base(11, 801m, 438m),
-        Base(12, 575m, 451m),
-        Base(13, 677m, 501m),
-        Base(14, 766m, 763m),
-        Base(15, 777m, 636m),
+        Base(1, BasePointKinds.Major, 406m, 801m),
+        Base(2, BasePointKinds.Major, 622m, 709m),
+        Base(3, BasePointKinds.Major, 285m, 670m),
+        Base(4, BasePointKinds.Major, 325m, 568m),
+        Base(5, BasePointKinds.Major, 287m, 462m),
+        Base(6, BasePointKinds.Major, 234m, 288m),
+        Base(7, BasePointKinds.Major, 409m, 182m),
+        Base(8, BasePointKinds.Major, 425m, 308m),
+        Base(9, BasePointKinds.Major, 642m, 303m),
+        Base(10, BasePointKinds.Major, 730m, 229m),
+        Base(11, BasePointKinds.Major, 791m, 436m),
+        Base(12, BasePointKinds.Major, 597m, 439m),
+        Base(13, BasePointKinds.Major, 679m, 476m),
+        Base(14, BasePointKinds.Major, 763m, 760m),
+        Base(15, BasePointKinds.Major, 771m, 643m),
+        Base(16, BasePointKinds.Major, 644m, 608m),
+        Base(17, BasePointKinds.Minor, 549m, 245m),
+        Base(18, BasePointKinds.Minor, 805m, 361m),
+        Base(19, BasePointKinds.Minor, 228m, 368m),
+        Base(20, BasePointKinds.Minor, 709m, 381m),
+        Base(21, BasePointKinds.Minor, 368m, 412m),
+        Base(22, BasePointKinds.Minor, 216m, 572m),
+        Base(23, BasePointKinds.Minor, 828m, 597m),
+        Base(24, BasePointKinds.Minor, 563m, 655m),
+        Base(25, BasePointKinds.Minor, 464m, 721m),
+        Base(26, BasePointKinds.Minor, 208m, 727m),
+        Base(27, BasePointKinds.Minor, 590m, 827m),
+        Base(28, BasePointKinds.FieldBoss, 247m, 198m),
+        Base(29, BasePointKinds.FieldBoss, 644m, 213m),
+        Base(30, BasePointKinds.FieldBoss, 335m, 241m),
+        Base(31, BasePointKinds.FieldBoss, 477m, 370m),
+        Base(32, BasePointKinds.FieldBoss, 313m, 380m),
+        Base(33, BasePointKinds.FieldBoss, 561m, 386m),
+        Base(34, BasePointKinds.FieldBoss, 776m, 513m),
+        Base(35, BasePointKinds.FieldBoss, 422m, 736m),
+        Base(36, BasePointKinds.FieldBoss, 704m, 792m),
+        Base(37, BasePointKinds.FieldBoss, 315m, 835m),
     ];
 
     private static object Point(int id, string nameJa, decimal x, decimal y) =>
         new { Id = id, NameJa = nameJa, X = x, Y = y, CreatedAt = SeedData.CreatedAt };
 
-    private static object Base(int id, decimal x, decimal y) =>
-        new { Id = id, MapId = BasePoint.NormalMapId, X = x, Y = y, CreatedAt = SeedData.CreatedAt };
+    private static object Base(int id, string kind, decimal x, decimal y) =>
+        new { Id = id, MapId = BasePoint.NormalMapId, Kind = kind, X = x, Y = y, CreatedAt = SeedData.CreatedAt };
 }

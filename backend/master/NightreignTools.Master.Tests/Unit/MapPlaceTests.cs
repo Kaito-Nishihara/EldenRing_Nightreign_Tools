@@ -74,10 +74,22 @@ public class MapPlaceTests
     [Fact]
     public void 拠点候補地の名前は任意で空ならnullにする()
     {
-        var point = BasePoint.Create("crater", " ", 10m, 20m);
+        var point = BasePoint.Create("crater", "minor", " ", 10m, 20m);
 
         Assert.Null(point.NameJa);
         Assert.Equal("crater", point.MapId);
+        Assert.Equal(BasePointKinds.Minor, point.Kind);
+    }
+
+    [Fact]
+    public void 拠点候補地の種類を誤った修正では何も変えない()
+    {
+        var point = BasePoint.Create("normal", "major", null, 10m, 20m);
+
+        Assert.Throws<BusinessRuleException>(() => point.Update("normal", "red", null, 30m, 40m));
+
+        Assert.Equal(BasePointKinds.Major, point.Kind);
+        Assert.Equal(10m, point.X);
     }
 
     [Fact]

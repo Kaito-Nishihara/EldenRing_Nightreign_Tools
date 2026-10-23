@@ -65,10 +65,11 @@ public sealed record SecondShrinkPointDto(int Id, string NameJa, decimal X, deci
 /// </summary>
 /// <param name="Id">識別子。</param>
 /// <param name="MapId">マップの識別子。normal か地変の識別子。</param>
+/// <param name="Kind">拠点の種類。major は大拠点、minor は小拠点、field_boss は強敵。</param>
 /// <param name="NameJa">日本語の名前。null は名前なし。</param>
 /// <param name="X">X 座標(1024 四方の座標空間)。</param>
 /// <param name="Y">Y 座標(1024 四方の座標空間)。</param>
-public sealed record BasePointDto(int Id, string MapId, string? NameJa, decimal X, decimal Y);
+public sealed record BasePointDto(int Id, string MapId, string Kind, string? NameJa, decimal X, decimal Y);
 
 /// <summary>
 /// 夜ボス。

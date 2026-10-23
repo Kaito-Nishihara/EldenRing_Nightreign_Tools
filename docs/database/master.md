@@ -8,7 +8,7 @@
 
 ## game.base_points
 
-拠点候補地。マップ(通常か地変)ごとに持つ。拠点の種類は持たない(決定の記録 0010)。
+拠点候補地。マップ(通常か地変)ごとに持ち、大拠点、小拠点、強敵の種類を持つ(決定の記録 0018)。その場所に出る施設の種類は持たない(決定の記録 0010)。
 
 | 列 | 型 | NULL | 既定値 | 説明 |
 |---|---|---|---|---|
@@ -16,6 +16,7 @@
 | `hidden_at` | `timestamp with time zone` | 許す |  | 非表示にした日時。null は表示中。 |
 | `created_at` | `timestamp with time zone` | 許さない | `now()` | 行を作った日時(UTC)。データベースの既定値で入る。 |
 | `map_id` | `character varying(50)` | 許さない | `normal` | どのマップの拠点か。normal は通常のマップ、ほかは地変の識別子。 |
+| `kind` | `character varying(20)` | 許さない | `major` | 拠点の種類。major は大拠点、minor は小拠点、field_boss は強敵。 |
 | `name_ja` | `character varying(100)` | 許す |  | 日本語の名前。null は名前なし。 |
 | `x` | `numeric(7,2)` | 許さない |  | x 座標。1024 四方の座標空間の数。 |
 | `y` | `numeric(7,2)` | 許さない |  | y 座標。1024 四方の座標空間の数。 |
@@ -34,6 +35,7 @@
 
 | 名前 | 式 |
 |---|---|
+| `ck_base_points_kind` | `kind IN ('major', 'minor', 'field_boss')` |
 | `ck_base_points_x` | `x BETWEEN 0 AND 1024` |
 | `ck_base_points_y` | `y BETWEEN 0 AND 1024` |
 

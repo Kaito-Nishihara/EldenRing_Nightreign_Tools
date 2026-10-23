@@ -46,6 +46,15 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                         .HasColumnName("hidden_at")
                         .HasComment("非表示にした日時。null は表示中。");
 
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("major")
+                        .HasColumnName("kind")
+                        .HasComment("拠点の種類。major は大拠点、minor は小拠点、field_boss は強敵。");
+
                     b.Property<string>("MapId")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -81,7 +90,9 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
 
                     b.ToTable("base_points", "game", t =>
                         {
-                            t.HasComment("拠点候補地。マップ(通常か地変)ごとに持つ。拠点の種類は持たない(決定の記録 0010)。");
+                            t.HasComment("拠点候補地。マップ(通常か地変)ごとに持ち、大拠点、小拠点、強敵の種類を持つ(決定の記録 0018)。その場所に出る施設の種類は持たない(決定の記録 0010)。");
+
+                            t.HasCheckConstraint("ck_base_points_kind", "kind IN ('major', 'minor', 'field_boss')");
 
                             t.HasCheckConstraint("ck_base_points_x", "x BETWEEN 0 AND 1024");
 
@@ -93,121 +104,334 @@ namespace NightreignTools.Master.Infrastructure.Persistence.Migrations
                         {
                             Id = 1,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 404m,
-                            Y = 798m
+                            X = 406m,
+                            Y = 801m
                         },
                         new
                         {
                             Id = 2,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 615m,
-                            Y = 698m
+                            X = 622m,
+                            Y = 709m
                         },
                         new
                         {
                             Id = 3,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 279m,
-                            Y = 667m
+                            X = 285m,
+                            Y = 670m
                         },
                         new
                         {
                             Id = 4,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 317m,
-                            Y = 562m
+                            X = 325m,
+                            Y = 568m
                         },
                         new
                         {
                             Id = 5,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 278m,
-                            Y = 459m
+                            X = 287m,
+                            Y = 462m
                         },
                         new
                         {
                             Id = 6,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 225m,
-                            Y = 272m
+                            X = 234m,
+                            Y = 288m
                         },
                         new
                         {
                             Id = 7,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 410m,
-                            Y = 197m
+                            X = 409m,
+                            Y = 182m
                         },
                         new
                         {
                             Id = 8,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 434m,
-                            Y = 316m
+                            X = 425m,
+                            Y = 308m
                         },
                         new
                         {
                             Id = 9,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 638m,
-                            Y = 301m
+                            X = 642m,
+                            Y = 303m
                         },
                         new
                         {
                             Id = 10,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 742m,
-                            Y = 232m
+                            X = 730m,
+                            Y = 229m
                         },
                         new
                         {
                             Id = 11,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 801m,
-                            Y = 438m
+                            X = 791m,
+                            Y = 436m
                         },
                         new
                         {
                             Id = 12,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 575m,
-                            Y = 451m
+                            X = 597m,
+                            Y = 439m
                         },
                         new
                         {
                             Id = 13,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 677m,
-                            Y = 501m
+                            X = 679m,
+                            Y = 476m
                         },
                         new
                         {
                             Id = 14,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 766m,
-                            Y = 763m
+                            X = 763m,
+                            Y = 760m
                         },
                         new
                         {
                             Id = 15,
                             CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
                             MapId = "normal",
-                            X = 777m,
-                            Y = 636m
+                            X = 771m,
+                            Y = 643m
+                        },
+                        new
+                        {
+                            Id = 16,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "major",
+                            MapId = "normal",
+                            X = 644m,
+                            Y = 608m
+                        },
+                        new
+                        {
+                            Id = 17,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "minor",
+                            MapId = "normal",
+                            X = 549m,
+                            Y = 245m
+                        },
+                        new
+                        {
+                            Id = 18,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "minor",
+                            MapId = "normal",
+                            X = 805m,
+                            Y = 361m
+                        },
+                        new
+                        {
+                            Id = 19,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "minor",
+                            MapId = "normal",
+                            X = 228m,
+                            Y = 368m
+                        },
+                        new
+                        {
+                            Id = 20,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "minor",
+                            MapId = "normal",
+                            X = 709m,
+                            Y = 381m
+                        },
+                        new
+                        {
+                            Id = 21,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "minor",
+                            MapId = "normal",
+                            X = 368m,
+                            Y = 412m
+                        },
+                        new
+                        {
+                            Id = 22,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "minor",
+                            MapId = "normal",
+                            X = 216m,
+                            Y = 572m
+                        },
+                        new
+                        {
+                            Id = 23,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "minor",
+                            MapId = "normal",
+                            X = 828m,
+                            Y = 597m
+                        },
+                        new
+                        {
+                            Id = 24,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "minor",
+                            MapId = "normal",
+                            X = 563m,
+                            Y = 655m
+                        },
+                        new
+                        {
+                            Id = 25,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "minor",
+                            MapId = "normal",
+                            X = 464m,
+                            Y = 721m
+                        },
+                        new
+                        {
+                            Id = 26,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "minor",
+                            MapId = "normal",
+                            X = 208m,
+                            Y = 727m
+                        },
+                        new
+                        {
+                            Id = 27,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "minor",
+                            MapId = "normal",
+                            X = 590m,
+                            Y = 827m
+                        },
+                        new
+                        {
+                            Id = 28,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "field_boss",
+                            MapId = "normal",
+                            X = 247m,
+                            Y = 198m
+                        },
+                        new
+                        {
+                            Id = 29,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "field_boss",
+                            MapId = "normal",
+                            X = 644m,
+                            Y = 213m
+                        },
+                        new
+                        {
+                            Id = 30,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "field_boss",
+                            MapId = "normal",
+                            X = 335m,
+                            Y = 241m
+                        },
+                        new
+                        {
+                            Id = 31,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "field_boss",
+                            MapId = "normal",
+                            X = 477m,
+                            Y = 370m
+                        },
+                        new
+                        {
+                            Id = 32,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "field_boss",
+                            MapId = "normal",
+                            X = 313m,
+                            Y = 380m
+                        },
+                        new
+                        {
+                            Id = 33,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "field_boss",
+                            MapId = "normal",
+                            X = 561m,
+                            Y = 386m
+                        },
+                        new
+                        {
+                            Id = 34,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "field_boss",
+                            MapId = "normal",
+                            X = 776m,
+                            Y = 513m
+                        },
+                        new
+                        {
+                            Id = 35,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "field_boss",
+                            MapId = "normal",
+                            X = 422m,
+                            Y = 736m
+                        },
+                        new
+                        {
+                            Id = 36,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "field_boss",
+                            MapId = "normal",
+                            X = 704m,
+                            Y = 792m
+                        },
+                        new
+                        {
+                            Id = 37,
+                            CreatedAt = new DateTime(2026, 10, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = "field_boss",
+                            MapId = "normal",
+                            X = 315m,
+                            Y = 835m
                         });
                 });
 

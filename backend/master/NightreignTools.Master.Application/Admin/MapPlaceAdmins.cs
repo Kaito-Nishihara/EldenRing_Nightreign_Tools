@@ -89,14 +89,14 @@ internal sealed class BasePointAdmin(IMapPlaceAdminRepository repository, TimePr
     }
 
     protected override BasePoint Create(SaveBasePointRequest r) =>
-        BasePoint.Create(MapId(r), r.NameJa, Required(r.X, "x"), Required(r.Y, "y"));
+        BasePoint.Create(MapId(r), r.Kind, r.NameJa, Required(r.X, "x"), Required(r.Y, "y"));
 
     protected override void Update(BasePoint place, SaveBasePointRequest r) =>
-        place.Update(MapId(r), r.NameJa, Required(r.X, "x"), Required(r.Y, "y"));
+        place.Update(MapId(r), r.Kind, r.NameJa, Required(r.X, "x"), Required(r.Y, "y"));
 
     protected override bool? IsHidden(SaveBasePointRequest r) => r.IsHidden;
 
-    protected override AdminBasePointDto ToDto(BasePoint p) => new(p.Id, p.MapId, p.NameJa, p.X, p.Y, p.IsHidden);
+    protected override AdminBasePointDto ToDto(BasePoint p) => new(p.Id, p.MapId, p.Kind, p.NameJa, p.X, p.Y, p.IsHidden);
 
     /// <summary>
     /// 省いたときは通常のマップ

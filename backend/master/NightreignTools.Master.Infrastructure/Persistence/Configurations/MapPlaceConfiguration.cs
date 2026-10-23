@@ -59,6 +59,10 @@ internal sealed class BasePointConfiguration : IEntityTypeConfiguration<BasePoin
         builder.ToTable(table);
         builder.HasMapPlaceDefaults();
         builder.Property(p => p.MapId).HasMaxLength(50).HasDefaultValue(BasePoint.NormalMapId);
+        // 種類を足す前からある行は、どれも大拠点だった(決定の記録 0018)
+        builder.Property(p => p.Kind).HasMaxLength(20).HasDefaultValue(BasePointKinds.Major);
+        builder.ToTable(table, t => t.HasCheckConstraint(
+            $"ck_{table}_kind", $"kind IN ({string.Join(", ", BasePointKinds.All.Select(k => $"'{k}'"))})"));
         builder.Property(p => p.NameJa).HasMaxLength(100);
         builder.HasCoordinate(table, p => p.X, "x");
         builder.HasCoordinate(table, p => p.Y, "y");

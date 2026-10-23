@@ -20,6 +20,9 @@
 - 管理者ごとのアカウントと、誰が直したかの記録
 - 変更の履歴
 - 行を実際に消すこと
+- 地変のマップの拠点候補地の初期データ
+- 強敵に出るボスの名前を持つこと。出るボスは毎回変わるためである
+- 記録の画面でフィールドボスとレッドボスを選ぶこと(#46 に残す)
 
 ## 3. 画面
 
@@ -42,10 +45,12 @@
 | 開始地点 | 開始地点のアイコン | 名前、X、Y |
 | 収縮候補地 | `tide` の中心の印。直しているものは実際の大きさの円 | 名前、X、Y、半径 |
 | 第二収縮地点 | `tide` の菱形 | 名前、X、Y |
-| 拠点候補地 | 「?」の丸 | 名前(任意)、X、Y、マップ |
+| 拠点候補地 | 種類ごとの丸(画面の共通仕様 3.8) | 種類、名前(任意)、X、Y、マップ |
 
 - 4 つのボタンで種類を切り替える。選んだ種類の印だけをマップに出す。
 - 拠点候補地は、マップの種類(通常、各地変)ごとに持つ。マップの選択の欄で切り替える。
+- 拠点候補地の種類は、大拠点、小拠点、強敵の 3 つである(決定の記録 [0018](../decisions/0018-base-point-kinds.md))。入力の欄の選択の欄で選ぶ。新しく登録するときの初めの値は、大拠点とする。
+- 一覧の行に、種類の名前を出す。
 
 ### 3.3 操作
 
@@ -61,6 +66,7 @@
 | 項目 | 決まり | 誤りの文言 |
 |---|---|---|
 | 名前 | 1 文字以上 100 文字以下。拠点候補地では任意 | 「名前を入れてください」 |
+| 種類 | `major`、`minor`、`field_boss` のどれか。拠点候補地だけ | 「種類を選んでください」 |
 | X、Y | 0 以上 1024 以下の数。小数は 2 桁まで | 「0 から 1024 の数を入れてください」 |
 | 半径 | 10 以上 512 以下 | 「10 から 512 の数を入れてください」 |
 | マップ | `normal` か地変の識別子 | |
@@ -76,7 +82,7 @@
 | `GET /api/v1/spawn-points` | `[{ id, nameJa, x, y }]` |
 | `GET /api/v1/shrink-zones` | `[{ id, nameJa, iconPath, centerX, centerY, radius }]` |
 | `GET /api/v1/second-shrink-points` | `[{ id, nameJa, x, y }]` |
-| `GET /api/v1/base-points?mapId=normal` | `[{ id, mapId, nameJa, x, y }]`。`mapId` を省くと `normal` |
+| `GET /api/v1/base-points?mapId=normal` | `[{ id, mapId, kind, nameJa, x, y }]`。`mapId` を省くと `normal`。`kind` は `major`、`minor`、`field_boss` のどれか |
 | `GET /api/v1/bosses` | `[{ id, nameJa, nameEn, imagePath, weaknesses, isDlc, unlockCondition }]` |
 | `GET /api/v1/jihen` | `[{ id, nameJa, imagePath, area, centerX, centerY, isDlc, unlockCondition }]` |
 | `GET /api/v1/night-bosses` | `[{ id, nameJa, day }]` |
@@ -188,9 +194,10 @@ Gateway は振り分けない。
 | `spawn_points` | `id`、`name_ja`、`x`、`y`、`hidden_at`、`created_at` |
 | `shrink_zones` | `id`、`name_ja`、`icon_path`、`center_x`、`center_y`、`radius`、`hidden_at`、`created_at` |
 | `second_shrink_points` | `id`、`name_ja`、`x`、`y`、`hidden_at`、`created_at` |
-| `base_points` | `id`、`map_id`、`name_ja`、`x`、`y`、`hidden_at`、`created_at` |
+| `base_points` | `id`、`map_id`、`kind`、`name_ja`、`x`、`y`、`hidden_at`、`created_at` |
 
 座標と半径は `numeric(7,2)` とし、0 以上 1024 以下の検査の制約を付ける。
+`base_points` の `kind` は `character varying(20)` で、`major`、`minor`、`field_boss` のどれかに限る検査の制約を付ける。
 `hidden_at` は `timestamp with time zone` で、`NULL` は表示中を表す。
 
 ## 6. サービスの間のやり取り
@@ -227,7 +234,18 @@ Gateway は振り分けない。
 | `AC-ADM-15` | 画面で、鍵のない状態で `/admin` を開くと、鍵の入力の欄だけが出て、マップが出ない |
 | `AC-ADM-16` | 画面で誤った鍵を入れて「入る」を押すと、「管理用の鍵が違います」と出て、鍵の入力の欄に留まる |
 | `AC-ADM-17` | 画面で「鍵を消す」を押すと、`sessionStorage` から鍵が消え、鍵の入力の欄に戻る |
+| `AC-ADM-24` | 拠点候補地を `{ mapId: "normal", kind: "field_boss", nameJa: null, x: 400, y: 300 }` で登録すると 201 が返り、`GET /api/v1/base-points` にその行が `kind: "field_boss"` で入っている |
+| `AC-ADM-25` | `kind` を `unknown` にして拠点候補地を登録すると 400 が返り、`message` が「種類を選んでください」である |
+| `AC-ADM-26` | `kind` を省いて拠点候補地を登録すると 400 が返り、行が増えない |
+| `AC-ADM-27` | 初期データの `GET /api/v1/base-points` は 37 件で、`major` が 16 件、`minor` が 11 件、`field_boss` が 10 件である |
+| `AC-ADM-28` | 大拠点の行を `kind: "minor"` で修正すると 200 が返り、`GET /api/v1/base-points` でその行が `minor` になっている |
+| `AC-ADM-29` | 画面で拠点候補地を選び、マップを押して種類に「強敵」を選んで保存すると、一覧の行に「強敵」と出て、マップに「強」の丸が出る |
+| `AC-ADM-30` | 画面で拠点候補地を選ぶと、大拠点は「大」、小拠点は「小」、強敵は「強」の丸でマップに出る |
 
 ## 8. 未決事項
+
+- **拠点候補地の座標**: 通常のマップの 37 か所は、wiki の地図から写した座標で、実際のゲームでは確かめていない(決定の記録 [0018](../decisions/0018-base-point-kinds.md))。利用者がプレイの中で確かめ、ずれていたら管理の画面で直す。
+- **地変のマップの拠点候補地**: 初期データを持たない。地変のマップで種類ごとに登録するかは、利用者が決める。
+- **強敵を記録に使うか**: 記録の画面でフィールドボスとレッドボスを選ぶ形は、#46 で利用者が決める。
 
 - **Gateway の受け入れ条件の確かめ方**: `AC-ADM-09` から `AC-ADM-13` は Gateway の動きである。Gateway のテストのプロジェクトで確かめるか、compose で動かして確かめるかは、[サービスの共通構成](common-service.md) の未決事項と合わせて段階 0 で決める。

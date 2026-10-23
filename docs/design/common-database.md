@@ -121,7 +121,7 @@ docker compose up --build
 | `shrink_zones` | 12 | V10 | ダミーの座標である(要件定義の 12 章)。V3 の 12 か所(収縮地点A〜L)は格子に並べただけだったので、V10 の第二収縮地点と同じ名前と中心に置き直す。半径は 12 か所とも 255 にする。旧版のデータベースで、利用者が実際のゲームを見て登録した円の半径である |
 | `second_shrink_points` | 12 | V10 | |
 | `spawn_points` | 9 | V8 | |
-| `base_points` | 15 | V7 | `map_id` は `normal` |
+| `base_points` | 37 | V7 と wiki の地図 | `map_id` は `normal`。大拠点 16、小拠点 11、強敵 10。座標は wiki の地図から写した(決定の記録 [0018](../decisions/0018-base-point-kinds.md)) |
 | `night_bosses` | 35 | V10 | 1 日目 14 体、2 日目 21 体 |
 | `relic_effect_categories` | 8 | V11 | |
 | `relic_effects`、`relic_effect_ranks` | V11 のすべて | V11 | |

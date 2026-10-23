@@ -4,7 +4,7 @@ import { useId } from "react";
 import Badge from "@/components/ui/Badge";
 import Panel from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/StatusViews";
-import { placeName, type AdminPlace, type AdminPlaceKindSpec } from "@/lib/adminPlaces";
+import { BASE_POINT_KIND_LABELS, placeName, type AdminPlace, type AdminPlaceKindSpec } from "@/lib/adminPlaces";
 
 interface AdminPlaceListProps {
   spec: AdminPlaceKindSpec;
@@ -37,6 +37,7 @@ export default function AdminPlaceList({ spec, places, selectedId, onSelect }: A
           <thead>
             <tr className="border-b border-line text-left text-xs text-ash-soft">
               <th className="py-2 font-normal">名前</th>
+              {spec.hasBaseKind && <th className="py-2 font-normal">種類</th>}
               <th className="py-2 text-right font-normal">X</th>
               <th className="py-2 text-right font-normal">Y</th>
               {spec.hasRadius && <th className="py-2 text-right font-normal">半径</th>}
@@ -61,6 +62,9 @@ export default function AdminPlaceList({ spec, places, selectedId, onSelect }: A
                       {place.isHidden && <Badge>非表示</Badge>}
                     </button>
                   </td>
+                  {spec.hasBaseKind && (
+                    <td className="py-1 text-ash-soft">{place.baseKind && BASE_POINT_KIND_LABELS[place.baseKind].label}</td>
+                  )}
                   <td className="py-1 text-right tabular-nums">{formatNumber(place.x)}</td>
                   <td className="py-1 text-right tabular-nums">{formatNumber(place.y)}</td>
                   {spec.hasRadius && <td className="py-1 text-right tabular-nums">{formatNumber(place.radius ?? 0)}</td>}

@@ -12,7 +12,7 @@ const KIND_DOTS: Record<AdminPlaceKind, string> = {
   "spawn-points": "rounded-full bg-azure-bright",
   "shrink-zones": "rounded-full border-2 border-tide",
   "second-shrink-points": "rotate-45 bg-tide",
-  "base-points": "rounded-full border-2 border-line-strong",
+  "base-points": "rounded-full bg-ember",
 };
 
 interface AdminModePanelProps {

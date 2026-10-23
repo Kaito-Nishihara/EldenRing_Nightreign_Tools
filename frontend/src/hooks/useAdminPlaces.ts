@@ -7,6 +7,7 @@ import { clearAdminKey } from "@/lib/adminKey";
 import {
   ADMIN_PLACE_KINDS,
   ADMIN_PLACE_KIND_ORDER,
+  DEFAULT_BASE_POINT_KIND,
   DEFAULT_RADIUS,
   NORMAL_MAP_ID,
   type AdminPlace,
@@ -41,6 +42,7 @@ function valuesWithHidden(place: AdminPlace, isHidden: boolean): AdminPlaceSaveV
     x: place.x,
     y: place.y,
     radius: place.radius ?? DEFAULT_RADIUS,
+    baseKind: place.baseKind ?? DEFAULT_BASE_POINT_KIND,
     mapId: place.mapId ?? NORMAL_MAP_ID,
     iconPath: place.iconPath,
     isHidden,

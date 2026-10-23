@@ -51,7 +51,7 @@ describe("useAdminPlaces(マスタの管理 3.3、4.2)", () => {
     const { result } = await loaded();
 
     await act(() =>
-      result.current.save("shrink-zones", null, { nameJa: "最南", x: 500, y: 900, radius: 150, mapId: "normal", iconPath: null })
+      result.current.save("shrink-zones", null, { nameJa: "最南", x: 500, y: 900, radius: 150, baseKind: "major", mapId: "normal", iconPath: null })
     );
 
     expect(adminCreatePlace).toHaveBeenCalledWith(
@@ -82,7 +82,7 @@ describe("useAdminPlaces(マスタの管理 3.3、4.2)", () => {
     const { result } = await loaded();
 
     await act(() =>
-      result.current.save("shrink-zones", 4, { nameJa: "最北", x: 583, y: 297, radius: 255, mapId: "normal", iconPath: null })
+      result.current.save("shrink-zones", 4, { nameJa: "最北", x: 583, y: 297, radius: 255, baseKind: "major", mapId: "normal", iconPath: null })
     );
 
     expect(result.current.actionError).toBe("0 から 1024 の数を入れてください");

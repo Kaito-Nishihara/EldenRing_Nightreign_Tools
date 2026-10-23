@@ -54,10 +54,14 @@ export interface SpawnPoint {
   y: number;
 }
 
-/** 拠点候補地（マップ上の固定座標、?マーク） */
+/** 拠点の種類(決定の記録 0018)。major は大拠点、minor は小拠点、field_boss は強敵 */
+export type BasePointKind = "major" | "minor" | "field_boss";
+
+/** 拠点候補地。マップごとに持ち、大拠点、小拠点、強敵の種類を持つ */
 export interface BasePoint {
   id: number;
   mapId: string;
+  kind: BasePointKind;
   nameJa?: string;
   x: number;
   y: number;

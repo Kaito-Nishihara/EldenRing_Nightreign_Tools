@@ -123,6 +123,7 @@ docker compose up --build
 | `spawn_points` | 9 | V8 | |
 | `base_points` | 37 | V7 と wiki の地図 | `map_id` は `normal`。大拠点 16、小拠点 11、強敵 10。座標は wiki の地図から写した(決定の記録 [0018](../decisions/0018-base-point-kinds.md)) |
 | `night_bosses` | 35 | V10 | 1 日目 14 体、2 日目 21 体 |
+| `field_bosses` | 22 | wiki | 通常 11 体、恐るべき強敵 11 体。名前は下の表のとおり(決定の記録 [0019](../decisions/0019-field-boss-names.md)) |
 | `relic_effect_categories` | 8 | V11 | |
 | `relic_effects`、`relic_effect_ranks` | V11 のすべて | V11 | |
 
@@ -156,6 +157,13 @@ docker compose up --build
 
 マップ画像の列は、画面側の対応表(`frontend/src/lib/mapImage.ts`)が持ち、上の識別子を鍵にする。
 
+フィールドボス(識別子は通常が 1 から 11、恐るべき強敵が 12 から 22。表の順に振る):
+
+| 分類 | 名前 |
+|---|---|
+| 通常(`normal`) | 亜人の女王、黄金カバ、王配の赤狼、黒き刃の刺客、ザミェルの古英雄、獅子の混種、接ぎ木の貴公子、ミランダフラワー、夜の騎兵、王族の幽鬼、老獅子 |
+| 恐るべき強敵(`dreadful`) | 黄金樹の化身、カーリアの親衛騎士、丘陵の飛竜、黒き剣の眷属、死儀礼の鳥、鈴玉狩り、祖霊、爛れた樹霊、ツリーガード、溶岩土竜、竜のツリーガード |
+
 ### 5.7 全体の関係
 
 テーブルの関係は、サービスのデータベースの中で閉じていて、記録からマスタへは識別子だけを持つことを読み取ってほしい。
@@ -171,6 +179,7 @@ erDiagram
     base_points
     jihen
     night_bosses
+    field_bosses
 ```
 
 `record-service`(`nightreign_record`):

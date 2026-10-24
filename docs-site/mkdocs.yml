@@ -121,3 +121,4 @@ nav:
       - 0016 ゲームの画像を公開の場で使う: decisions/0016-publish-game-images.md
       - 0017 テーブルの定義書をエンティティから作る: decisions/0017-schema-doc-from-entities.md
       - 0018 拠点候補地を大拠点、小拠点、強敵に分ける: decisions/0018-base-point-kinds.md
+      - 0019 フィールドボスの名前を場所と結び付けずに持つ: decisions/0019-field-boss-names.md
